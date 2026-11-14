@@ -1344,62 +1344,171 @@ private struct CalmModeView: View {
     @ObservedObject var live: LiveState
     @ObservedObject var model: AppModel
 
-    private var running: Bool {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    /// True while the paced breath is running.
+    @State private var running = false
+    /// 0 folded (breath out), 1 open (breath in).
+    @State private var progress: CGFloat = 0
+    @State private var inhaling = true
+    @State private var stepEnds = Date.distantFuture
+    @State private var startedAt = Date()
+    @State private var startPulse: Int?
+    @State private var endPulse: Int?
+
+    private let tick = Timer.publish(every: 0.1, on: .main, in: .common).autoconnect()
+
+    /// A slow breath with the way out longer than the way in, the usual pattern for settling the pulse.
+    private static let inhaleSeconds = 4.0
+    private static let exhaleSeconds = 6.0
+    private static let totalSeconds = 180.0
+
+    /// True while the older wrist metronome is running.
+    private var beatRunning: Bool {
         if case .calmMe = controller.session { return true }
         return false
     }
 
     var body: some View {
         VStack(spacing: NoopMetrics.gap) {
-            explainerCard
-            if running { liveCard } else { startCard }
-            if let outcome = controller.calmOutcome, !running { outcomeCard(outcome) }
+            if beatRunning {
+                liveCard
+            } else {
+                breathCard
+                NoopButton(running ? "Stop" : "Calm me for 3 min",
+                           systemImage: running ? "stop.fill" : "heart.fill",
+                           kind: running ? .destructive : .primary, fullWidth: true) {
+                    running ? stop() : start()
+                }
+                if !running, let from = startPulse, let to = endPulse {
+                    StrandCard(padding: 18) {
+                        Text("Your pulse went from \(from) to \(to) bpm.")
+                            .font(.system(size: 17))
+                            .foregroundStyle(StrandPalette.textPrimary)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                    }
+                }
+                if !running {
+                    // The earlier Calm me, a steady beat on the wrist just under the pulse, is kept as
+                    // a second option.
+                    NoopButton("Steady beat instead", systemImage: "metronome", kind: .secondary,
+                               fullWidth: true) {
+                        controller.startCalmMe()
+                    }
+                    .disabled(!canRun)
+                    if let outcome = controller.calmOutcome { outcomeCard(outcome) }
+                }
+            }
         }
+        .onReceive(tick) { now in
+            guard running else { return }
+            if now.timeIntervalSince(startedAt) >= Self.totalSeconds {
+                stop()
+            } else if now >= stepEnds {
+                nextStep(now)
+            }
+        }
+        .onDisappear { if running { stop() } }
     }
 
-    private var explainerCard: some View {
-        StrandCard(tint: StrandPalette.restColor) {
-            VStack(alignment: .leading, spacing: 8) {
-                HStack {
-                    Text("Calm me").strandOverline()
-                    Spacer()
-                    StatePill(canRun ? "Ready" : "Strap needed",
-                              tone: canRun ? .neutral : .warning, showsDot: true)
+    private var breathCard: some View {
+        StrandCard(padding: 24) {
+            VStack(spacing: 16) {
+                ZStack {
+                    BreathBloom(progress: reduceMotion ? 0.6 : progress)
+                    centre
                 }
-                Text("The strap taps a slow, steady beat just under your pulse so your heart can settle to it. It is not a breathing cue, and it stops by itself.")
-                    .font(.system(size: 17))
-                    .foregroundStyle(StrandPalette.textPrimary)
-                    .fixedSize(horizontal: false, vertical: true)
+                .frame(height: 300)
+                .frame(maxWidth: .infinity)
+
+                if running {
+                    TimelineView(.periodic(from: startedAt, by: 1)) { timeline in
+                        let left = max(0, Int(Self.totalSeconds - timeline.date.timeIntervalSince(startedAt)))
+                        HStack {
+                            Text(String(format: "%d:%02d", left / 60, left % 60))
+                                .font(StrandFont.number(17))
+                                .foregroundStyle(StrandPalette.textPrimary)
+                            Spacer()
+                            if let pulse = model.bpm {
+                                Text("\(pulse) bpm")
+                                    .font(StrandFont.number(17))
+                                    .foregroundStyle(StrandPalette.textSecondary)
+                            }
+                        }
+                    }
+                } else {
+                    Text("Four seconds in, six out, for three minutes. A tap on the wrist marks each change.")
+                        .font(.system(size: 16))
+                        .foregroundStyle(StrandPalette.textPrimary)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
         }
     }
 
-    /// L2 needs the encrypted channel (haptic-first) and a resting-band HR to read H₀.
+    /// The step and its seconds while the breath runs, the pulse otherwise.
+    @ViewBuilder private var centre: some View {
+        if running {
+            VStack(spacing: 4) {
+                Text(inhaling ? String(localized: "Breathe in…") : String(localized: "Breathe out…"))
+                    .font(.system(size: 24, weight: .medium))
+                    .foregroundStyle(Color.white)
+                TimelineView(.periodic(from: Date(), by: 0.25)) { timeline in
+                    Text(String(max(1, Int(stepEnds.timeIntervalSince(timeline.date).rounded(.up)))))
+                        .font(StrandFont.number(40))
+                        .foregroundStyle(Color.white.opacity(0.9))
+                        .contentTransition(.numericText())
+                }
+            }
+            .shadow(color: .black.opacity(0.55), radius: 8, y: 1)
+        } else {
+            VStack(spacing: 2) {
+                Text(model.bpm.map { String($0) } ?? "–")
+                    .font(StrandFont.number(44))
+                    .foregroundStyle(Color.white)
+                    .contentTransition(.numericText())
+                Text(String(localized: "BPM"))
+                    .font(.system(size: 14))
+                    .tracking(0.8)
+                    .foregroundStyle(Color.white.opacity(0.7))
+            }
+            .shadow(color: .black.opacity(0.55), radius: 8, y: 1)
+        }
+    }
+
+    private func start() {
+        running = true
+        ScreenIdle.keepAwake(true)
+        startedAt = Date()
+        startPulse = model.bpm
+        endPulse = nil
+        inhaling = false
+        nextStep(startedAt)
+    }
+
+    /// Move to the other half of the breath and tap the wrist once.
+    private func nextStep(_ now: Date) {
+        inhaling.toggle()
+        let seconds = inhaling ? Self.inhaleSeconds : Self.exhaleSeconds
+        stepEnds = now.addingTimeInterval(seconds)
+        if !reduceMotion {
+            withAnimation(.easeInOut(duration: seconds)) { progress = inhaling ? 1 : 0 }
+        }
+        model.buzz(loops: 1, gate: HapticPrefs.breathing)
+    }
+
+    private func stop() {
+        running = false
+        ScreenIdle.keepAwake(false)
+        stepEnds = .distantFuture
+        endPulse = model.bpm
+        model.stopHaptics()
+        withAnimation(.easeInOut(duration: 0.8)) { progress = 0 }
+    }
+
+    /// The wrist metronome needs the encrypted channel and a resting-band HR to read H₀.
     private var canRun: Bool { controller.canBuzz && (model.bpm.map { $0 >= 55 && $0 <= 120 } ?? false) }
-
-    private var startCard: some View {
-        StrandCard {
-            VStack(spacing: NoopMetrics.rowSpacing) {
-                NoopButton("Calm me for 3 min", systemImage: "heart.fill",
-                           kind: .primary, fullWidth: true) {
-                    controller.startCalmMe()
-                }
-                .disabled(!canRun)
-
-                if !controller.canBuzz {
-                    Text("Connect your strap. Calm me is a felt rhythm on the wrist, so it needs a bonded connection.")
-                        .font(StrandFont.footnote)
-                        .foregroundStyle(StrandPalette.textTertiary)
-                        .fixedSize(horizontal: false, vertical: true)
-                } else if !canRun {
-                    Text("Waiting for a resting heart rate. Start a live reading first, or come back when you're still.")
-                        .font(StrandFont.footnote)
-                        .foregroundStyle(StrandPalette.textTertiary)
-                        .fixedSize(horizontal: false, vertical: true)
-                }
-            }
-        }
-    }
 
     private var liveCard: some View {
         StrandCard(tint: StrandPalette.restColor) {

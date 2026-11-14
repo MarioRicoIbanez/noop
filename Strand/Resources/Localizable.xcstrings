@@ -1,6 +1,9 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "Four seconds in, six out, for three minutes. A tap on the wrist marks each change.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Four seconds in, six out, for three minutes. A tap on the wrist marks each change."}}, "es": {"stringUnit": {"state": "translated", "value": "Cuatro segundos inhalando y seis exhalando, durante tres minutos. Un toque en la muñeca marca cada cambio."}}}},
+    "Your pulse went from %lld to %lld bpm.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Your pulse went from %lld to %lld bpm."}}, "es": {"stringUnit": {"state": "translated", "value": "Tu pulso pasó de %lld a %lld ppm."}}}},
+    "Steady beat instead": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Steady beat instead"}}, "es": {"stringUnit": {"state": "translated", "value": "Compás constante en la muñeca"}}}},
     "How it works": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "How it works"}}, "es": {"stringUnit": {"state": "translated", "value": "Cómo funciona"}}}},
     "About your ranges": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "About your ranges"}}, "es": {"stringUnit": {"state": "translated", "value": "Sobre tus rangos"}}}},
     "Blood tests and body numbers": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Blood tests and body numbers"}}, "es": {"stringUnit": {"state": "translated", "value": "Analíticas y medidas corporales"}}}},
