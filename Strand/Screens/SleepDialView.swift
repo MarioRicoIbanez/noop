@@ -42,9 +42,13 @@ struct SleepDial: View {
     private func angle(_ secondsFromOnset: TimeInterval) -> Double {
         let onset = night.onsetDate
         let parts = Calendar.current.dateComponents([.hour, .minute, .second], from: onset)
-        let onsetSeconds = Double((parts.hour ?? 0) * 3_600 + (parts.minute ?? 0) * 60 + (parts.second ?? 0))
-        let hours = (onsetSeconds + secondsFromOnset) / 3_600
-        return hours / 12 * 2 * Double.pi - Double.pi / 2
+        let hour: Int = parts.hour ?? 0
+        let minute: Int = parts.minute ?? 0
+        let second: Int = parts.second ?? 0
+        let onsetSeconds: Double = Double(hour * 3_600 + minute * 60 + second)
+        let hours: Double = (onsetSeconds + secondsFromOnset) / 3_600
+        let turn: Double = hours / 12
+        return turn * 2 * Double.pi - Double.pi / 2
     }
 
     var body: some View {
