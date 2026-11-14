@@ -177,6 +177,7 @@ struct SummaryCard<Content: View>: View {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .strokeBorder(Color.white.opacity(0.085), lineWidth: 0.5)
         )
+        .scrollReveal()
     }
 }
 
@@ -684,7 +685,8 @@ struct SummaryLiveCard: View {
             router.openDevices()
         } label: {
             SummaryCard(symbol: "waveform.path.ecg", title: "Now", trailing: status, accent: SummaryStyle.heart) {
-                HStack(alignment: .center, spacing: 16) {
+                HStack(alignment: .center, spacing: 12) {
+                    BeatingHeart(bpm: live.connected ? live.heartRate : nil, size: 18)
                     SummaryValue(text: live.heartRate.map { String($0) } ?? "–", unit: "bpm", size: 44,
                                  weight: .light)
                     MotionTraceLine(values: trace)

@@ -589,6 +589,7 @@ struct RootTabView: View {
             }
             .environment(\.moreRowTint, tint)
         }
+        .staggeredAppear(index: ["Your body": 0, "Train": 1, "Understand": 2, "Strap": 3, "Data": 4, "App": 5][title] ?? 0)
     }
 }
 

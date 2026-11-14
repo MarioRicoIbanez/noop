@@ -38,6 +38,31 @@ enum SleepStageStyle {
 /// takes its stage's colour.
 struct SleepDial: View {
     let night: Night
+    @State private var reveal: Double = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        SleepDialFace(night: night, reveal: reveal)
+            .onAppear {
+                if reduceMotion {
+                    reveal = 1
+                } else {
+                    withAnimation(.easeOut(duration: 1.1).delay(0.15)) { reveal = 1 }
+                }
+            }
+    }
+}
+
+/// The dial drawn up to `reveal` of the night, so it can sweep from bedtime to wake-up when it appears.
+private struct SleepDialFace: View, Animatable {
+    let night: Night
+    /// 0 shows an empty dial, 1 the whole night.
+    var reveal: Double
+
+    var animatableData: Double {
+        get { reveal }
+        set { reveal = newValue }
+    }
 
     private func angle(_ secondsFromOnset: TimeInterval) -> Double {
         let onset = night.onsetDate
@@ -54,7 +79,8 @@ struct SleepDial: View {
     var body: some View {
         let intervals = night.intervals
         let total = intervals.last?.end ?? 0
-        let asleep = Int(night.stages.asleep.rounded())
+        let asleep = Int((night.stages.asleep * min(1, max(0, reveal))).rounded())
+        let shown = total * min(1, max(0, reveal))
 
         ZStack {
             Canvas { ctx, size in
@@ -85,24 +111,25 @@ struct SleepDial: View {
                     ctx.draw(text, at: CGPoint(x: c.x + CGFloat(cos(a)) * r, y: c.y + CGFloat(sin(a)) * r))
                 }
 
-                guard total > 0 else { return }
+                guard total > 0, shown > 0 else { return }
                 let start = angle(0)
-                let end = angle(total)
+                let end = angle(shown)
                 var whole = Path()
                 whole.addArc(center: c, radius: radius, startAngle: .radians(start), endAngle: .radians(end),
                              clockwise: false)
                 ctx.stroke(whole, with: .color(SummaryStyle.sleep),
                            style: StrokeStyle(lineWidth: width - 4, lineCap: .round))
                 if intervals.count > 2 {
-                    for interval in intervals.dropFirst().dropLast() {
+                    for interval in intervals.dropFirst().dropLast() where interval.start < shown {
                         var arc = Path()
                         arc.addArc(center: c, radius: radius,
                                    startAngle: .radians(angle(interval.start) - 0.002),
-                                   endAngle: .radians(angle(interval.end) + 0.002), clockwise: false)
+                                   endAngle: .radians(angle(min(interval.end, shown)) + 0.002), clockwise: false)
                         ctx.stroke(arc, with: .color(SleepStageStyle.color(interval.stage)), lineWidth: width - 4)
                     }
                 }
-                let knobs: [(Double, String)] = [(start + 0.03, "bed.double.fill"), (end - 0.03, "alarm.fill")]
+                var knobs: [(Double, String)] = [(start + 0.03, "bed.double.fill")]
+                if reveal >= 0.999 { knobs.append((end - 0.03, "alarm.fill")) }
                 for (a, symbol) in knobs {
                     let icon = Text(Image(systemName: symbol))
                         .font(.system(size: 9, weight: .bold))
@@ -131,6 +158,8 @@ struct SleepDial: View {
 /// The night as four lanes, one per stage, with thin connectors where the stage changes.
 struct SleepLanes: View {
     let night: Night
+    @State private var shown = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         let intervals = night.intervals
@@ -171,6 +200,12 @@ struct SleepLanes: View {
             }
         }
         .frame(height: 4 * 12 + 3 * 13)
+        .mask(alignment: .leading) {
+            Rectangle().scaleEffect(x: shown || reduceMotion ? 1 : 0, anchor: .leading)
+        }
+        .onAppear {
+            withAnimation(.easeOut(duration: 0.9).delay(0.35)) { shown = true }
+        }
     }
 }
 

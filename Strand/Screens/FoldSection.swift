@@ -82,5 +82,56 @@ struct FoldSection<Content: View>: View {
                 .strokeBorder(Color.white.opacity(0.085), lineWidth: 0.5)
         )
         .contentShape(Rectangle())
+        .scrollReveal()
+    }
+}
+
+// MARK: - Motion
+
+/// Cards settle into place as they scroll onto the screen: slightly smaller and dimmer at the edge,
+/// full size once inside. Does nothing with Reduce Motion on or on systems before iOS 17.
+struct ScrollReveal: ViewModifier {
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    func body(content: Content) -> some View {
+        if #available(iOS 17.0, macOS 14.0, *), !reduceMotion {
+            content.scrollTransition(.animated(.easeOut(duration: 0.35)).threshold(.visible(0.12))) { view, phase in
+                view
+                    .opacity(phase.isIdentity ? 1 : 0.5)
+                    .scaleEffect(phase.isIdentity ? 1 : 0.96)
+            }
+        } else {
+            content
+        }
+    }
+}
+
+extension View {
+    /// Apply `ScrollReveal`.
+    func scrollReveal() -> some View {
+        modifier(ScrollReveal())
+    }
+}
+
+/// A small heart that beats at the given rate. Still when there is no rate or Reduce Motion is on.
+struct BeatingHeart: View {
+    let bpm: Int?
+    var size: CGFloat = 16
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: reduceMotion || bpm == nil)) { timeline in
+            let rate = Double(max(30, min(220, bpm ?? 60)))
+            let beat = timeline.date.timeIntervalSinceReferenceDate * rate / 60
+            let within = beat - beat.rounded(.down)
+            // A quick swell at the start of each beat that dies away before the next.
+            let swell = bpm == nil || reduceMotion ? 0 : exp(-7 * within)
+            Image(systemName: "heart.fill")
+                .font(.system(size: size, weight: .semibold))
+                .foregroundStyle(SummaryStyle.heart)
+                .scaleEffect(1 + 0.22 * swell)
+                .opacity(bpm == nil ? 0.4 : 1)
+        }
+        .accessibilityHidden(true)
     }
 }
