@@ -37,8 +37,65 @@ public enum RepCounter {
     public static let minRepSeconds = 0.6
 
     /// Count repetitions in one set. `gx`, `gy`, `gz` are gyro rates in degrees per second.
-    public static func count(gx: [Double], gy: [Double], gz: [Double], sampleRate: Double = 100) -> Result {
-        analyse(gx: gx, gy: gy, gz: gz, sampleRate: sampleRate).result
+    public static func count(gx: [Double], gy: [Double], gz: [Double], sampleRate: Double = 100,
+                             settings: Settings = .standard) -> Result {
+        analyse(gx: gx, gy: gy, gz: gz, sampleRate: sampleRate, settings: settings).result
+    }
+
+    /// The four thresholds of the counter. `standard` suits a slow curl; a wearer's marked set can
+    /// produce a better fit for one exercise through `calibrate`.
+    public struct Settings: Equatable, Codable, Sendable {
+        /// How far a peak must stand out, as a fraction of the swing.
+        public var prominenceFraction: Double
+        /// Shortest time between two repetitions, in seconds.
+        public var minRepSeconds: Double
+        /// Smallest swing, in degrees, that counts as a set.
+        public var minSwingDegrees: Double
+        /// Smallest share of variance on the main axis that counts as a set.
+        public var minAxisShare: Double
+
+        public init(prominenceFraction: Double, minRepSeconds: Double, minSwingDegrees: Double,
+                    minAxisShare: Double) {
+            self.prominenceFraction = prominenceFraction
+            self.minRepSeconds = minRepSeconds
+            self.minSwingDegrees = minSwingDegrees
+            self.minAxisShare = minAxisShare
+        }
+
+        public static let standard = Settings(prominenceFraction: 0.6, minRepSeconds: RepCounter.minRepSeconds,
+                                              minSwingDegrees: RepCounter.minSwingDegrees,
+                                              minAxisShare: RepCounter.minAxisShare)
+    }
+
+    /// Find settings under which this recorded set counts exactly `targetReps`, the number the wearer
+    /// marked by hand. Tries a small grid and keeps the match closest to the standard settings; the
+    /// set's own swing and axis share become the gates, loosened so a lighter set still passes.
+    /// Nil when no combination reproduces the marked count.
+    public static func calibrate(gx: [Double], gy: [Double], gz: [Double], targetReps: Int,
+                                 sampleRate: Double = 100) -> Settings? {
+        guard targetReps > 0 else { return nil }
+        let open = Settings(prominenceFraction: 0.6, minRepSeconds: 0.6, minSwingDegrees: 0, minAxisShare: 0)
+        let base = analyse(gx: gx, gy: gy, gz: gz, sampleRate: sampleRate, settings: open).result
+        guard base.swingDegrees > 0 else { return nil }
+        let swingGate = base.swingDegrees * 0.5
+        let shareGate = max(0.3, base.axisShare * 0.75)
+
+        var best: Settings?
+        var bestCost = Double.infinity
+        for prominence in [0.6, 0.5, 0.7, 0.4, 0.8, 0.3] {
+            for minRep in [0.6, 0.8, 0.4, 1.0, 1.3] {
+                let candidate = Settings(prominenceFraction: prominence, minRepSeconds: minRep,
+                                         minSwingDegrees: swingGate, minAxisShare: shareGate)
+                let counted = analyse(gx: gx, gy: gy, gz: gz, sampleRate: sampleRate, settings: candidate).result.reps
+                guard counted == targetReps else { continue }
+                let cost = abs(prominence - 0.6) + abs(minRep - 0.6)
+                if cost < bestCost {
+                    bestCost = cost
+                    best = candidate
+                }
+            }
+        }
+        return best
     }
 
     /// The count together with the two signals it was read from, for drawing.
@@ -53,7 +110,8 @@ public enum RepCounter {
     }
 
     /// Count repetitions in one set and keep the angle and rate signals.
-    public static func analyse(gx: [Double], gy: [Double], gz: [Double], sampleRate: Double = 100) -> Analysis {
+    public static func analyse(gx: [Double], gy: [Double], gz: [Double], sampleRate: Double = 100,
+                               settings: Settings = .standard) -> Analysis {
         let n = min(gx.count, min(gy.count, gz.count))
         guard n >= Int(3 * sampleRate) else { return .empty }
 
@@ -140,7 +198,7 @@ public enum RepCounter {
                 candidates.append(i)
             }
         }
-        let minDistance = Int(minRepSeconds * sampleRate)
+        let minDistance = Int(settings.minRepSeconds * sampleRate)
         var kept: [Int] = []
         for i in candidates.sorted(by: { angle[$0] > angle[$1] }) {
             var clear = true
@@ -167,10 +225,10 @@ public enum RepCounter {
                 right = min(right, angle[j])
                 j += 1
             }
-            if angle[i] - max(left, right) >= 0.6 * p95 { reps += 1 }
+            if angle[i] - max(left, right) >= settings.prominenceFraction * p95 { reps += 1 }
         }
 
-        let looksLikeSet = p95 >= minSwingDegrees && share >= minAxisShare
+        let looksLikeSet = p95 >= settings.minSwingDegrees && share >= settings.minAxisShare
         let result = Result(reps: looksLikeSet ? reps : 0, swingDegrees: p95, axisShare: share)
         return Analysis(result: result, angle: angle, rate: rate)
     }

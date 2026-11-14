@@ -35,6 +35,16 @@ final class RepCounterTests: XCTestCase {
         XCTAssertEqual(count(set(reps: 8, period: 2.0, amplitude: 10)), 0)
     }
 
+    func testCalibrationReproducesAMarkedCount() throws {
+        // A fast, small-swing set that the standard settings refuse.
+        let rate = set(reps: 10, period: 1.0, amplitude: 24)
+        let minor = rate.map { $0 * 0.02 }
+        let zero = [Double](repeating: 0, count: rate.count)
+        XCTAssertEqual(RepCounter.count(gx: rate, gy: minor, gz: zero).reps, 0)
+        let learned = try XCTUnwrap(RepCounter.calibrate(gx: rate, gy: minor, gz: zero, targetReps: 10))
+        XCTAssertEqual(RepCounter.count(gx: rate, gy: minor, gz: zero, settings: learned).reps, 10)
+    }
+
     func testShortInputIsNotASet() {
         XCTAssertEqual(RepCounter.count(gx: [1, 2], gy: [0, 0], gz: [0, 0]), .none)
     }

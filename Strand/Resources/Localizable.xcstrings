@@ -1,6 +1,12 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "Choose exercise": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Choose exercise"}}, "es": {"stringUnit": {"state": "translated", "value": "Elegir ejercicio"}}}},
+    "Not learned yet": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Not learned yet"}}, "es": {"stringUnit": {"state": "translated", "value": "Sin aprender todavía"}}}},
+    "Learned": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Learned"}}, "es": {"stringUnit": {"state": "translated", "value": "Aprendido"}}}},
+    "Mark a rep (%lld)": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Mark a rep (%lld)"}}, "es": {"stringUnit": {"state": "translated", "value": "Marcar repetición (%lld)"}}}},
+    "Learned from your marks. Next time this exercise counts by itself.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Learned from your marks. Next time this exercise counts by itself."}}, "es": {"stringUnit": {"state": "translated", "value": "Aprendido de tus marcas. La próxima vez este ejercicio se cuenta solo."}}}},
+    "Could not match your marks on this set. Try marking another set.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Could not match your marks on this set. Try marking another set."}}, "es": {"stringUnit": {"state": "translated", "value": "No he podido ajustar el contador a tus marcas en esta serie. Prueba a marcar otra."}}}},
     "Essentials": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Essentials"}}, "es": {"stringUnit": {"state": "translated", "value": "Lo esencial"}}}},
     "Live, not fully paired": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Live, not fully paired"}}, "es": {"stringUnit": {"state": "translated", "value": "En vivo, sin emparejar del todo"}}}},
     "Last 10 seconds": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Last 10 seconds"}}, "es": {"stringUnit": {"state": "translated", "value": "Últimos 10 segundos"}}}},
