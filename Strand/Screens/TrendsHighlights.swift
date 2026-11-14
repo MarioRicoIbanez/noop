@@ -70,14 +70,14 @@ struct TrendsHighlights: View {
         let comparable = now.count >= 3 && before.count >= 3
         let top = max(nowMean ?? 0, beforeMean ?? 0, 1)
 
-        return SummaryCard(symbol: "bed.double.fill", title: "Sleep") {
+        return SummaryCard(symbol: "bed.double.fill", title: "Sleep", accent: SummaryStyle.sleep) {
             Text(headline(now: nowMean, before: beforeMean, comparable: comparable))
                 .font(.system(size: 20))
                 .foregroundStyle(SummaryStyle.primary)
                 .fixedSize(horizontal: false, vertical: true)
                 .padding(.top, 10)
                 .padding(.bottom, 18)
-            comparisonRow("This period", nowMean, top, SummaryStyle.tint, SummaryStyle.primary)
+            comparisonRow("This period", nowMean, top, SummaryStyle.sleep, SummaryStyle.primary)
             comparisonRow("The period before", beforeMean, top, Color(white: 0.23), SummaryStyle.secondary)
                 .padding(.top, 16)
         }
@@ -124,7 +124,7 @@ struct TrendsHighlights: View {
         // Long periods are drawn as weekly means so the bars stay readable.
         let bars: [Double?] = nights.count > 60 ? weekly(nights) : nights
 
-        return SummaryCard(symbol: "moon.zzz.fill", title: "Deep sleep") {
+        return SummaryCard(symbol: "moon.zzz.fill", title: "Deep sleep", accent: SummaryStyle.sleep) {
             Text("Average per night")
                 .font(.system(size: 12.5))
                 .foregroundStyle(SummaryStyle.secondary)
@@ -151,7 +151,7 @@ struct TrendsHighlights: View {
                     let inset = min(2.2, slot * 0.2)
                     let rect = CGRect(x: CGFloat(i) * slot + inset, y: size.height - h,
                                       width: max(1, slot - inset * 2), height: h)
-                    ctx.fill(Path(roundedRect: rect, cornerRadius: 1.6), with: .color(SummaryStyle.tint))
+                    ctx.fill(Path(roundedRect: rect, cornerRadius: 1.6), with: .color(SummaryStyle.sleep))
                 }
                 if let average {
                     let y = size.height - CGFloat(average / top) * (size.height - 4)

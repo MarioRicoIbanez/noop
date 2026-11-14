@@ -157,7 +157,7 @@ struct MuscleFigure: View {
         }
         var view = BodyView(gender: .male, side: side, style: style)
         for (muscle, level) in strongest {
-            view = view.highlight(muscle, color: SummaryStyle.tint, opacity: 0.3 + 0.7 * level)
+            view = view.highlight(muscle, color: SummaryStyle.activity, opacity: 0.3 + 0.7 * level)
         }
         return view.frame(maxWidth: .infinity)
     }
@@ -287,7 +287,7 @@ struct ExercisePickerView: View {
                 Spacer()
                 Button("Close") { dismiss() }
                     .font(.system(size: 17))
-                    .foregroundStyle(SummaryStyle.tint)
+                    .foregroundStyle(SummaryStyle.activity)
             }
             .padding(.horizontal, 18)
 
@@ -340,7 +340,7 @@ struct ExercisePickerView: View {
                 .foregroundStyle(selected ? Color.black : SummaryStyle.primary)
                 .padding(.horizontal, 14)
                 .frame(height: 36)
-                .background(Capsule().fill(selected ? SummaryStyle.tint : StrandPalette.surfaceInset))
+                .background(Capsule().fill(selected ? SummaryStyle.activity : StrandPalette.surfaceInset))
         }
         .buttonStyle(.plain)
     }
@@ -368,7 +368,7 @@ struct ExercisePickerView: View {
             if learned {
                 Image(systemName: "checkmark.circle.fill")
                     .font(.system(size: 20))
-                    .foregroundStyle(SummaryStyle.tint)
+                    .foregroundStyle(SummaryStyle.activity)
             }
         }
         .padding(.vertical, 9)
@@ -395,7 +395,7 @@ struct MuscleLoadView: View {
         let ranked = sets.sorted { $0.value > $1.value }
         ScreenScaffold(title: "Muscle load") {
             SummaryCard(symbol: "figure.strengthtraining.traditional", title: "Sets per muscle",
-                        trailing: "Last 7 days") {
+                        trailing: "Last 7 days", accent: SummaryStyle.activity) {
                 MuscleFigure(levels: sets.mapValues { $0 / top })
                     .frame(height: 260)
                     .padding(.top, 12)
@@ -421,7 +421,7 @@ struct MuscleLoadView: View {
                 }
             }
             ForEach(days, id: \.day) { group in
-                SummaryCard(symbol: "calendar", title: LocalizedStringKey(Self.dayFormatter.string(from: group.day))) {
+                SummaryCard(symbol: "calendar", title: LocalizedStringKey(Self.dayFormatter.string(from: group.day)), accent: SummaryStyle.activity) {
                     ForEach(Array(group.items.enumerated()), id: \.offset) { index, item in
                         if index > 0 { Rectangle().fill(SummaryStyle.rule).frame(height: 0.5) }
                         HStack {

@@ -114,6 +114,18 @@ enum SummaryStyle {
     static let tertiary = StrandPalette.textTertiary
     static let rule = Color.white.opacity(0.09)
 
+    // One colour per kind of thing, so a card says what it is about before it is read:
+    // green for recovery, indigo for sleep and rest, orange for training and energy,
+    // blue for breathing, oxygen and temperature, red for the heart.
+    static let sleep = Color(red: 0.557, green: 0.549, blue: 0.949)
+    static let sleepPale = Color(red: 0.792, green: 0.788, blue: 0.984)
+    static let sleepDeep = Color(red: 0.310, green: 0.302, blue: 0.741)
+    static let activity = Color(red: 0.949, green: 0.541, blue: 0.306)
+    static let activityPale = Color(red: 0.973, green: 0.765, blue: 0.627)
+    static let activityDeep = Color(red: 0.722, green: 0.353, blue: 0.157)
+    static let vitals = Color(red: 0.345, green: 0.718, blue: 0.933)
+    static let heart = Color(red: 0.941, green: 0.376, blue: 0.478)
+
     static func number(_ size: CGFloat, _ weight: Font.Weight = .light) -> Font {
         Font.system(size: size, weight: weight).monospacedDigit()
     }
@@ -125,6 +137,8 @@ struct SummaryCard<Content: View>: View {
     let title: LocalizedStringKey
     var trailing: LocalizedStringKey? = nil
     var showsChevron: Bool = false
+    /// The colour of the card's subject; tints the header. Grey when the card has no single subject.
+    var accent: Color? = nil
     @ViewBuilder var content: () -> Content
 
     var body: some View {
@@ -148,7 +162,7 @@ struct SummaryCard<Content: View>: View {
                         .foregroundStyle(SummaryStyle.tertiary)
                 }
             }
-            .foregroundStyle(SummaryStyle.secondary)
+            .foregroundStyle(accent ?? SummaryStyle.secondary)
             content()
         }
         .padding(.horizontal, 18)
@@ -419,12 +433,12 @@ struct SummaryView: View {
         let sleepFill = sleepMin.map { min(1, $0 / 480) } ?? 0
 
         let segments = [
-            SummaryRing.Segment(weight: 0.4, fill: hrvFill, color: SummaryStyle.pale),
-            SummaryRing.Segment(weight: 0.3, fill: rhrFill, color: SummaryStyle.tint),
-            SummaryRing.Segment(weight: 0.3, fill: sleepFill, color: SummaryStyle.deep),
+            SummaryRing.Segment(weight: 0.4, fill: hrvFill, color: SummaryStyle.tint),
+            SummaryRing.Segment(weight: 0.3, fill: rhrFill, color: SummaryStyle.heart),
+            SummaryRing.Segment(weight: 0.3, fill: sleepFill, color: SummaryStyle.sleep),
         ]
 
-        return SummaryCard(symbol: "heart.fill", title: "Recovery") {
+        return SummaryCard(symbol: "heart.fill", title: "Recovery", accent: SummaryStyle.tint) {
             HStack(alignment: .center, spacing: 20) {
                 ZStack {
                     SummaryOrb(energy: recovery.map { 0.35 + 0.5 * $0 / 100 } ?? 0.3)
@@ -445,8 +459,8 @@ struct SummaryView: View {
                 .frame(width: 148, height: 148)
 
                 VStack(alignment: .leading, spacing: 10) {
-                    factor("Variability", hrv?.valueText ?? "–", "ms", SummaryStyle.pale)
-                    factor("Resting pulse", rhr?.valueText ?? "–", "bpm", SummaryStyle.tint)
+                    factor("Variability", hrv?.valueText ?? "–", "ms", SummaryStyle.tint)
+                    factor("Resting pulse", rhr?.valueText ?? "–", "bpm", SummaryStyle.heart)
                     sleepFactor(sleepMin)
                 }
                 Spacer(minLength: 0)
@@ -479,7 +493,7 @@ struct SummaryView: View {
     private func sleepFactor(_ minutes: Double?) -> some View {
         HStack(spacing: 8) {
             RoundedRectangle(cornerRadius: 1.5)
-                .fill(SummaryStyle.deep)
+                .fill(SummaryStyle.sleep)
                 .frame(width: 3, height: 36)
             VStack(alignment: .leading, spacing: 0) {
                 Text("Sleep")
@@ -519,8 +533,8 @@ struct SummaryView: View {
         let measured = vitals.filter { $0.value != nil && $0.hasRange }
         let inRange = measured.filter { !$0.outOfRange }.count
 
-        return SummaryCard(symbol: "waveform.path.ecg", title: "Vitals", trailing: "Last night",
-                           showsChevron: true) {
+        return SummaryCard(symbol: "lungs.fill", title: "Vitals", trailing: "Last night",
+                           showsChevron: true, accent: SummaryStyle.vitals) {
             HStack(alignment: .firstTextBaseline, spacing: 8) {
                 if measured.isEmpty {
                     Text("Your usual range appears after five nights.")
@@ -573,7 +587,7 @@ struct SummaryView: View {
         let top = max(values.max() ?? 0, 1)
 
         return SummaryCard(symbol: "flame.fill", title: "Effort", trailing: "Last 14 days",
-                           showsChevron: true) {
+                           showsChevron: true, accent: SummaryStyle.activity) {
             HStack(alignment: .bottom) {
                 Text(today.map { ($0 * factor).formatted(.number.precision(.fractionLength(1))) } ?? "–")
                     .font(SummaryStyle.number(38))
@@ -584,7 +598,7 @@ struct SummaryView: View {
                     ForEach(0..<values.count, id: \.self) { i in
                         let last = i == values.count - 1
                         RoundedRectangle(cornerRadius: 2)
-                            .fill(last ? SummaryStyle.tint : Color(white: 0.34))
+                            .fill(last ? SummaryStyle.activity : Color(white: 0.34))
                             .frame(width: 5, height: max(3, CGFloat(values[i] / top) * 50))
                     }
                 }
@@ -610,7 +624,7 @@ struct SummaryLiveCard: View {
         Button {
             router.openDevices()
         } label: {
-            SummaryCard(symbol: "waveform.path.ecg", title: "Now", trailing: status) {
+            SummaryCard(symbol: "waveform.path.ecg", title: "Now", trailing: status, accent: SummaryStyle.heart) {
                 HStack(alignment: .center, spacing: 16) {
                     SummaryValue(text: live.heartRate.map { String($0) } ?? "–", unit: "bpm", size: 44,
                                  weight: .light)
@@ -681,7 +695,7 @@ struct MotionTraceLine: View {
                 let y = size.height - 3 - CGFloat((value - low) / span) * (size.height - 6)
                 if i == 0 { path.move(to: CGPoint(x: x, y: y)) } else { path.addLine(to: CGPoint(x: x, y: y)) }
             }
-            ctx.stroke(path, with: .color(SummaryStyle.tint), style: StrokeStyle(lineWidth: 1.5, lineJoin: .round))
+            ctx.stroke(path, with: .color(SummaryStyle.heart), style: StrokeStyle(lineWidth: 1.5, lineJoin: .round))
         }
     }
 }
@@ -877,7 +891,7 @@ struct VitalNightsChart: View {
                 let q = series[i]
                 let outside = vital.hasRange && (q < lo || q > hi)
                 let dot = CGRect(x: x(i) - 1.55, y: y(q) - 1.55, width: 3.1, height: 3.1)
-                ctx.fill(Path(ellipseIn: dot), with: .color(SummaryStyle.primary.opacity(outside ? 0.9 : 0.42)))
+                ctx.fill(Path(ellipseIn: dot), with: .color(outside ? SummaryStyle.warn : SummaryStyle.vitals.opacity(0.7)))
             }
             let cx = x(series.count - 1)
             let cy = y(v)

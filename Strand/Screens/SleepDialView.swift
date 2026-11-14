@@ -7,9 +7,9 @@ enum SleepStageStyle {
     static func color(_ stage: SleepStage) -> Color {
         switch stage {
         case .awake: return SummaryStyle.warn
-        case .rem: return SummaryStyle.pale
-        case .light: return SummaryStyle.tint
-        case .deep: return SummaryStyle.deep
+        case .rem: return SummaryStyle.sleepPale
+        case .light: return SummaryStyle.sleep
+        case .deep: return SummaryStyle.sleepDeep
         }
     }
 
@@ -91,7 +91,7 @@ struct SleepDial: View {
                 var whole = Path()
                 whole.addArc(center: c, radius: radius, startAngle: .radians(start), endAngle: .radians(end),
                              clockwise: false)
-                ctx.stroke(whole, with: .color(SummaryStyle.tint),
+                ctx.stroke(whole, with: .color(SummaryStyle.sleep),
                            style: StrokeStyle(lineWidth: width - 4, lineCap: .round))
                 if intervals.count > 2 {
                     for interval in intervals.dropFirst().dropLast() {
@@ -106,7 +106,7 @@ struct SleepDial: View {
                 for (a, symbol) in knobs {
                     let icon = Text(Image(systemName: symbol))
                         .font(.system(size: 9, weight: .bold))
-                        .foregroundColor(Color(red: 0.02, green: 0.15, blue: 0.10))
+                        .foregroundColor(Color(red: 0.07, green: 0.06, blue: 0.24))
                     ctx.draw(icon, at: CGPoint(x: c.x + CGFloat(cos(a)) * radius, y: c.y + CGFloat(sin(a)) * radius))
                 }
             }
@@ -189,7 +189,8 @@ struct SleepStagesCard: View {
 
     var body: some View {
         SummaryCard(symbol: "moon.fill", title: "Stages",
-                    trailing: LocalizedStringKey(night.onsetText + " – " + night.wakeText)) {
+                    trailing: LocalizedStringKey(night.onsetText + " – " + night.wakeText),
+                    accent: SummaryStyle.sleep) {
             SleepLanes(night: night)
                 .padding(.top, 12)
                 .padding(.bottom, 10)

@@ -197,7 +197,7 @@ struct RepCounterView: View {
                 MuscleLoadView()
             } label: {
                 SummaryCard(symbol: "figure.strengthtraining.traditional", title: "Muscle load",
-                            showsChevron: true) {
+                            showsChevron: true, accent: SummaryStyle.activity) {
                     Text("Sets per muscle group this week, and your history.")
                         .font(.system(size: 16))
                         .foregroundStyle(SummaryStyle.primary)
@@ -235,7 +235,7 @@ struct RepCounterView: View {
         Button {
             if !counter.isCounting { choosing = true }
         } label: {
-            SummaryCard(symbol: "dumbbell.fill", title: "Exercise", showsChevron: true) {
+            SummaryCard(symbol: "dumbbell.fill", title: "Exercise", showsChevron: true, accent: SummaryStyle.activity) {
                 if let exercise {
                     VStack(alignment: .leading, spacing: 12) {
                         ExerciseAnimation(exercise: exercise)
@@ -246,7 +246,7 @@ struct RepCounterView: View {
                                 .fixedSize(horizontal: false, vertical: true)
                             Text(MuscleGroups.title(exercise.muscle))
                                 .font(.system(size: 16))
-                                .foregroundStyle(SummaryStyle.tint)
+                                .foregroundStyle(SummaryStyle.activity)
                             Text(RepProfileStore.profile(for: exercise.id) == nil ? "Not learned yet" : "Learned")
                                 .font(.system(size: 15))
                                 .foregroundStyle(SummaryStyle.secondary)
@@ -268,7 +268,7 @@ struct RepCounterView: View {
     }
 
     private var setCard: some View {
-        SummaryCard(symbol: "repeat", title: "Current set") {
+        SummaryCard(symbol: "repeat", title: "Current set", accent: SummaryStyle.activity) {
             VStack(spacing: 6) {
                 Text(String(counter.reps))
                     .font(SummaryStyle.number(96, .thin))
@@ -287,7 +287,7 @@ struct RepCounterView: View {
                             .foregroundStyle(Color.black)
                             .frame(maxWidth: .infinity)
                             .frame(height: 64)
-                            .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(SummaryStyle.tint))
+                            .background(RoundedRectangle(cornerRadius: 14, style: .continuous).fill(SummaryStyle.activity))
                     }
                     .buttonStyle(.plain)
                     .padding(.top, 14)
@@ -304,7 +304,7 @@ struct RepCounterView: View {
                         .frame(height: 50)
                         .background(
                             RoundedRectangle(cornerRadius: 14, style: .continuous)
-                                .fill(counter.isCounting ? StrandPalette.surfaceInset : SummaryStyle.tint)
+                                .fill(counter.isCounting ? StrandPalette.surfaceInset : SummaryStyle.activity)
                         )
                 }
                 .buttonStyle(.plain)
@@ -343,7 +343,7 @@ struct RepCounterView: View {
     }
 
     private var motionCard: some View {
-        SummaryCard(symbol: "gyroscope", title: "Motion", trailing: motionStatus) {
+        SummaryCard(symbol: "gyroscope", title: "Motion", trailing: motionStatus, accent: SummaryStyle.activity) {
             HStack(alignment: .firstTextBaseline) {
                 Text("Elevation")
                     .font(.system(size: 13))
@@ -352,20 +352,20 @@ struct RepCounterView: View {
                 SummaryValue(text: String(Int(counter.swingDegrees.rounded())), unit: "°", size: 18)
             }
             .padding(.top, 12)
-            RepMotionTrace(series: [counter.angleTrace], colors: [SummaryStyle.tint])
+            RepMotionTrace(series: [counter.angleTrace], colors: [SummaryStyle.activity])
                 .frame(height: 90)
             Rectangle().fill(SummaryStyle.rule).frame(height: 0.5).padding(.vertical, 10)
             Text("Gyroscope")
                 .font(.system(size: 13))
                 .foregroundStyle(SummaryStyle.secondary)
             RepMotionTrace(series: counter.gyroTrace,
-                           colors: [SummaryStyle.pale, SummaryStyle.tint, SummaryStyle.deep])
+                           colors: [SummaryStyle.activityPale, SummaryStyle.activity, SummaryStyle.activityDeep])
                 .frame(height: 70)
         }
     }
 
     private var setsCard: some View {
-        SummaryCard(symbol: "list.bullet", title: "Sets") {
+        SummaryCard(symbol: "list.bullet", title: "Sets", accent: SummaryStyle.activity) {
             ForEach(Array(counter.sets.enumerated()), id: \.element.id) { index, set in
                 if index > 0 {
                     Rectangle().fill(SummaryStyle.rule).frame(height: 0.5)
@@ -476,7 +476,7 @@ struct RepMotionTrace: View {
 /// The entry card shown at the top of the Training tab.
 struct RepCounterEntryCard: View {
     var body: some View {
-        SummaryCard(symbol: "repeat", title: "Rep counter", showsChevron: true) {
+        SummaryCard(symbol: "repeat", title: "Rep counter", showsChevron: true, accent: SummaryStyle.activity) {
             Text("Count your sets with the strap's motion sensor.")
                 .font(.system(size: 15))
                 .foregroundStyle(SummaryStyle.primary)

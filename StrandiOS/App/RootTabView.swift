@@ -148,7 +148,7 @@ struct RootTabView: View {
             // position across a flip instead of inheriting Coach's.
             moreTab(path: $tabPaths[4], scrollSignal: scrollTop[4]).tag(4)
         }
-        .tint(StrandPalette.accent)
+        .tint(tabTint)
         // Switching Coach off while STANDING on it leaves `selectedTab` pointing at a tag no tab claims
         // any more, which renders as an empty tab rather than as an error. Send that wearer to Today, and
         // only in that case, so a flip made from anywhere else does not move them.
@@ -439,6 +439,17 @@ struct RootTabView: View {
         }
     }
 
+    /// The tab bar takes the colour of the section on screen: green for the day's summary, indigo for
+    /// sleep, orange for training, blue for trends.
+    private var tabTint: Color {
+        switch selectedTab {
+        case 2: return SummaryStyle.sleep
+        case 3: return SummaryStyle.activity
+        case 1: return SummaryStyle.vitals
+        default: return StrandPalette.accent
+        }
+    }
+
     private func tab<V: View>(_ view: V, _ title: LocalizedStringKey, _ icon: String,
                               path: Binding<NavigationPath>, scrollSignal: Int) -> some View {
         // Each primary tab gets its OWN NavigationStack so the in-content NavigationLinks (e.g. the Today
@@ -471,7 +482,7 @@ struct RootTabView: View {
             ScreenScaffold(title: "More", subtitle: "Everything else, one tap away",
                            onRefresh: { await repo.refresh() },
                            topBackground: liquidScaffoldSky()) {
-                moreSection("Your body") {
+                moreSection("Your body", tint: SummaryStyle.heart) {
                     MoreRow("Health", "heart.text.square.fill", .health,
                             caption: "Vital signs and long-term markers")
                     MoreRow("Vital signs", "waveform.path.ecg.rectangle.fill", .vitals,
@@ -483,7 +494,7 @@ struct RootTabView: View {
                     MoreRow("Rhythm", "waveform.path", .rhythm,
                             caption: "Checks the night's heartbeat for irregular beats")
                 }
-                moreSection("Train") {
+                moreSection("Train", tint: SummaryStyle.activity) {
                     MoreRow("Rep counter", "repeat", .repCounter,
                             caption: "Counts your sets from wrist motion")
                     MoreRow("Lift Log", "dumbbell.fill", .liftLog,
@@ -508,7 +519,7 @@ struct RootTabView: View {
                     MoreRow("Intelligence", "brain.head.profile", .intelligence,
                             caption: "How each day's scores were calculated")
                 }
-                moreSection("Strap") {
+                moreSection("Strap", tint: SummaryStyle.vitals) {
                     MoreRow("Live", "dot.radiowaves.left.and.right", .live,
                             caption: "Connection, live readings and sync")
                     MoreRow("Alarms", "alarm.fill", .alarms,
@@ -520,7 +531,7 @@ struct RootTabView: View {
                     MoreRow("NOOP Limitations", "list.bullet.rectangle", .noopLimitations,
                             caption: "What this strap can and cannot read")
                 }
-                moreSection("Data") {
+                moreSection("Data", tint: StrandPalette.textSecondary) {
                     MoreRow("Data Sources", "externaldrive.fill", .dataSources,
                             caption: "Import from Apple Health or WHOOP")
                     MoreRow("Apple Health", "heart.fill", .appleHealth,
@@ -534,7 +545,7 @@ struct RootTabView: View {
                     MoreRow("Siri & Shortcuts", "mic.fill", .siriShortcuts,
                             caption: "Ask Siri for your scores")
                 }
-                moreSection("App") {
+                moreSection("App", tint: StrandPalette.textSecondary) {
                     MoreRow("Settings", "gearshape.fill", .settings, caption: "Profile, units and appearance")
                     MoreRow("Test Centre", "stethoscope", .testCentre,
                             caption: "Diagnostics for when something fails")
@@ -562,7 +573,7 @@ struct RootTabView: View {
     /// One titled group in the More index: a plain heading over a card of rows. Always open, so every
     /// destination is visible without unfolding anything.
     @ViewBuilder
-    private func moreSection<Rows: View>(_ title: String,
+    private func moreSection<Rows: View>(_ title: String, tint: Color = StrandPalette.accent,
                                          @ViewBuilder rows: @escaping () -> Rows) -> some View {
         VStack(alignment: .leading, spacing: 10) {
             Text(LocalizedStringKey(title))
@@ -576,7 +587,20 @@ struct RootTabView: View {
                 VStack(spacing: 0) { rows() }
                     .clipShape(RoundedRectangle(cornerRadius: NoopMetrics.cardRadius, style: .continuous))
             }
+            .environment(\.moreRowTint, tint)
         }
+    }
+}
+
+/// The icon colour of the More rows inside one section.
+private struct MoreRowTintKey: EnvironmentKey {
+    static let defaultValue: Color = StrandPalette.accent
+}
+
+private extension EnvironmentValues {
+    var moreRowTint: Color {
+        get { self[MoreRowTintKey.self] }
+        set { self[MoreRowTintKey.self] = newValue }
     }
 }
 
@@ -639,6 +663,7 @@ private struct MoreRow: View {
     let route: MoreDestination
 
     let caption: LocalizedStringKey?
+    @Environment(\.moreRowTint) private var tint
 
     init(_ title: LocalizedStringKey, _ icon: String, _ route: MoreDestination,
          caption: LocalizedStringKey? = nil) {
@@ -653,7 +678,7 @@ private struct MoreRow: View {
                 // explicit foregroundStyle on the image overrides that; the title keeps the primary colour.
                 Image(systemName: icon)
                     .font(.system(size: 17, weight: .regular))
-                    .foregroundStyle(StrandPalette.accent)
+                    .foregroundStyle(tint)
                     .frame(width: 26, alignment: .center)
                 VStack(alignment: .leading, spacing: 2) {
                     Text(title)
