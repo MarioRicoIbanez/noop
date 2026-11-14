@@ -127,7 +127,7 @@ public enum StrandPalette {
     // user-themed — the recovery/strain/sleep DATA worlds follow `chartStyle`, never this.
     /// The user's chrome-accent choice. Set from `@AppStorage(AccentColor.storageKey)` at the app root
     /// via `.noopAccent(...)`; the four accessors below branch on it. Default mint.
-    public static var accentChoice: AccentColor = .mint
+    public static var accentChoice: AccentColor = .standard
     /// The custom accent's hex, used only when `accentChoice == .custom`. Set alongside `accentChoice`.
     public static var customAccentHex: String = AccentColor.defaultCustomHex
     public static var accent: Color { accentChoice.accent }

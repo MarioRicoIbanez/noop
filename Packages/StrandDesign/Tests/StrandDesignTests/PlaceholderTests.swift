@@ -4,6 +4,31 @@ import SwiftUI
 
 final class StrandDesignTests: XCTestCase {
 
+    // The titanium ramps are asserted below against their own tokens, so pin that style; the default
+    // style is green. Restored in tearDown so other tests see the shipped default.
+    private var savedChartStyle: ChartStyle = .standard
+    override func setUp() {
+        super.setUp()
+        savedChartStyle = StrandPalette.chartStyle
+        StrandPalette.chartStyle = .titanium
+    }
+    override func tearDown() {
+        StrandPalette.chartStyle = savedChartStyle
+        super.tearDown()
+    }
+
+    func testDefaultStyleIsGreenWithApprovedSleepStages() {
+        StrandPalette.chartStyle = .standard
+        XCTAssertEqual(ChartStyle.standard, .green)
+        XCTAssertEqual(AccentColor.standard, .green)
+        XCTAssertEqual(AppearanceMode.standard, .dark)
+        XCTAssertFalse(SceneBackgroundPrefs.defaultEnabled)
+        let deep = StrandPalette.sleepDeep.rgbaComponents
+        XCTAssertEqual(deep.r, 0x1B / 255.0, accuracy: 0.01)
+        XCTAssertEqual(deep.g, 0x7F / 255.0, accuracy: 0.01)
+        XCTAssertEqual(deep.b, 0x49 / 255.0, accuracy: 0.01)
+    }
+
     func testVersion() {
         XCTAssertEqual(StrandDesign.version, "0.1.0")
     }
