@@ -342,6 +342,12 @@ targets:
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: $(BUNDLE_ID_PREFIX).noop
+        # Fork testing builds: compile the app target itself without optimisation and file by file, so
+        # the large app module builds across all cores instead of as one optimised whole. The packages
+        # (analytics, storage, import, protocol) keep their Release optimisation, so the heavy maths and
+        # the importers run at full speed; only the screen code is unoptimised.
+        SWIFT_OPTIMIZATION_LEVEL: "-Onone"
+        SWIFT_COMPILATION_MODE: incremental
         # NOT "NOOP Staging": 749c94118 dropped the .staging suffix from every iOS-family bundle id
         # because iOS has no App Store app to install beside (NoopApp is closed), so the overlay served
         # no purpose and only broke sideloading. The product name was missed by that same change. macOS

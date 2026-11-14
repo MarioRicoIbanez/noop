@@ -154,6 +154,8 @@ jobs:
 
   macos:
     needs: meta
+    # Fork: the Mac app is not used, and its leg only repeats the iPhone leg's compile.
+    if: ${{ false }}
     runs-on: macos-15
     timeout-minutes: 40
     steps:
