@@ -76,7 +76,8 @@ public enum DomainTheme: String, CaseIterable, Sendable {
 
 // MARK: - Scenic Hero Background (NEW)
 //
-// A Canvas-drawn premium backdrop for detail-screen heroes: a radial deep blue-black
+// A backdrop for detail-screen heroes. The default `.plain` style is the flat canvas; the legacy `.radial`
+// style is a Canvas-drawn radial deep blue-black
 // gradient (warm-lit center → near-black edge) sprinkled with a faint deterministic
 // starfield, optionally tinted toward a domain's glow. Sits behind a ScoreGauge /
 // hero number. Deterministic (no per-frame randomness) so it never flickers, and the
@@ -84,42 +85,58 @@ public enum DomainTheme: String, CaseIterable, Sendable {
 
 public struct ScenicHeroBackground: View {
 
+    /// How the hero canvas is drawn.
+    public enum Style: Sendable {
+        /// A flat canvas: `StrandPalette.surfaceBase`, no gradient, no stars. The default.
+        case plain
+        /// The previous radial blue-black wash (lit centre to dark edge) with the bottom fade.
+        case radial
+    }
+
     /// Optional domain whose glow tints the upper bloom. nil = neutral blue-black.
     public var domain: DomainTheme?
     /// Star count — kept modest so the field reads as texture, not noise.
     public var starCount: Int
     /// Whether to draw the bottom fade that lets content sit cleanly over the field.
     public var fadesToBase: Bool
+    /// `.plain` (default) or the legacy `.radial` wash.
+    public var style: Style
 
     @Environment(\.colorScheme) private var scheme
 
-    public init(domain: DomainTheme? = nil, starCount: Int = 40, fadesToBase: Bool = true) {
+    public init(domain: DomainTheme? = nil, starCount: Int = 40, fadesToBase: Bool = true, style: Style = .plain) {
         self.domain = domain
         self.starCount = starCount
         self.fadesToBase = fadesToBase
+        self.style = style
     }
 
     public var body: some View {
         ZStack {
-            // Radial deep blue-black: lit center → near-black edge.
-            RadialGradient(
-                gradient: Gradient(colors: [StrandPalette.scenicCenter, StrandPalette.scenicEdge]),
-                center: .init(x: 0.5, y: 0.36),
-                startRadius: 0,
-                endRadius: 520
-            )
-
-            // Design Reset (2026-06-22): the domain bloom + starfield are removed for the flat
-            // WHOOP look. The hero is now a clean blue-grey radial — no glow, no stars. `domain` and
-            // `starCount` stay on the type for API stability but no longer paint.
-
-            // Bottom fade so a hero number / card reads cleanly over the field.
-            if fadesToBase {
-                LinearGradient(
-                    colors: [.clear, StrandPalette.scenicEdge.opacity(0.72), StrandPalette.scenicEdge],
-                    startPoint: .center,
-                    endPoint: .bottom
+            switch style {
+            case .plain:
+                StrandPalette.surfaceBase
+            case .radial:
+                // Radial deep blue-black: lit center → near-black edge.
+                RadialGradient(
+                    gradient: Gradient(colors: [StrandPalette.scenicCenter, StrandPalette.scenicEdge]),
+                    center: .init(x: 0.5, y: 0.36),
+                    startRadius: 0,
+                    endRadius: 520
                 )
+
+                // Design Reset (2026-06-22): the domain bloom + starfield are removed for the flat
+                // WHOOP look. `domain` and `starCount` stay on the type for API stability but no
+                // longer paint.
+
+                // Bottom fade so a hero number / card reads cleanly over the field.
+                if fadesToBase {
+                    LinearGradient(
+                        colors: [.clear, StrandPalette.scenicEdge.opacity(0.72), StrandPalette.scenicEdge],
+                        startPoint: .center,
+                        endPoint: .bottom
+                    )
+                }
             }
         }
         .accessibilityHidden(true)

@@ -9,20 +9,25 @@ import SwiftUI
 /// app root); the data-ramp accessors in `StrandPalette` branch on it. The app root keys its content on
 /// the raw value so a flip re-renders the visible charts live.
 public enum ChartStyle: String, CaseIterable, Identifiable, Sendable {
+    case green      // default: one green family (deep/mid/soft + grey) with amber/red kept for warnings only
     case titanium   // brand: gold recovery, amber strain, blue rest
     case classic    // throwback: red→green recovery, cool→hot zones, green→red stress
 
     public var id: String { rawValue }
     public static let storageKey = "chart.style"
 
+    /// The style a fresh install (and an unknown stored value) resolves to.
+    public static let standard: ChartStyle = .green
+
     public var label: String {
         switch self {
-        case .titanium: return String(localized: "Default", bundle: .module)
+        case .green:    return String(localized: "Default", bundle: .module)
+        case .titanium: return String(localized: "Titanium", bundle: .module)
         case .classic:  return String(localized: "Classic", bundle: .module)
         }
     }
 
-    public static func resolve(_ raw: String) -> ChartStyle { ChartStyle(rawValue: raw) ?? .titanium }
+    public static func resolve(_ raw: String) -> ChartStyle { ChartStyle(rawValue: raw) ?? standard }
 }
 
 /// The Sleep tab's stage-CHART shape (distinct from `ChartStyle`, which is colours): the long-standing
@@ -88,7 +93,8 @@ public extension View {
 /// `accent`/`accentHover`/`accentMuted`/`focusRing` accessors in `StrandPalette` branch on it. Mirror in
 /// Kotlin via `Palette.accentChoice` + `NoopPrefs.accentColor`/`accentCustomHex`.
 public enum AccentColor: String, CaseIterable, Identifiable, Sendable {
-    case mint        // the brand default (#1068 NoopVisualStyle.mint world)
+    case green       // the default: system green #30D158 (NoopVisualStyle.green)
+    case mint        // the previous brand default (#1068 NoopVisualStyle.mint world)
     case whoopBlue   // the classic WHOOP link blue
     case custom      // a user-picked colour (hex stored separately)
 
@@ -98,20 +104,24 @@ public enum AccentColor: String, CaseIterable, Identifiable, Sendable {
     public static let customHexKey = "accent.customHex"
     /// Seeds the custom picker (mint) so a fresh `.custom` selection is not black.
     public static let defaultCustomHex = "#149A78"
+    /// The accent a fresh install (and an unknown stored value) resolves to.
+    public static let standard: AccentColor = .green
 
     public var label: String {
         switch self {
+        case .green:     return String(localized: "Green", bundle: .module)
         case .mint:      return String(localized: "Mint", bundle: .module)
         case .whoopBlue: return String(localized: "WHOOP Blue", bundle: .module)
         case .custom:    return String(localized: "Custom", bundle: .module)
         }
     }
 
-    public static func resolve(_ raw: String) -> AccentColor { AccentColor(rawValue: raw) ?? .mint }
+    public static func resolve(_ raw: String) -> AccentColor { AccentColor(rawValue: raw) ?? standard }
 
     /// The chrome accent. `.custom` resolves the stored hex at read time.
     public var accent: Color {
         switch self {
+        case .green:     return NoopVisualStyle.green
         case .mint:      return NoopVisualStyle.mint
         case .whoopBlue: return Color(light: "#234F9E", dark: "#60A0E0")
         case .custom:    return Color(hex: StrandPalette.customAccentHex)
@@ -121,6 +131,7 @@ public enum AccentColor: String, CaseIterable, Identifiable, Sendable {
     /// The brighter hover/pressed accent. For `.custom` it is the chosen colour lightened toward white.
     public var accentHover: Color {
         switch self {
+        case .green:     return NoopVisualStyle.greenMid
         case .mint:      return NoopVisualStyle.mintGlow
         case .whoopBlue: return Color(light: "#3A6FC0", dark: "#8FBEEC")
         case .custom:    return AccentColor.lighten(StrandPalette.customAccentHex)
@@ -131,6 +142,7 @@ public enum AccentColor: String, CaseIterable, Identifiable, Sendable {
     /// composites over whatever surface is behind it — the same 0.18 the mint world uses.
     public var accentMuted: Color {
         switch self {
+        case .green:     return NoopVisualStyle.green.opacity(0.18)
         case .mint:      return NoopVisualStyle.mintDeep.opacity(0.18)
         case .whoopBlue: return Color(light: "#234F9E", dark: "#60A0E0").opacity(0.18)
         case .custom:    return Color(hex: StrandPalette.customAccentHex).opacity(0.18)
@@ -166,7 +178,8 @@ public extension View {
 /// control simply resolves to `.custom`. Theme MODE (System/Light/Dark) is independent and never bundled.
 /// Twin of Kotlin `ThemePreset`.
 public enum ThemePreset: String, CaseIterable, Identifiable, Sendable {
-    case mint       // brand default: mint accent, Titanium charts, backdrop on, solid cards
+    case noop       // default: green accent, green data ramps, plain black canvas, solid cards
+    case mint       // previous brand default: mint accent, Titanium charts, backdrop on, solid cards
     case ocean      // WHOOP-blue accent, Titanium charts, backdrop on, solid
     case classic    // WHOOP-blue accent, Classic throwback charts, backdrop on, solid
     case midnight   // mint accent, Titanium charts, backdrop OFF (plain canvas), solid
@@ -177,6 +190,7 @@ public enum ThemePreset: String, CaseIterable, Identifiable, Sendable {
 
     public var label: String {
         switch self {
+        case .noop:     return String(localized: "Default", bundle: .module)
         case .mint:     return String(localized: "Mint", bundle: .module)
         case .ocean:    return String(localized: "Ocean", bundle: .module)
         case .classic:  return String(localized: "Classic", bundle: .module)
@@ -198,6 +212,7 @@ public enum ThemePreset: String, CaseIterable, Identifiable, Sendable {
 
     public var recipe: Recipe? {
         switch self {
+        case .noop:     return Recipe(accent: .green,     chart: .green,    backdrop: false, cardOpacity: 100)
         case .mint:     return Recipe(accent: .mint,      chart: .titanium, backdrop: true,  cardOpacity: 100)
         case .ocean:    return Recipe(accent: .whoopBlue, chart: .titanium, backdrop: true,  cardOpacity: 100)
         case .classic:  return Recipe(accent: .whoopBlue, chart: .classic,  backdrop: true,  cardOpacity: 100)
@@ -210,7 +225,7 @@ public enum ThemePreset: String, CaseIterable, Identifiable, Sendable {
     /// The presets a user can pick (everything except the derived `.custom` sentinel).
     public static var selectable: [ThemePreset] { allCases.filter { $0 != .custom } }
 
-    public static func resolve(_ raw: String) -> ThemePreset { ThemePreset(rawValue: raw) ?? .mint }
+    public static func resolve(_ raw: String) -> ThemePreset { ThemePreset(rawValue: raw) ?? .noop }
 
     /// Which preset the live prefs correspond to, or `.custom` when none match.
     public static func matching(accent: AccentColor, chart: ChartStyle,
@@ -226,7 +241,7 @@ public enum ThemePreset: String, CaseIterable, Identifiable, Sendable {
 }
 
 /// The user's appearance preference for the whole app. Persisted via
-/// `@AppStorage(AppearanceMode.storageKey)`. `.system` follows the OS (the default);
+/// `@AppStorage(AppearanceMode.storageKey)`. `.system` follows the OS (no longer the default; see `standard`);
 /// `.light` / `.dark` force a scheme regardless of the system setting.
 ///
 /// Applied once at each app root via `.preferredColorScheme(mode.colorScheme)`. Because every
@@ -241,6 +256,10 @@ public enum AppearanceMode: String, CaseIterable, Identifiable, Sendable {
 
     /// The @AppStorage key shared by the app roots and the Settings picker.
     public static let storageKey = "theme.appearance"
+
+    /// The mode a fresh install (and an unknown stored value) resolves to: dark. A stored choice from
+    /// the Settings picker still wins, so an existing install keeps whatever it picked.
+    public static let standard: AppearanceMode = .dark
 
     /// Human label for the Settings control.
     ///
@@ -277,9 +296,9 @@ public enum AppearanceMode: String, CaseIterable, Identifiable, Sendable {
         }
     }
 
-    /// Resolve a stored raw value (tolerant of an unknown/missing value → `.system`).
+    /// Resolve a stored raw value (tolerant of an unknown/missing value → `standard`, i.e. dark).
     public static func resolve(_ raw: String) -> AppearanceMode {
-        AppearanceMode(rawValue: raw) ?? .system
+        AppearanceMode(rawValue: raw) ?? standard
     }
 }
 
@@ -290,8 +309,11 @@ public enum AppearanceMode: String, CaseIterable, Identifiable, Sendable {
 /// they stay perfectly readable. Read in `TodayView` via `@AppStorage(SceneBackgroundPrefs.enabledKey)`
 /// and toggled from Settings → Appearance. Mirror in Kotlin via `NoopPrefs.showDayCycleBackground`.
 public enum SceneBackgroundPrefs {
-    /// The @AppStorage key shared by TodayView and the Settings toggle. Default value is `true`.
+    /// The @AppStorage key shared by TodayView and the Settings toggle.
     public static let enabledKey = "noop.showDayCycleBackground"
+    /// Default for a fresh install: OFF, so every screen sits on the plain canvas. Every reader passes
+    /// this as its `@AppStorage` default; a value the user stored from Settings still wins.
+    public static let defaultEnabled = false
 }
 
 /// Card-surface opacity as a PERCENT (0 = fully see-through, 100 = solid; default 100). `FrostedCardSurface`
@@ -309,6 +331,8 @@ public enum CardAppearancePrefs {
 /// Kotlin via `NoopPrefs.skyBehindCards`.
 public enum SkyBehindCardsPrefs {
     public static let enabledKey = "noop.skyBehindCards"
+    /// Default for a fresh install: OFF (it only matters while the day-cycle background is on).
+    public static let defaultEnabled = false
 }
 
 /// Custom background image (#custom-background): a user-picked photo drawn full-bleed behind every screen,
@@ -362,9 +386,9 @@ public enum BackgroundFillMode: String, CaseIterable, Identifiable, Sendable {
 private struct AdditiveBloom: ViewModifier {
     @Environment(\.colorScheme) private var scheme
     func body(content: Content) -> some View {
-        // Dialed back (0.55) — the full-strength additive bloom read as too much glow against the
-        // crisper design language. Still present on dark for depth, just restrained.
-        if scheme == .dark { content.blendMode(.plusLighter).opacity(0.55) }
+        // `NoopVisualStyle.glowsEnabled` is the single switch: off by default (flat design), so every
+        // bloom layer is hidden. When on, it is the previous dark-only, restrained additive bloom.
+        if NoopVisualStyle.glowsEnabled, scheme == .dark { content.blendMode(.plusLighter).opacity(0.55) }
         else { content.opacity(0) }
     }
 }
@@ -388,6 +412,18 @@ private struct NoopElevation: ViewModifier {
 public extension View {
     /// Apply the additive glow only on dark; hide it on light. See `AdditiveBloom`.
     func additiveBloom() -> some View { modifier(AdditiveBloom()) }
+
+    /// A coloured halo (a tinted `shadow`) that only exists while `NoopVisualStyle.glowsEnabled` is on.
+    /// With the flat design (the default) it adds no modifier at all, so dots, gauge tips and icons
+    /// render without a halo. Use this instead of a bare tinted `.shadow` for any decorative glow.
+    @ViewBuilder
+    func noopGlow(_ color: Color, radius: CGFloat, y: CGFloat = 0) -> some View {
+        if NoopVisualStyle.glowsEnabled {
+            shadow(color: color, radius: radius, x: 0, y: y)
+        } else {
+            self
+        }
+    }
 
     /// Apply the per-scheme card/surface elevation (shadow on light, lighter-fill idiom on dark).
     func noopElevation(hovering: Bool = false) -> some View { modifier(NoopElevation(hovering: hovering)) }
