@@ -23,6 +23,7 @@ jobs:
     outputs:
       tag: ${{ steps.m.outputs.tag }}
       ver: ${{ steps.m.outputs.ver }}
+      appver: ${{ steps.m.outputs.appver }}
     steps:
       - uses: actions/checkout@v5
       - id: m
@@ -35,6 +36,9 @@ jobs:
           SHA="${GITHUB_SHA:0:7}"
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           echo "ver=$VER" >> "$GITHUB_OUTPUT"
+          # The iPhone app's own version carries the run number in its last part (12.1.0 -> 12.1.<run>),
+          # so every testing build is newer than the one before and a sideload source offers it as an update.
+          echo "appver=${VER%.*}.${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
           # ROLLING release: recreate the single tag so stale (incl. old-version) assets never linger —
           # one stable URL, always the newest build, zero cleanup. (To KEEP a build, cut a one-off tag.)
           #
@@ -205,6 +209,7 @@ jobs:
           xcodebuild -scheme NOOPiOS -configuration Release -destination 'generic/platform=iOS'
           -derivedDataPath build/dd
           CODE_SIGNING_ALLOWED=NO CODE_SIGNING_REQUIRED=NO CODE_SIGN_IDENTITY=""
+          MARKETING_VERSION=${{ needs.meta.outputs.appver }}
           build
       - name: Package sideload .ipa (strip watch, preserve app/widget capabilities) + attach
         env:
@@ -226,6 +231,53 @@ jobs:
           rm -rf Payload && mkdir Payload && cp -R "$APP" Payload/
           zip -qr "NOOP-ios-unsigned-v${VER}.ipa" Payload
           gh release upload "${{ needs.meta.outputs.tag }}" "NOOP-ios-unsigned-v${VER}.ipa" --repo "$GITHUB_REPOSITORY" --clobber
+
+  # Point the fork's sideload source (altstore-source.json on main) at the build just published, so
+  # AltStore / SideStore offer it as an update from
+  # https://raw.githubusercontent.com/<fork>/main/altstore-source.json.
+  sideload-source:
+    needs: [meta, ios]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          ref: main
+      - name: Update altstore-source.json on main
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VER: ${{ needs.meta.outputs.ver }}
+          APPVER: ${{ needs.meta.outputs.appver }}
+          TAG: ${{ needs.meta.outputs.tag }}
+        run: |
+          IPA="NOOP-ios-unsigned-v${VER}.ipa"
+          URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/${IPA}"
+          SIZE=$(gh release view "$TAG" --repo "$GITHUB_REPOSITORY" --json assets -q ".assets[] | select(.name==\"$IPA\") | .size")
+          test -n "$SIZE" || { echo "::error::$IPA is not attached to $TAG"; exit 1; }
+          BUILD=$(gh api "repos/${GITHUB_REPOSITORY}/contents/project.yml?ref=${GITHUB_SHA}" -H "Accept: application/vnd.github.raw" \
+            | grep -m1 'CURRENT_PROJECT_VERSION' | sed -E 's/.*"([^"]+)".*/\1/')
+          DATE=$(date -u +%Y-%m-%d)
+          SHA="${GITHUB_SHA:0:7}"
+          tmp=$(mktemp)
+          jq --arg v "$APPVER" --arg b "$BUILD" --arg d "$DATE" --arg u "$URL" --argjson s "$SIZE" \
+             --arg repo "$GITHUB_REPOSITORY" --arg note "Testing build ${SHA}." '
+            .sourceURL = "https://raw.githubusercontent.com/\($repo)/main/altstore-source.json"
+            | .identifier = "com.noopapp.noop.altstore.fork"
+            | .website = "https://github.com/\($repo)"
+            | .news = []
+            | .apps[0].version = $v
+            | .apps[0].buildVersion = $b
+            | .apps[0].versionDate = $d
+            | .apps[0].versionDescription = $note
+            | .apps[0].downloadURL = $u
+            | .apps[0].size = $s
+            | .apps[0].versions = [{version: $v, buildVersion: $b, date: $d, localizedDescription: $note,
+                                    downloadURL: $u, size: $s, minOSVersion: (.apps[0].minOSVersion // "17.0")}]
+          ' altstore-source.json > "$tmp" && mv "$tmp" altstore-source.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add altstore-source.json
+          git commit -m "Point the sideload source at testing build ${SHA}"
+          git push origin HEAD:main
 
   # Fork-only housekeeping: the disposable `noop-staging` branch exists ONLY to feed this build. Once every
   # platform job has finished (pass OR fail — always()), delete it so GitHub's "Compare & pull request"
