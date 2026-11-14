@@ -18,7 +18,7 @@ public enum StrandFont {
     // MARK: Family
 
     private static func roundedSystem(_ size: CGFloat, weight: Font.Weight) -> Font {
-        .system(size: size, weight: weight, design: .rounded)
+        .system(size: size, weight: weight, design: .default)
     }
 
     // MARK: Scale (§9.2)
@@ -26,7 +26,7 @@ public enum StrandFont {
     /// Display 64–80 / Bold — the gauge score number. SF Rounded Bold with tight
     /// tracking (≈ -0.04em), tabular digits so a changing value never reflows.
     public static func display(_ size: CGFloat = 72) -> Font {
-        roundedSystem(size, weight: .bold).monospacedDigit()
+        roundedSystem(size, weight: .light).monospacedDigit()
     }
 
     /// The tight tracking for big display numbers (≈ -0.04em). Apply alongside
@@ -37,12 +37,12 @@ public enum StrandFont {
 
     /// A SF Rounded numeric style at an arbitrary size/weight — the house
     /// numeral. Tabular so live values align. Use anywhere a score/number is shown.
-    public static func rounded(_ size: CGFloat, weight: Font.Weight = .bold) -> Font {
+    public static func rounded(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
         roundedSystem(size, weight: weight).monospacedDigit()
     }
 
     /// Title1: the large-title style (34 pt) in the system font, Bold. Scales with Dynamic Type.
-    public static let title1 = Font.system(.largeTitle, weight: .bold)
+    public static let title1 = Font.system(.largeTitle, weight: .semibold)
 
     /// Title2 22 / Bold, system font. Scales with Dynamic Type.
     public static let title2 = Font.system(.title2, weight: .bold)
@@ -91,16 +91,16 @@ public enum StrandFont {
 
     /// A numeric style at an arbitrary size/weight, for live values — SF Rounded
     /// Bold by default, tabular digits. This is the tile/value numeral.
-    public static func number(_ size: CGFloat, weight: Font.Weight = .bold) -> Font {
+    public static func number(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {
         roundedSystem(size, weight: weight).monospacedDigit()
     }
 
     /// Helvetica-Neue body number — for inline live values that should align. Scales with Dynamic
     /// Type alongside its sibling `body`/`caption` labels so a value and its label stay matched.
-    public static let bodyNumber = Font.system(.body, design: .rounded, weight: .bold).monospacedDigit()
+    public static let bodyNumber = Font.system(.body, design: .default, weight: .medium).monospacedDigit()
 
     /// Helvetica-Neue caption number — for small live values (sparklines, chips). Scales with Dynamic Type.
-    public static let captionNumber = Font.system(.caption, design: .rounded, weight: .bold).monospacedDigit()
+    public static let captionNumber = Font.system(.caption, design: .default, weight: .medium).monospacedDigit()
 
     /// Mono at an arbitrary size.
     public static func mono(_ size: CGFloat, weight: Font.Weight = .regular) -> Font {

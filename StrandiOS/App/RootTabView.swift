@@ -69,9 +69,16 @@ struct RootTabView: View {
     /// Today if they prefer it (keyed identically to the SettingsView toggle). Default ON.
     @AppStorage("noop.liquidTodayEnabled") private var liquidTodayEnabled = true
 
+    /// The Summary screen is the first tab by default; switching this off restores the earlier Today.
+    @AppStorage("noop.summaryEnabled") private var summaryEnabled = true
+
+    /// Tab tags in the order the bar shows them. Tags stay literal because `tabPaths` and `scrollTop`
+    /// are indexed by tag; only the display order differs from the numeric order.
+    private static let tabOrder = [0, 2, 3, 1, 4]
+
     /// The Today tab root, honouring the liquid/classic preference.
     @ViewBuilder private var todayTabRoot: some View {
-        if liquidTodayEnabled { LiquidTodayView() } else { TodayView() }
+        if summaryEnabled { SummaryView() } else if liquidTodayEnabled { LiquidTodayView() } else { TodayView() }
     }
 
     /// Native tab selection binding. SwiftUI sends taps on the already-selected item through the
@@ -114,7 +121,9 @@ struct RootTabView: View {
                 guard selectedTab != 0 else { return }
                 let dx = v.translation.width, dy = v.translation.height
                 guard abs(dx) > 60, abs(dx) > abs(dy) * 1.6 else { return }
-                let next = min(4, max(0, selectedTab + (dx < 0 ? 1 : -1)))
+                let order = Self.tabOrder
+                let index = order.firstIndex(of: selectedTab) ?? 0
+                let next = order[min(order.count - 1, max(0, index + (dx < 0 ? 1 : -1)))]
                 if next != selectedTab {
                     withAnimation(.timingCurve(0.22, 1, 0.36, 1, duration: 0.24)) { selectedTab = next }
                 }
@@ -126,18 +135,17 @@ struct RootTabView: View {
         // its dynamic interaction with scrolling content automatically; older supported releases use
         // the corresponding system material and safe-area behaviour from the same TabView.
         TabView(selection: nativeTabSelection) {
-            tab(todayTabRoot, "Today", "square.grid.2x2", path: $tabPaths[0], scrollSignal: scrollTop[0]).tag(0)
-            tab(TrendsView(), "Trends", "chart.line.uptrend.xyaxis", path: $tabPaths[1], scrollSignal: scrollTop[1]).tag(1)
-            tab(SleepView(), "Sleep", "bed.double", path: $tabPaths[2], scrollSignal: scrollTop[2]).tag(2)
+            tab(todayTabRoot, "Summary", "house.fill", path: $tabPaths[0], scrollSignal: scrollTop[0]).tag(0)
+            tab(SleepView(), "Sleep", "bed.double.fill", path: $tabPaths[2], scrollSignal: scrollTop[2]).tag(2)
+            // Workouts takes the slot Coach used to hold (tag 3); Coach moved back under More.
+            tab(WorkoutsView(), "Training", "flame.fill", path: $tabPaths[3], scrollSignal: scrollTop[3]).tag(3)
+            tab(TrendsView(), "Trends", "chart.bar.fill", path: $tabPaths[1], scrollSignal: scrollTop[1]).tag(1)
             // K3: Coach promoted to a top-level tab (was behind the More list). The sparkles icon
             // matches the More-tab row and the macOS sidebar entry.
             // Conditional on the master switch. The tags stay LITERAL rather than being renumbered when
             // Coach is absent: `tabPaths` and `scrollTop` are indexed by tag, and More stays tag 4 in both
             // shapes, so a wearer's More tab keeps its identity, its navigation path and its scroll
             // position across a flip instead of inheriting Coach's.
-            if coachEnabled {
-                tab(CoachView(), "Coach", "sparkles", path: $tabPaths[3], scrollSignal: scrollTop[3]).tag(3)
-            }
             moreTab(path: $tabPaths[4], scrollSignal: scrollTop[4]).tag(4)
         }
         .tint(StrandPalette.accent)
@@ -145,7 +153,7 @@ struct RootTabView: View {
         // any more, which renders as an empty tab rather than as an error. Send that wearer to Today, and
         // only in that case, so a flip made from anywhere else does not move them.
         .onChangeCompat(of: coachEnabled) { enabled in
-            if !enabled && selectedTab == 3 { selectedTab = 0 }
+            _ = enabled   // Coach no longer owns a tab, so switching it off never strands the selection.
         }
         // #1841: the same "Hide bar when scrolling" preference Android drives its own bar with. Here the
         // system owns the behaviour — iOS 26's tab bar MINIMISES to a pill on scroll down rather than
@@ -223,7 +231,7 @@ struct RootTabView: View {
                     router.requestedDestination = nil
                     break
                 }
-                withAnimation(.timingCurve(0.22, 1, 0.36, 1, duration: 0.24)) { selectedTab = 3 }
+                routedPillar = dest
                 router.requestedDestination = nil
             case .trends:
                 // Trends is a primary tab on iPhone (not a pillar sheet) — switch to it.
@@ -466,7 +474,7 @@ struct RootTabView: View {
                 moreSection("Insights") {
                     MoreRow("What Moves You", "wand.and.sparkles", .insightsHub)
                     MoreRow("Intelligence", "brain.head.profile", .intelligence)
-                    // K3: Coach promoted to a top-level tab — no longer listed under More.
+                    if coachEnabled { MoreRow("Coach", "sparkles", .coach) }
                     MoreRow("Insights", "lightbulb.fill", .insights)
                     MoreRow("Explore", "square.grid.2x2.fill", .explore)
                     MoreRow("Compare", "rectangle.split.2x1.fill", .compare)

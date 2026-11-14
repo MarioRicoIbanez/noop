@@ -7,20 +7,20 @@ import SwiftUI
 // bindings, while cards, gauges, typography, and chrome share one maintainable source of truth.
 
 public enum NoopVisualStyle {
-    // Dark appearance follows the iOS system palette on a pure black canvas: black canvas, #1C1C1E cards,
-    // #2C2C2E inset wells, #38383A separators. Light values are unchanged from the previous design.
+    // Dark appearance follows the iOS system palette on a pure black canvas: black canvas, #111112 cards,
+    // #1E1E20 inset wells, #38383A separators. Light values are unchanged from the previous design.
     public static let canvas = Color(light: "#F3F4F6", dark: "#000000")
-    public static let surface = Color(light: "#FFFFFF", dark: "#1C1C1E")
-    public static let surfaceTop = Color(light: "#FFFFFF", dark: "#1C1C1E")
-    public static let surfaceBottom = Color(light: "#F4F5F7", dark: "#1C1C1E")
-    public static let inset = Color(light: "#E8E9ED", dark: "#2C2C2E")
+    public static let surface = Color(light: "#FFFFFF", dark: "#111112")
+    public static let surfaceTop = Color(light: "#FFFFFF", dark: "#111112")
+    public static let surfaceBottom = Color(light: "#F4F5F7", dark: "#111112")
+    public static let inset = Color(light: "#E8E9ED", dark: "#1E1E20")
 
     public static let border = Color(light: "#D8DAE0", dark: "#38383A")
     /// Only used for transient emphasis (hover / press / selected segment); resting cards draw no border.
     public static let borderHighlight = Color(light: "#FFFFFF", dark: "#48484A")
     public static let divider = Color(light: "#E4E5E9", dark: "#38383A")
 
-    public static let primaryText = Color(light: "#17181C", dark: "#FFFFFF")
+    public static let primaryText = Color(light: "#17181C", dark: "#F5F3EE")
     public static let secondaryText = Color(light: "#555861", dark: "#8E8E93")
     public static let tertiaryText = Color(light: "#7D808A", dark: "#636366")
 
@@ -33,26 +33,26 @@ public enum NoopVisualStyle {
 
     // The single accent and its tonal steps. Dark values are the approved design hexes; the light values
     // are the same hues darkened so the greens keep contrast on a white card.
-    /// System green: the one accent (selected state, links, gauges at full value).
-    public static let green = Color(light: "#1E9E45", dark: "#30D158")
+    /// Muted emerald: the one accent (selected state, links, gauges at full value).
+    public static let green = Color(light: "#1E9E45", dark: "#54C794")
     /// Deep green: sleep "deep", the low end of intensity ramps.
-    public static let greenDeep = Color(light: "#14663A", dark: "#1B7F49")
+    public static let greenDeep = Color(light: "#14663A", dark: "#1E6F52")
     /// Mid green: sleep "light", mid intensity.
-    public static let greenMid = Color(light: "#2A9A55", dark: "#34B866")
+    public static let greenMid = Color(light: "#2A9A55", dark: "#3FA57A")
     /// Pale green: sleep "REM", the top of intensity ramps.
-    public static let greenSoft = Color(light: "#5CCB8A", dark: "#A6F2C0")
+    public static let greenSoft = Color(light: "#5CCB8A", dark: "#BFE6D3")
     /// Neutral grey for "awake" and other non-data marks (system grey).
     public static let neutralMark = Color(light: "#8E8E93", dark: "#8E8E93")
     /// The only colours that are allowed to differ from the green family: real warnings.
-    public static let warning = Color(light: "#C77700", dark: "#FF9F0A")
+    public static let warning = Color(light: "#C77700", dark: "#D9906A")
     public static let critical = Color(light: "#D70015", dark: "#FF453A")
 
     /// Decorative glow, bloom and halo layers are off. The shared glow helpers (`additiveBloom`, gauge
     /// tip halos, pulse-dot shadows) read this single switch, so flipping it back restores them.
     public static let glowsEnabled = false
 
-    public static let cardRadius: CGFloat = 22
-    public static let compactRadius: CGFloat = 20
+    public static let cardRadius: CGFloat = 16
+    public static let compactRadius: CGFloat = 14
     public static let pillRadius: CGFloat = 999
     public static let pagePadding: CGFloat = 16
     public static let cardPadding: CGFloat = 16

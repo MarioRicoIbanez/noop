@@ -343,8 +343,8 @@ public enum StrandPalette {
     public static let scenicStar       = Color(light: "#D8CDB6", dark: "#C8CFD8")
 
     /// Frosted-card tint endpoints (white→warm on light; the accent wash sits over them).
-    public static let cardFillTop      = Color(light: "#FFFFFF", dark: "#1C1C1E")
-    public static let cardFillBottom   = Color(light: "#FAF7F0", dark: "#1C1C1E")
+    public static let cardFillTop      = Color(light: "#FFFFFF", dark: "#111112")
+    public static let cardFillBottom   = Color(light: "#FAF7F0", dark: "#111112")
 
     // MARK: - Titanium & Gold core tokens (NEW)
     //

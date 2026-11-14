@@ -11,7 +11,7 @@ public extension View {
     /// Apply the card surface as a background. `tint` no longer paints anything (flat surface).
     func frostedCardSurface(
         tint: Color? = nil,
-        cornerRadius: CGFloat = 22,
+        cornerRadius: CGFloat = 16,
         washStrength: Double = 1.0
     ) -> some View {
         background(FrostedCardSurface(tint: tint, cornerRadius: cornerRadius, washStrength: washStrength))
@@ -28,7 +28,7 @@ public struct FrostedCardSurface: View {
     // solid (default). Reading it here makes every card update live when the Settings slider moves.
     @AppStorage(CardAppearancePrefs.opacityKey) private var cardOpacityPercent = CardAppearancePrefs.defaultPercent
 
-    public init(tint: Color? = nil, cornerRadius: CGFloat = 22, washStrength: Double = 1.0) {
+    public init(tint: Color? = nil, cornerRadius: CGFloat = 16, washStrength: Double = 1.0) {
         self.tint = tint
         self.cornerRadius = cornerRadius
         self.washStrength = washStrength
@@ -61,7 +61,7 @@ public struct StrandCard<Content: View>: View {
 
     public init(
         padding: CGFloat = 16,
-        cornerRadius: CGFloat = 22,
+        cornerRadius: CGFloat = 16,
         tint: Color? = nil,
         @ViewBuilder content: @escaping () -> Content
     ) {
@@ -87,7 +87,7 @@ public struct StrandCardHover: ViewModifier {
     public var cornerRadius: CGFloat
     @State private var hovering = false
 
-    public init(cornerRadius: CGFloat = 22) {
+    public init(cornerRadius: CGFloat = 16) {
         self.cornerRadius = cornerRadius
     }
 
@@ -105,7 +105,7 @@ public struct StrandCardHover: ViewModifier {
 
 public extension View {
     /// Apply the Strand card hover lift (-1px translate; no shadow or border).
-    func strandCardHover(cornerRadius: CGFloat = 22) -> some View {
+    func strandCardHover(cornerRadius: CGFloat = 16) -> some View {
         modifier(StrandCardHover(cornerRadius: cornerRadius))
     }
 }

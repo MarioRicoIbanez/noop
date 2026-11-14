@@ -35,6 +35,8 @@ enum TabRoute: Hashable {
     case health
     case hydration
     case coupled
+    /// The nightly vitals against the wearer's usual range, pushed from the Summary vitals card.
+    case vitals
 }
 
 extension View {
@@ -71,6 +73,7 @@ extension View {
             case .health: HealthView()
             case .hydration: HydrationView()
             case .coupled: CoupledView()
+            case .vitals: VitalsDetailView()
             }
         }
     }
