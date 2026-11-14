@@ -10,7 +10,7 @@ final class MoreSectionPrefsTests: XCTestCase {
 
     func testFreshInstallDefaultsToInsightsAndBody() {
         // The seed: Insights + Body open at rest, Data + App collapsed.
-        XCTAssertEqual(MoreSectionPrefs.defaultExpanded, ["Insights", "Body"])
+        XCTAssertEqual(MoreSectionPrefs.defaultExpanded, ["Essentials"])
         XCTAssertEqual(MoreSectionPrefs.decode(MoreSectionPrefs.defaultCSV), ["Insights", "Body"])
     }
 

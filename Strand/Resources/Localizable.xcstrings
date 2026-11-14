@@ -1,6 +1,13 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "Essentials": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Essentials"}}, "es": {"stringUnit": {"state": "translated", "value": "Lo esencial"}}}},
+    "Live, not fully paired": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Live, not fully paired"}}, "es": {"stringUnit": {"state": "translated", "value": "En vivo, sin emparejar del todo"}}}},
+    "Last 10 seconds": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Last 10 seconds"}}, "es": {"stringUnit": {"state": "translated", "value": "Últimos 10 segundos"}}}},
+    "Elevation": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Elevation"}}, "es": {"stringUnit": {"state": "translated", "value": "Elevación"}}}},
+    "Gyroscope": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Gyroscope"}}, "es": {"stringUnit": {"state": "translated", "value": "Giroscopio"}}}},
+    "%lld %": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "%lld %"}}, "es": {"stringUnit": {"state": "translated", "value": "%lld %"}}}},
+    "The strap is connected without a secure pairing, so it cannot send motion. Pair it again with its light flashing blue.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "The strap is connected without a secure pairing, so it cannot send motion. Pair it again with its light flashing blue."}}, "es": {"stringUnit": {"state": "translated", "value": "La pulsera está conectada sin emparejamiento seguro, así que no puede mandar el movimiento. Vuelve a emparejarla con la luz parpadeando en azul."}}}},
     "Period": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Period"}}, "es": {"stringUnit": {"state": "translated", "value": "Periodo"}}}},
     "This period": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "This period"}}, "es": {"stringUnit": {"state": "translated", "value": "Este periodo"}}}},
     "The period before": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "The period before"}}, "es": {"stringUnit": {"state": "translated", "value": "El periodo anterior"}}}},

@@ -68,6 +68,12 @@ struct ScreenScaffold<Content: View, Trailing: View>: View {
         // permits horizontal bounce when content genuinely overflows the width (it does not here, the column
         // is width-capped), so the spurious horizontal rubber-band that caused the sideways drift is gone.
         .scrollBounceBehavior(.basedOnSize, axes: .horizontal)
+        // An opaque strip behind the status bar, so scrolled content never shows through the clock.
+        .safeAreaInset(edge: .top, spacing: 0) {
+            Color.clear
+                .frame(height: 0)
+                .background(StrandPalette.surfaceBase.ignoresSafeArea(edges: .top))
+        }
         #endif
         // The flat canvas, plus an optional full-bleed TOP backdrop (Today's day-cycle scene) drawn behind
         // the scroll content — edge-to-edge under the status bar. The scene is CONFINED to the header+hero
@@ -103,12 +109,12 @@ struct ScreenScaffold<Content: View, Trailing: View>: View {
     @ViewBuilder private var column: some View {
         if lazy {
             LazyVStack(alignment: .leading, spacing: 20) {
-                if title != nil || subtitle != nil { header }
+                if title != nil { header }
                 content()
             }
         } else {
             VStack(alignment: .leading, spacing: 20) {
-                if title != nil || subtitle != nil { header }
+                if title != nil { header }
                 content()
             }
         }
@@ -122,9 +128,7 @@ struct ScreenScaffold<Content: View, Trailing: View>: View {
                     // identically (2026-07-02 cohesion pass).
                     Text(title).font(StrandFont.rounded(28)).foregroundStyle(StrandPalette.textPrimary)
                 }
-                if let subtitle {
-                    Text(subtitle).font(StrandFont.subhead).foregroundStyle(StrandPalette.textSecondary)
-                }
+                // The subtitle is accepted but not drawn: one line of title per screen keeps it calm.
             }
             Spacer(minLength: 0)
             trailing()

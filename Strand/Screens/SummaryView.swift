@@ -357,6 +357,7 @@ struct SummaryView: View {
 
         ScreenScaffold(title: nil, onRefresh: { await repo.refresh() }) {
             header
+            SummaryLiveCard()
             recoveryCard(latest: latest, vitals: vitals)
             NavigationLink(value: TabRoute.vitals) {
                 vitalsCard(vitals)
@@ -592,6 +593,76 @@ struct SummaryView: View {
             .padding(.top, 8)
         }
         .contentShape(Rectangle())
+    }
+}
+
+// MARK: - Live card
+
+/// What the strap reads right now: pulse, a two-minute trace, battery. Its own view so the one-second
+/// updates redraw only this card.
+struct SummaryLiveCard: View {
+    @EnvironmentObject private var live: LiveState
+    @EnvironmentObject private var router: NavRouter
+    @State private var trace: [Double] = []
+    private let tick = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
+
+    var body: some View {
+        Button {
+            router.openDevices()
+        } label: {
+            SummaryCard(symbol: "waveform.path.ecg", title: "Now", trailing: status) {
+                HStack(alignment: .center, spacing: 16) {
+                    SummaryValue(text: live.heartRate.map { String($0) } ?? "–", unit: "bpm", size: 44,
+                                 weight: .light)
+                    MotionTraceLine(values: trace)
+                        .frame(height: 44)
+                    if let battery = live.batteryPct {
+                        VStack(alignment: .trailing, spacing: 2) {
+                            Image(systemName: "battery.50")
+                                .font(.system(size: 13))
+                                .foregroundStyle(SummaryStyle.secondary)
+                            Text("\(Int(battery.rounded())) %")
+                                .font(SummaryStyle.number(13, .regular))
+                                .foregroundStyle(SummaryStyle.secondary)
+                        }
+                    }
+                }
+                .padding(.top, 10)
+            }
+            .contentShape(Rectangle())
+        }
+        .buttonStyle(.plain)
+        .onReceive(tick) { _ in
+            guard live.connected, let hr = live.heartRate else { return }
+            trace.append(Double(hr))
+            if trace.count > 120 { trace.removeFirst(trace.count - 120) }
+        }
+    }
+
+    private var status: LocalizedStringKey {
+        if !live.connected { return "Not connected" }
+        return live.encryptedBond ? "Live" : "Live, not fully paired"
+    }
+}
+
+/// A single line scaled between its own lowest and highest value, newest at the right.
+struct MotionTraceLine: View {
+    let values: [Double]
+
+    var body: some View {
+        Canvas { ctx, size in
+            guard values.count >= 2, let low = values.min(), let high = values.max() else { return }
+            let span = max(high - low, 6)
+            let step = size.width / CGFloat(119)
+            let offset = CGFloat(120 - values.count) * step
+            var path = Path()
+            for (i, value) in values.enumerated() {
+                let x = offset + CGFloat(i) * step
+                let y = size.height - 3 - CGFloat((value - low) / span) * (size.height - 6)
+                if i == 0 { path.move(to: CGPoint(x: x, y: y)) } else { path.addLine(to: CGPoint(x: x, y: y)) }
+            }
+            ctx.stroke(path, with: .color(SummaryStyle.tint), style: StrokeStyle(lineWidth: 1.5, lineJoin: .round))
+        }
     }
 }
 

@@ -38,8 +38,24 @@ public enum RepCounter {
 
     /// Count repetitions in one set. `gx`, `gy`, `gz` are gyro rates in degrees per second.
     public static func count(gx: [Double], gy: [Double], gz: [Double], sampleRate: Double = 100) -> Result {
+        analyse(gx: gx, gy: gy, gz: gz, sampleRate: sampleRate).result
+    }
+
+    /// The count together with the two signals it was read from, for drawing.
+    public struct Analysis: Sendable {
+        public let result: Result
+        /// Swing angle around its midpoint, in degrees, one value per sample.
+        public let angle: [Double]
+        /// Rotation rate around the main axis, in degrees per second, one value per sample.
+        public let rate: [Double]
+
+        public static let empty = Analysis(result: .none, angle: [], rate: [])
+    }
+
+    /// Count repetitions in one set and keep the angle and rate signals.
+    public static func analyse(gx: [Double], gy: [Double], gz: [Double], sampleRate: Double = 100) -> Analysis {
         let n = min(gx.count, min(gy.count, gz.count))
-        guard n >= Int(3 * sampleRate) else { return .none }
+        guard n >= Int(3 * sampleRate) else { return .empty }
 
         // Centre each axis.
         var cols: [[Double]] = []
@@ -69,7 +85,7 @@ public enum RepCounter {
                 next[a] = cov[a][0] * axis[0] + cov[a][1] * axis[1] + cov[a][2] * axis[2]
             }
             let norm = (next[0] * next[0] + next[1] * next[1] + next[2] * next[2]).squareRoot()
-            guard norm > 0 else { return .none }
+            guard norm > 0 else { return .empty }
             axis = [next[0] / norm, next[1] / norm, next[2] / norm]
         }
         var lambda = 0.0
@@ -155,7 +171,8 @@ public enum RepCounter {
         }
 
         let looksLikeSet = p95 >= minSwingDegrees && share >= minAxisShare
-        return Result(reps: looksLikeSet ? reps : 0, swingDegrees: p95, axisShare: share)
+        let result = Result(reps: looksLikeSet ? reps : 0, swingDegrees: p95, axisShare: share)
+        return Analysis(result: result, angle: angle, rate: rate)
     }
 
     // MARK: - Filters
