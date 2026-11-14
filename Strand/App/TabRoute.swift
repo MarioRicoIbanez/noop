@@ -37,6 +37,8 @@ enum TabRoute: Hashable {
     case coupled
     /// The nightly vitals against the wearer's usual range, pushed from the Summary vitals card.
     case vitals
+    /// The habit-based age and what each habit adds or removes, pushed from the Summary card.
+    case bodyAge
 }
 
 extension View {
@@ -74,6 +76,7 @@ extension View {
             case .hydration: HydrationView()
             case .coupled: CoupledView()
             case .vitals: VitalsDetailView()
+            case .bodyAge: BodyAgeDetailView()
             }
         }
     }

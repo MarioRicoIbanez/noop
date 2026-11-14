@@ -1,4 +1,5 @@
 import SwiftUI
+import StrandAnalytics
 import StrandDesign
 import WhoopStore
 
@@ -243,6 +244,64 @@ struct SummaryRing: View {
     }
 }
 
+// MARK: - Recovery orb
+
+/// A slow-moving sphere of the accent greens behind the recovery number. Brighter with a better
+/// recovery; still when Reduce Motion is on.
+struct SummaryOrb: View {
+    /// 0…1, how bright the sphere is.
+    let energy: Double
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        TimelineView(.animation(minimumInterval: 1.0 / 20.0, paused: reduceMotion)) { timeline in
+            let t = timeline.date.timeIntervalSinceReferenceDate * 0.35
+            GeometryReader { geo in
+                let radius = min(geo.size.width, geo.size.height) / 2
+                Canvas { ctx, size in
+                    let c = CGPoint(x: size.width / 2, y: size.height / 2)
+                    let r = min(size.width, size.height) / 2
+                    ctx.drawLayer { layer in
+                        layer.addFilter(.blur(radius: r * 0.32))
+                        let base = CGRect(x: c.x - r * 0.95, y: c.y - r * 0.95, width: r * 1.9, height: r * 1.9)
+                        layer.fill(Path(ellipseIn: base), with: .color(SummaryStyle.deep.opacity(0.55)))
+                        SummaryOrb.blob(&layer, c, r, t * 0.55, SummaryStyle.tint.opacity(0.9), 0.42)
+                        SummaryOrb.blob(&layer, c, r, t * 0.38 + 2.4, SummaryStyle.pale.opacity(0.55), 0.30)
+                        SummaryOrb.blob(&layer, c, r, t * 0.70 + 4.4, SummaryStyle.deep.opacity(0.9), 0.50)
+                    }
+                }
+                .mask(
+                    RadialGradient(stops: [
+                        .init(color: .black, location: 0),
+                        .init(color: .black.opacity(0.85), location: 0.6),
+                        .init(color: .clear, location: 1),
+                    ], center: .center, startRadius: radius * 0.35, endRadius: radius)
+                )
+                .opacity(min(1, max(0, energy)))
+                .overlay(
+                    Circle().fill(
+                        RadialGradient(stops: [
+                            .init(color: Color.white.opacity(0.10), location: 0),
+                            .init(color: Color.white.opacity(0), location: 0.5),
+                            .init(color: Color.black.opacity(0.25), location: 1),
+                        ], center: UnitPoint(x: 0.375, y: 0.325), startRadius: 0, endRadius: radius)
+                    )
+                )
+            }
+        }
+        .accessibilityHidden(true)
+    }
+
+    private static func blob(_ ctx: inout GraphicsContext, _ c: CGPoint, _ r: CGFloat, _ angle: Double,
+                             _ color: Color, _ size: CGFloat) {
+        let orbit = r * 0.42
+        let x = c.x + CGFloat(cos(angle)) * orbit
+        let y = c.y + CGFloat(sin(angle * 1.31 + 0.6)) * orbit
+        let rect = CGRect(x: x - r * size, y: y - r * size, width: r * size * 2, height: r * size * 2)
+        ctx.fill(Path(ellipseIn: rect), with: .color(color))
+    }
+}
+
 // MARK: - Vitals range track
 
 /// One vital on a ruler: the grey stretch is the usual range, the hairlines are the previous seven
@@ -288,6 +347,7 @@ struct VitalRangeTrack: View {
 struct SummaryView: View {
     @EnvironmentObject private var repo: Repository
     @EnvironmentObject private var router: NavRouter
+    @EnvironmentObject private var profile: ProfileStore
     @State private var oxygenEstimate: [String: Double] = [:]
 
     var body: some View {
@@ -304,6 +364,10 @@ struct SummaryView: View {
             .buttonStyle(.plain)
             NavigationLink(value: TabRoute.workouts) {
                 effortCard(days: days)
+            }
+            .buttonStyle(.plain)
+            NavigationLink(value: TabRoute.bodyAge) {
+                bodyAgeCard(SummaryBodyAge.estimate(days: days, sleeps: repo.sleeps, age: profile.age))
             }
             .buttonStyle(.plain)
         }
@@ -362,6 +426,8 @@ struct SummaryView: View {
         return SummaryCard(symbol: "heart.fill", title: "Recovery") {
             HStack(alignment: .center, spacing: 20) {
                 ZStack {
+                    SummaryOrb(energy: recovery.map { 0.35 + 0.5 * $0 / 100 } ?? 0.3)
+                        .frame(width: 100, height: 100)
                     SummaryRing(segments: segments)
                     VStack(spacing: 2) {
                         Text(recovery.map { String(Int($0.rounded())) } ?? "–")
@@ -526,6 +592,153 @@ struct SummaryView: View {
             .padding(.top, 8)
         }
         .contentShape(Rectangle())
+    }
+}
+
+// MARK: - Body age
+
+enum SummaryBodyAge {
+    /// The habit-based age from the last 30 days. Each habit needs at least a week of values.
+    static func estimate(days: [DailyMetric], sleeps: [CachedSleepSession], age: Int) -> BiologicalAge.Result? {
+        let recent = Array(days.sorted { $0.day < $1.day }.suffix(30))
+
+        func mean(_ values: [Double]) -> Double? {
+            guard values.count >= 7 else { return nil }
+            return values.reduce(0, +) / Double(values.count)
+        }
+        let steps = mean(recent.compactMap { d in d.steps.map { Double($0) } }.filter { $0 > 0 })
+        let rhr = mean(recent.compactMap { d in d.restingHr.map { Double($0) } })
+        let sleep = mean(recent.compactMap { $0.totalSleepMin }.filter { $0 > 0 }.map { $0 / 60 })
+
+        let cutoff = Int(Date().timeIntervalSince1970) - 30 * 86_400
+        let sessions = sleeps.filter { $0.endTs >= cutoff }.map { (start: $0.effectiveStartTs, end: $0.endTs) }
+        let regularity = sessions.count >= 7 ? BiologicalAge.sleepRegularityIndex(sessions: sessions) : nil
+
+        return BiologicalAge.estimate(chronologicalAge: Double(age), steps: steps, restingHR: rhr,
+                                      sleepHours: sleep, sleepRegularity: regularity)
+    }
+
+    static func yearsText(_ years: Double) -> String {
+        let body = abs(years).formatted(.number.precision(.fractionLength(1)))
+        if years > 0.05 { return "+" + body }
+        if years < -0.05 { return "−" + body }
+        return body
+    }
+}
+
+extension SummaryView {
+    func bodyAgeCard(_ result: BiologicalAge.Result?) -> some View {
+        SummaryCard(symbol: "hourglass", title: "Body age", trailing: "Last 30 days", showsChevron: true) {
+            if let result {
+                HStack(alignment: .firstTextBaseline, spacing: 10) {
+                    Text(result.age.formatted(.number.precision(.fractionLength(1))))
+                        .font(SummaryStyle.number(38))
+                        .tracking(-1.1)
+                        .foregroundStyle(SummaryStyle.primary)
+                    Text("\(SummaryBodyAge.yearsText(result.deltaYears)) years against your real age")
+                        .font(.system(size: 13))
+                        .foregroundStyle(SummaryStyle.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+                .padding(.top, 8)
+            } else {
+                Text("Appears after a week of steps, pulse and sleep.")
+                    .font(.system(size: 15))
+                    .foregroundStyle(SummaryStyle.secondary)
+                    .padding(.top, 8)
+            }
+        }
+        .contentShape(Rectangle())
+    }
+}
+
+/// Pushed from the Summary body-age card: what each habit adds or removes, and where the numbers
+/// come from.
+struct BodyAgeDetailView: View {
+    @EnvironmentObject private var repo: Repository
+    @EnvironmentObject private var profile: ProfileStore
+
+    var body: some View {
+        let result = SummaryBodyAge.estimate(days: repo.days, sleeps: repo.sleeps, age: profile.age)
+
+        ScreenScaffold(title: "Body age", onRefresh: { await repo.refresh() }) {
+            if let result {
+                HStack(alignment: .firstTextBaseline, spacing: 8) {
+                    Text(result.age.formatted(.number.precision(.fractionLength(1))))
+                        .font(SummaryStyle.number(64, .thin))
+                        .foregroundStyle(SummaryStyle.primary)
+                    Text("Real age \(profile.age)")
+                        .font(.system(size: 15))
+                        .foregroundStyle(SummaryStyle.secondary)
+                }
+
+                VStack(spacing: 0) {
+                    ForEach(Array(result.factors.enumerated()), id: \.element.id) { index, factor in
+                        if index > 0 {
+                            Rectangle().fill(SummaryStyle.rule).frame(height: 0.5)
+                        }
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text(title(factor.kind))
+                                    .font(.system(size: 16))
+                                    .foregroundStyle(SummaryStyle.primary)
+                                Text(valueText(factor))
+                                    .font(.system(size: 13))
+                                    .foregroundStyle(SummaryStyle.secondary)
+                            }
+                            Spacer()
+                            Text("\(SummaryBodyAge.yearsText(factor.years)) years")
+                                .font(SummaryStyle.number(17, .regular))
+                                .foregroundStyle(factor.years > 0.05 ? SummaryStyle.warn
+                                                 : factor.years < -0.05 ? SummaryStyle.tint : SummaryStyle.secondary)
+                        }
+                        .frame(height: 62)
+                    }
+                }
+                .padding(.horizontal, 18)
+                .padding(.vertical, 4)
+                .background(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .fill(StrandPalette.surfaceRaised)
+                )
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16, style: .continuous)
+                        .strokeBorder(Color.white.opacity(0.085), lineWidth: 0.5)
+                )
+            } else {
+                Text("Appears after a week of steps, pulse and sleep.")
+                    .font(.system(size: 15))
+                    .foregroundStyle(SummaryStyle.secondary)
+            }
+
+            Text("An estimate, not a measurement and not medical advice. It starts from the age in your profile and moves it by four habits from the last 30 days, each converted to years with a published mortality study (Paluch 2022 for steps, Zhang 2016 for resting pulse, Yin 2017 for sleep duration, Windred 2024 for sleep regularity). The four effects overlap in real life, so their sum overstates the total.")
+                .font(.system(size: 13))
+                .foregroundStyle(SummaryStyle.tertiary)
+                .fixedSize(horizontal: false, vertical: true)
+        }
+    }
+
+    private func title(_ kind: BiologicalAge.Factor.Kind) -> LocalizedStringKey {
+        switch kind {
+        case .steps: return "Steps"
+        case .restingHR: return "Resting pulse"
+        case .sleepDuration: return "Sleep"
+        case .sleepRegularity: return "Sleep regularity"
+        }
+    }
+
+    private func valueText(_ factor: BiologicalAge.Factor) -> String {
+        switch factor.kind {
+        case .steps:
+            return String(localized: "\(Int(factor.value.rounded())) a day")
+        case .restingHR:
+            return "\(Int(factor.value.rounded())) bpm"
+        case .sleepDuration:
+            let total = Int((factor.value * 60).rounded())
+            return "\(total / 60) h \(total % 60) min"
+        case .sleepRegularity:
+            return String(localized: "\(Int(factor.value.rounded())) of 100")
+        }
     }
 }
 
