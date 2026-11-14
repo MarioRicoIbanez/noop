@@ -1,6 +1,11 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "A beat on your wrist, a little slower than your pulse. It slows down as you do.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "A beat on your wrist, a little slower than your pulse. It slows down as you do."}}, "es": {"stringUnit": {"state": "translated", "value": "Un compás en la muñeca, un poco más lento que tu pulso. Va bajando a medida que bajas tú."}}}},
+    "Guided breath instead": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Guided breath instead"}}, "es": {"stringUnit": {"state": "translated", "value": "Respiración guiada"}}}},
+    "Your pulse": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Your pulse"}}, "es": {"stringUnit": {"state": "translated", "value": "Tu pulso"}}}},
+    "Beat": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Beat"}}, "es": {"stringUnit": {"state": "translated", "value": "Compás"}}}},
+    "Started at": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Started at"}}, "es": {"stringUnit": {"state": "translated", "value": "Empezaste en"}}}},
     "Four seconds in, six out, for three minutes. A tap on the wrist marks each change.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Four seconds in, six out, for three minutes. A tap on the wrist marks each change."}}, "es": {"stringUnit": {"state": "translated", "value": "Cuatro segundos inhalando y seis exhalando, durante tres minutos. Un toque en la muñeca marca cada cambio."}}}},
     "Your pulse went from %lld to %lld bpm.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Your pulse went from %lld to %lld bpm."}}, "es": {"stringUnit": {"state": "translated", "value": "Tu pulso pasó de %lld a %lld ppm."}}}},
     "Steady beat instead": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Steady beat instead"}}, "es": {"stringUnit": {"state": "translated", "value": "Compás constante en la muñeca"}}}},

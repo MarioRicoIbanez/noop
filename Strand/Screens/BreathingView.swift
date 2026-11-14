@@ -988,6 +988,44 @@ private struct BreathBloom: View {
     }
 }
 
+/// The Calm me beat drawn: a heart that swells once per beat and sends a ring outward each time. Still,
+/// with one faint ring, when no beat is running or Reduce Motion is on.
+private struct CalmBeat: View {
+    /// Beats per minute of the wrist metronome; nil while it is not running.
+    let bpm: Double?
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        TimelineView(.animation(minimumInterval: 1.0 / 30.0, paused: reduceMotion || bpm == nil)) { timeline in
+            let rate = max(30, min(200, bpm ?? 60))
+            let beat = timeline.date.timeIntervalSinceReferenceDate * rate / 60
+            let within = beat - beat.rounded(.down)
+            let moving = bpm != nil && !reduceMotion
+            Canvas { ctx, size in
+                let c = CGPoint(x: size.width / 2, y: size.height / 2)
+                let reach = min(size.width, size.height) / 2
+                // Three rings one beat apart, each fading as it travels outward.
+                for ring in 0..<3 {
+                    let travel = moving ? (within + Double(ring)) / 3 : (Double(ring) + 1) / 3.5
+                    let radius = reach * (0.3 + 0.7 * travel)
+                    let rect = CGRect(x: c.x - radius, y: c.y - radius, width: radius * 2, height: radius * 2)
+                    ctx.stroke(Path(ellipseIn: rect),
+                               with: .color(SummaryStyle.heart.opacity(moving ? 0.55 * (1 - travel) : 0.12)),
+                               lineWidth: 2)
+                }
+            }
+            .overlay {
+                Image(systemName: "heart.fill")
+                    .font(.system(size: 54, weight: .semibold))
+                    .foregroundStyle(SummaryStyle.heart)
+                    .scaleEffect(1 + (moving ? 0.2 * exp(-6 * within) : 0))
+                    .opacity(bpm == nil ? 0.5 : 1)
+            }
+        }
+        .accessibilityHidden(true)
+    }
+}
+
 // MARK: - Lazy controller holder
 
 /// Holds the `BiofeedbackController` so it can be created from the environment model/live on first
@@ -1371,32 +1409,33 @@ private struct CalmModeView: View {
 
     var body: some View {
         VStack(spacing: NoopMetrics.gap) {
-            if beatRunning {
-                liveCard
-            } else {
+            if running {
                 breathCard
-                NoopButton(running ? "Stop" : "Calm me for 3 min",
-                           systemImage: running ? "stop.fill" : "heart.fill",
-                           kind: running ? .destructive : .primary, fullWidth: true) {
-                    running ? stop() : start()
-                }
-                if !running, let from = startPulse, let to = endPulse {
-                    StrandCard(padding: 18) {
-                        Text("Your pulse went from \(from) to \(to) bpm.")
-                            .font(.system(size: 17))
-                            .foregroundStyle(StrandPalette.textPrimary)
-                            .frame(maxWidth: .infinity, alignment: .leading)
+                NoopButton("Stop", systemImage: "stop.fill", kind: .destructive, fullWidth: true) { stop() }
+            } else {
+                beatCard
+                if beatRunning {
+                    NoopButton("Stop", systemImage: "stop.fill", kind: .destructive, fullWidth: true) {
+                        controller.stop()
                     }
-                }
-                if !running {
-                    // The earlier Calm me, a steady beat on the wrist just under the pulse, is kept as
-                    // a second option.
-                    NoopButton("Steady beat instead", systemImage: "metronome", kind: .secondary,
-                               fullWidth: true) {
+                } else {
+                    NoopButton("Calm me for 3 min", systemImage: "heart.fill", kind: .primary, fullWidth: true) {
                         controller.startCalmMe()
                     }
                     .disabled(!canRun)
                     if let outcome = controller.calmOutcome { outcomeCard(outcome) }
+                    if let from = startPulse, let to = endPulse {
+                        StrandCard(padding: 18) {
+                            Text("Your pulse went from \(from) to \(to) bpm.")
+                                .font(.system(size: 17))
+                                .foregroundStyle(StrandPalette.textPrimary)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                        }
+                    }
+                    // A paced breath for when the beat alone does not settle things.
+                    NoopButton("Guided breath instead", systemImage: "wind", kind: .secondary, fullWidth: true) {
+                        start()
+                    }
                 }
             }
         }
@@ -1409,6 +1448,57 @@ private struct CalmModeView: View {
             }
         }
         .onDisappear { if running { stop() } }
+    }
+
+    /// The wrist beat drawn: rings leave the heart once per beat, with the wearer's pulse and the
+    /// beat's tempo side by side so the gap between them, and how it closes, can be seen.
+    private var beatCard: some View {
+        StrandCard(padding: 24) {
+            VStack(spacing: 18) {
+                CalmBeat(bpm: beatRunning ? controller.calmTargetBpm : nil)
+                    .frame(height: 240)
+                    .frame(maxWidth: .infinity)
+                if beatRunning {
+                    HStack(alignment: .top, spacing: 0) {
+                        beatFigure("Your pulse", model.bpm.map { String($0) } ?? "–", SummaryStyle.heart)
+                        beatFigure("Beat", controller.calmTargetBpm.map { String(Int($0.rounded())) } ?? "–",
+                                   SummaryStyle.primary)
+                        beatFigure("Started at", controller.calmStartHR.map { String($0) } ?? "–",
+                                   SummaryStyle.secondary)
+                    }
+                } else if !controller.canBuzz {
+                    Text("Connect your strap. Calm me is a felt rhythm on the wrist, so it needs a bonded connection.")
+                        .font(.system(size: 16))
+                        .foregroundStyle(StrandPalette.textSecondary)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                } else if !canRun {
+                    Text("Waiting for a resting heart rate. Start a live reading first, or come back when you're still.")
+                        .font(.system(size: 16))
+                        .foregroundStyle(StrandPalette.textSecondary)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                } else {
+                    Text("A beat on your wrist, a little slower than your pulse. It slows down as you do.")
+                        .font(.system(size: 16))
+                        .foregroundStyle(StrandPalette.textPrimary)
+                        .multilineTextAlignment(.center)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
+            }
+        }
+    }
+
+    private func beatFigure(_ label: LocalizedStringKey, _ value: String, _ color: Color) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(label)
+                .font(.system(size: 14))
+                .foregroundStyle(SummaryStyle.secondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+            SummaryValue(text: value, unit: "bpm", size: 26, color: color)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var breathCard: some View {
