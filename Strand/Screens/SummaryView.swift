@@ -193,6 +193,8 @@ struct SummaryValue: View {
             Text(text)
                 .font(SummaryStyle.number(size, weight))
                 .foregroundStyle(color)
+                .contentTransition(.numericText())
+                .animation(.easeOut(duration: 0.3), value: text)
             Text(unit)
                 .font(.system(size: max(12, size * 0.5)))
                 .foregroundStyle(SummaryStyle.secondary)
@@ -214,6 +216,9 @@ struct SummaryRing: View {
 
     let segments: [Segment]
     private let gap = 0.035
+    /// False until the ring has appeared; the bright arcs then sweep out to their length.
+    @State private var drawn = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private func bounds(_ index: Int) -> (start: Double, end: Double) {
         let free = 1 - gap * Double(segments.count)
@@ -248,13 +253,65 @@ struct SummaryRing: View {
                     .stroke(seg.color.opacity(0.2), style: StrokeStyle(lineWidth: 7, lineCap: .round))
                 if seg.fill > 0.01 {
                     Circle()
-                        .trim(from: b.start, to: lit)
+                        .trim(from: b.start, to: drawn ? lit : b.start)
                         .stroke(seg.color, style: StrokeStyle(lineWidth: 7, lineCap: .round))
+                        .opacity(drawn ? 1 : 0)
+                        .animation(reduceMotion ? nil : Animation.easeOut(duration: 0.9).delay(0.2 + 0.18 * Double(i)),
+                                   value: drawn)
                 }
             }
             .rotationEffect(.degrees(-90))
             .padding(3.5)
         }
+        .onAppear { drawn = true }
+    }
+}
+
+/// A whole number that counts up to its value when it appears and rolls when the value changes.
+struct SummaryCountUp: View {
+    let value: Double
+    let font: Font
+    var decimals: Int = 0
+    @State private var shown: Double = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        CountUpNumber(value: shown, font: font, decimals: decimals)
+            .onAppear { roll() }
+            .onChange(of: value) { _ in roll() }
+    }
+
+    private func roll() {
+        if reduceMotion {
+            shown = value
+        } else {
+            withAnimation(.easeOut(duration: 0.9)) { shown = value }
+        }
+    }
+}
+
+/// A row of thin bars that rise to their height one after another; the last one takes the subject's
+/// colour.
+struct SummaryBars: View {
+    let values: [Double]
+    let top: Double
+    var color: Color = SummaryStyle.activity
+    @State private var grown = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+
+    var body: some View {
+        HStack(alignment: .bottom, spacing: 3) {
+            ForEach(0..<values.count, id: \.self) { i in
+                let last = i == values.count - 1
+                RoundedRectangle(cornerRadius: 2)
+                    .fill(last ? color : Color(white: 0.34))
+                    .frame(width: 5, height: grown ? max(3, CGFloat(values[i] / top) * 50) : 3)
+                    .animation(reduceMotion ? nil : Animation.spring(response: 0.5, dampingFraction: 0.8)
+                        .delay(0.15 + 0.03 * Double(i)), value: grown)
+            }
+        }
+        .frame(height: 52, alignment: .bottom)
+        .onAppear { grown = true }
     }
 }
 
@@ -372,19 +429,24 @@ struct SummaryView: View {
         ScreenScaffold(title: nil, onRefresh: { await repo.refresh() }) {
             header
             SummaryLiveCard()
+                .staggeredAppear(index: 0)
             recoveryCard(latest: latest, vitals: vitals)
+                .staggeredAppear(index: 1)
             NavigationLink(value: TabRoute.vitals) {
                 vitalsCard(vitals)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(LiquidPressStyle())
+            .staggeredAppear(index: 2)
             NavigationLink(value: TabRoute.workouts) {
                 effortCard(days: days)
             }
-            .buttonStyle(.plain)
+            .buttonStyle(LiquidPressStyle())
+            .staggeredAppear(index: 3)
             NavigationLink(value: TabRoute.bodyAge) {
                 bodyAgeCard(SummaryBodyAge.estimate(days: days, sleeps: repo.sleeps, age: profile.age))
             }
-            .buttonStyle(.plain)
+            .buttonStyle(LiquidPressStyle())
+            .staggeredAppear(index: 4)
         }
         .task(id: repo.refreshSeq) {
             oxygenEstimate = await SummaryVitals.loadOxygenEstimate(repo)
@@ -445,10 +507,15 @@ struct SummaryView: View {
                         .frame(width: 100, height: 100)
                     SummaryRing(segments: segments)
                     VStack(spacing: 2) {
-                        Text(recovery.map { String(Int($0.rounded())) } ?? "–")
-                            .font(SummaryStyle.number(54))
-                            .tracking(-1.8)
-                            .foregroundStyle(SummaryStyle.primary)
+                        Group {
+                            if let recovery {
+                                SummaryCountUp(value: recovery, font: SummaryStyle.number(54))
+                            } else {
+                                Text(verbatim: "–").font(SummaryStyle.number(54))
+                            }
+                        }
+                        .tracking(-1.8)
+                        .foregroundStyle(SummaryStyle.primary)
                         if let recovery {
                             Text(recoveryLabel(recovery))
                                 .font(.system(size: 13))
@@ -594,15 +661,7 @@ struct SummaryView: View {
                     .tracking(-1.1)
                     .foregroundStyle(SummaryStyle.primary)
                 Spacer()
-                HStack(alignment: .bottom, spacing: 3) {
-                    ForEach(0..<values.count, id: \.self) { i in
-                        let last = i == values.count - 1
-                        RoundedRectangle(cornerRadius: 2)
-                            .fill(last ? SummaryStyle.activity : Color(white: 0.34))
-                            .frame(width: 5, height: max(3, CGFloat(values[i] / top) * 50))
-                    }
-                }
-                .frame(height: 52, alignment: .bottom)
+                SummaryBars(values: values, top: top)
             }
             .padding(.top, 8)
         }

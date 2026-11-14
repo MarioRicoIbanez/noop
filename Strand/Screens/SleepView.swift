@@ -7,6 +7,47 @@ import WhoopStore
 import UIKit
 #endif
 
+/// The three folded groups the Sleep tab's analytical cards sit in.
+private enum SleepFold: String, CaseIterable, Identifiable {
+    case night
+    case trends
+    case habits
+
+    var id: String { rawValue }
+
+    var sections: [SleepSection] {
+        switch self {
+        case .night: return [.stages, .nightDetail]
+        case .trends: return [.sleepDebt, .stagesVsTypical, .asleepDuration]
+        case .habits: return [.sleepMarks, .bodyClock]
+        }
+    }
+
+    var title: LocalizedStringKey {
+        switch self {
+        case .night: return "This night in detail"
+        case .trends: return "Trends and sleep debt"
+        case .habits: return "Body clock and marks"
+        }
+    }
+
+    var caption: LocalizedStringKey {
+        switch self {
+        case .night: return "Edit times, naps, heart rate"
+        case .trends: return "Last 30 days"
+        case .habits: return "Your rhythm, bedtime marks"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .night: return "moon.stars.fill"
+        case .trends: return "chart.line.uptrend.xyaxis"
+        case .habits: return "clock.fill"
+        }
+    }
+}
+
 // MARK: - SleepView
 //
 // Whoop-sleep clarity on the locked Noop component system. Scannable in two seconds:
@@ -179,13 +220,26 @@ struct SleepView: View {
                         // in the upper band; the night scene itself is the fixed topBackground.
                         // Customize sits at the end of the hero (not floating in a blank band).
                         // The dial hero replaces the earlier liquid-gauge hero and its night scene.
-                        SleepDialHero(night: heroNight(resolved))
+                        SleepDialHero(night: heroNight(resolved),
+                                      canGoOlder: nightOffset < max(navDays.count - 1, 0),
+                                      canGoNewer: nightOffset > 0,
+                                      goOlder: { nightOffset += 1 },
+                                      goNewer: { nightOffset -= 1 })
                             .staggeredAppear(index: 0)
                         alarmsEntry
-                        // #sleep-layout: the analytical cards render in the user's saved order minus the
-                        // hidden set, below the pinned Rest hero. Reordered via the Arrange sheet.
-                        ForEach(Array(sleepVisibleSections.enumerated()), id: \.element) { idx, section in
-                            sleepSectionView(section, resolved).staggeredAppear(index: idx + 1)
+                        // #sleep-layout: the analytical cards keep the user's saved order minus the hidden
+                        // set, but wait in three folded groups below the night's dial and stages, so the
+                        // tab opens on one night read at a glance.
+                        ForEach(SleepFold.allCases) { fold in
+                            let sections = sleepVisibleSections.filter { fold.sections.contains($0) }
+                            if !sections.isEmpty {
+                                FoldSection(symbol: fold.symbol, title: fold.title, caption: fold.caption,
+                                            accent: SummaryStyle.sleep, storageKey: "sleep." + fold.rawValue) {
+                                    ForEach(sections) { section in
+                                        sleepSectionView(section, resolved)
+                                    }
+                                }
+                            }
                         }
                     }
                 } else {

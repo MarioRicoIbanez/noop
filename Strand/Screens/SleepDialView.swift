@@ -217,19 +217,52 @@ struct SleepStagesCard: View {
 /// The top of the Sleep tab: title, the night dial, and the stages card.
 struct SleepDialHero: View {
     let night: Night
+    var canGoOlder: Bool = false
+    var canGoNewer: Bool = false
+    var goOlder: () -> Void = {}
+    var goNewer: () -> Void = {}
 
     var body: some View {
         VStack(alignment: .leading, spacing: 14) {
-            VStack(alignment: .leading, spacing: 1) {
-                Text(night.dateLabel)
-                    .font(.system(size: 13))
-                    .foregroundStyle(SummaryStyle.secondary)
-                Text("Sleep")
-                    .font(.system(size: 31, weight: .medium))
-                    .foregroundStyle(SummaryStyle.primary)
+            HStack(alignment: .bottom) {
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(night.dateLabel)
+                        .font(.system(size: 14))
+                        .foregroundStyle(SummaryStyle.secondary)
+                    Text("Sleep")
+                        .font(.system(size: 31, weight: .medium))
+                        .foregroundStyle(SummaryStyle.primary)
+                }
+                Spacer()
+                stepButton("chevron.left", enabled: canGoOlder, label: "Previous night", action: goOlder)
+                stepButton("chevron.right", enabled: canGoNewer, label: "Next night", action: goNewer)
             }
-            SleepDial(night: night)
-            SleepStagesCard(night: night)
+            Group {
+                SleepDial(night: night)
+                SleepStagesCard(night: night)
+            }
+            .id(night.dateLabel)
+            .transition(.opacity)
         }
+        .animation(.easeInOut(duration: 0.25), value: night.dateLabel)
+    }
+
+    /// One of the two round buttons that step through the stored nights.
+    private func stepButton(_ symbol: String, enabled: Bool, label: LocalizedStringKey,
+                            action: @escaping () -> Void) -> some View {
+        Button {
+            StrandHaptic.selection.play()
+            action()
+        } label: {
+            Image(systemName: symbol)
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundStyle(enabled ? SummaryStyle.sleep : SummaryStyle.tertiary)
+                .frame(width: 44, height: 44)
+                .background(Circle().fill(StrandPalette.surfaceInset))
+        }
+        .buttonStyle(.plain)
+        .disabled(!enabled)
+        .opacity(enabled ? 1 : 0.45)
+        .accessibilityLabel(Text(label))
     }
 }

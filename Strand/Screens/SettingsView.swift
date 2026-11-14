@@ -16,7 +16,80 @@ import WhoopProtocol
 
 /// Settings — profile (powers zones / calories / recovery), strap connection, and about.
 /// Grouped cards on surface.raised with a two-column form feel.
+/// The pages Settings is split into on iPhone. The first screen lists them; each one holds the cards
+/// that used to sit in a single long scroll.
+enum SettingsPage: String, CaseIterable, Identifiable {
+    case profile
+    case appearance
+    case strap
+    case tracking
+    case scoring
+    case data
+    case advanced
+    case about
+
+    var id: String { rawValue }
+
+    var title: LocalizedStringKey {
+        switch self {
+        case .profile: return "Profile and units"
+        case .appearance: return "Appearance"
+        case .strap: return "Strap"
+        case .tracking: return "Tracking"
+        case .scoring: return "Recovery"
+        case .data: return "Sync and backup"
+        case .advanced: return "Advanced"
+        case .about: return "About"
+        }
+    }
+
+    var caption: LocalizedStringKey {
+        switch self {
+        case .profile: return "Age, height, weight, units"
+        case .appearance: return "Theme, icon, background"
+        case .strap: return "Name, notifications, HRV capture"
+        case .tracking: return "Optional trackers and streak"
+        case .scoring: return "Baseline and scoring"
+        case .data: return "Background sync, export, restore"
+        case .advanced: return "Test Centre and experiments"
+        case .about: return "Version, updates, help"
+        }
+    }
+
+    var symbol: String {
+        switch self {
+        case .profile: return "person.fill"
+        case .appearance: return "paintbrush.fill"
+        case .strap: return "dot.radiowaves.left.and.right"
+        case .tracking: return "checklist"
+        case .scoring: return "heart.text.square.fill"
+        case .data: return "arrow.triangle.2.circlepath"
+        case .advanced: return "wrench.and.screwdriver.fill"
+        case .about: return "info.circle.fill"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .profile: return SummaryStyle.heart
+        case .appearance: return SummaryStyle.sleep
+        case .strap: return SummaryStyle.vitals
+        case .tracking: return SummaryStyle.activity
+        case .scoring: return SummaryStyle.tint
+        case .data: return SummaryStyle.vitals
+        case .advanced, .about: return Color(white: 0.42)
+        }
+    }
+}
+
 struct SettingsView: View {
+    /// The page shown. Nil is the list of pages (iPhone) or the whole of Settings (Mac).
+    private let page: SettingsPage?
+
+    init(page: SettingsPage? = nil) {
+        self.page = page
+    }
+
     @EnvironmentObject var model: AppModel
     @EnvironmentObject var live: LiveState
     @EnvironmentObject var profile: ProfileStore
@@ -253,13 +326,20 @@ struct SettingsView: View {
     @AppStorage(SettingsDisclosureDefaults.advancedOpenKey) private var advancedOpen = SettingsDisclosureDefaults.advancedOpenDefault
 
     var body: some View {
-        ScreenScaffold(title: "Settings",
-                       subtitle: "Your numbers, your strap, and how NOOP works. All on \(Platform.deviceNounPhrase).",
+        ScreenScaffold(title: page?.title ?? "Settings",
+                       subtitle: scaffoldSubtitle,
                        // The day-of-sky liquid backdrop, matching Today / Health / Sleep / Trends / Devices:
                        // a fixed, full-bleed time-of-day sky behind the scroll content (it does not scroll).
                        // Settings' own frosted cards sit on the dark canvas below the sky band, unchanged.
                        topBackground: liquidScaffoldSky()) {
             VStack(alignment: .leading, spacing: NoopMetrics.sectionSpacing) {
+                #if os(iOS)
+                if let page {
+                    pageCards(page)
+                } else {
+                    settingsHub
+                }
+                #else
                 // Everyday sections stay expanded (S3): the ones a first-run user actually needs.
                 profileCard.staggeredAppear(index: 0)
                 unitsCard.staggeredAppear(index: 1)
@@ -293,6 +373,7 @@ struct SettingsView: View {
 
                 // About stays expanded at the foot (version, links and the help sheets people return to).
                 aboutCard.staggeredAppear(index: 7)
+                #endif
             }
         }
         .alert(backupAlertTitle, isPresented: $showBackupAlert) {
@@ -357,6 +438,112 @@ struct SettingsView: View {
         }
         #endif
     }
+
+    private var scaffoldSubtitle: LocalizedStringKey? {
+        #if os(iOS)
+        return nil
+        #else
+        return "Your numbers, your strap, and how NOOP works. All on \(Platform.deviceNounPhrase)."
+        #endif
+    }
+
+    // MARK: - Pages (iPhone)
+
+    #if os(iOS)
+    /// The first screen of Settings: every page as one row, in three groups.
+    private var settingsHub: some View {
+        VStack(spacing: 14) {
+            hubGroup([.profile, .appearance]).staggeredAppear(index: 0)
+            hubGroup([.strap, .tracking, .scoring]).staggeredAppear(index: 1)
+            hubGroup([.data, .advanced, .about]).staggeredAppear(index: 2)
+        }
+    }
+
+    private func hubGroup(_ pages: [SettingsPage]) -> some View {
+        VStack(spacing: 0) {
+            ForEach(Array(pages.enumerated()), id: \.element) { index, item in
+                if index > 0 {
+                    Rectangle()
+                        .fill(Color.white.opacity(0.09))
+                        .frame(height: 0.5)
+                        .padding(.leading, 66)
+                }
+                NavigationLink {
+                    SettingsView(page: item)
+                        .background(StrandPalette.surfaceBase.ignoresSafeArea())
+                } label: {
+                    hubRow(item)
+                }
+                .buttonStyle(.plain)
+            }
+        }
+        .background(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .fill(StrandPalette.surfaceRaised)
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .strokeBorder(Color.white.opacity(0.085), lineWidth: 0.5)
+        )
+    }
+
+    private func hubRow(_ item: SettingsPage) -> some View {
+        HStack(spacing: 14) {
+            Image(systemName: item.symbol)
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(Color.white)
+                .frame(width: 36, height: 36)
+                .background(RoundedRectangle(cornerRadius: 9, style: .continuous).fill(item.color))
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(item.title)
+                    .font(.system(size: 17))
+                    .foregroundStyle(StrandPalette.textPrimary)
+                Text(item.caption)
+                    .font(.system(size: 14))
+                    .foregroundStyle(StrandPalette.textSecondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.85)
+            }
+            Spacer(minLength: 8)
+            Image(systemName: "chevron.right")
+                .font(.system(size: 13, weight: .semibold))
+                .foregroundStyle(StrandPalette.textTertiary)
+                .accessibilityHidden(true)
+        }
+        .padding(.horizontal, 16)
+        .frame(minHeight: 64)
+        .contentShape(Rectangle())
+    }
+
+    /// The cards of one page. Every card of the old single scroll is on exactly one page.
+    @ViewBuilder private func pageCards(_ page: SettingsPage) -> some View {
+        switch page {
+        case .profile:
+            profileCard.staggeredAppear(index: 0)
+            unitsCard.staggeredAppear(index: 1)
+        case .appearance:
+            appearanceCard.staggeredAppear(index: 0)
+        case .strap:
+            strapCard.staggeredAppear(index: 0)
+            liveNotificationsCard.staggeredAppear(index: 1)
+            hrvCard.staggeredAppear(index: 2)
+        case .tracking:
+            featuresCard.staggeredAppear(index: 0)
+            streakCard.staggeredAppear(index: 1)
+        case .scoring:
+            recoveryCard.staggeredAppear(index: 0)
+        case .data:
+            syncCard.staggeredAppear(index: 0)
+            backupCard.staggeredAppear(index: 1)
+        case .advanced:
+            testCentreCard.staggeredAppear(index: 0)
+            experimentalCard
+        case .about:
+            aboutCard.staggeredAppear(index: 0)
+        }
+    }
+    #endif
 
     // MARK: - Profile
 
@@ -2846,7 +3033,6 @@ private struct SettingsSection<Content: View>: View {
         StrandCard(padding: NoopMetrics.space5) {
             VStack(alignment: .leading, spacing: NoopMetrics.space4) {
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Settings").strandOverline()
                     HStack(spacing: NoopMetrics.space2 + 2) {
                         Image(systemName: icon)
                             .foregroundStyle(StrandPalette.accent)

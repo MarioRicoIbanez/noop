@@ -311,28 +311,36 @@ struct TrendsView: View {
                 VStack(alignment: .leading, spacing: NoopMetrics.sectionSpacing) {
                     // The main card list ripples in once on appear (Reduce-Motion safe).
                     Group {
-                        // Week-in-review digest (#208) with prev/next week browsing (#710) — self-hides
-                        // only when NO week in history has data. Past weeks render in the same format.
-                        weeklyDigestNav
-                            .staggeredAppear(index: 0)
-                        // The Charge / Effort / Rest trio, presented in NOOP's pip language.
-                        weekInReview(charge: metrics.recovery, effort: metrics.strain, rest: metrics.rest)
-                            .staggeredAppear(index: 1)
                         rangeBar(recovery: metrics.recovery)
-                            .staggeredAppear(index: 2)
+                            .staggeredAppear(index: 0)
                         heroRecovery(recovery: metrics.recovery)
-                            .staggeredAppear(index: 3)
+                            .staggeredAppear(index: 1)
                         smallMultiples(hrv: metrics.hrv, rhr: metrics.rhr, strain: metrics.strain)
-                            .staggeredAppear(index: 4)
-                        // Long-horizon training load (CTL/ATL/TSB). Uses the FULL history, not the
-                        // range window — chronic load is inherently a 42-day horizon. Self-hides its
-                        // chart behind an honest "needs N more days" state until enough history exists.
-                        TrainingLoadCard(days: repo.days)
-                            .staggeredAppear(index: 5)
-                        yearStrip
-                            .staggeredAppear(index: 6)
+                            .staggeredAppear(index: 2)
+                        // The weekly digest and the long-horizon cards are read now and then, so they
+                        // wait folded below the range charts.
+                        FoldSection(symbol: "calendar", title: "Week in review",
+                                    caption: "Digest of each week",
+                                    accent: SummaryStyle.tint, storageKey: "trends.week") {
+                            // Week-in-review digest (#208) with prev/next week browsing (#710) — self-hides
+                            // only when NO week in history has data. Past weeks render in the same format.
+                            weeklyDigestNav
+                            // The Charge / Effort / Rest trio, presented in NOOP's pip language.
+                            weekInReview(charge: metrics.recovery, effort: metrics.strain, rest: metrics.rest)
+                        }
+                        .staggeredAppear(index: 3)
+                        FoldSection(symbol: "chart.xyaxis.line", title: "Training load and year",
+                                    caption: "Fitness, fatigue, the year at a glance",
+                                    accent: SummaryStyle.activity, storageKey: "trends.load") {
+                            // Long-horizon training load (CTL/ATL/TSB). Uses the FULL history, not the
+                            // range window — chronic load is inherently a 42-day horizon. Self-hides its
+                            // chart behind an honest "needs N more days" state until enough history exists.
+                            TrainingLoadCard(days: repo.days)
+                            yearStrip
+                        }
+                        .staggeredAppear(index: 4)
                         exportReportRow
-                            .staggeredAppear(index: 7)
+                            .staggeredAppear(index: 5)
                     }
                 }
             }

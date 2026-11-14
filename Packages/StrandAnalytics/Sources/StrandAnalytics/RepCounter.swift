@@ -105,8 +105,12 @@ public enum RepCounter {
         public let angle: [Double]
         /// Rotation rate around the main axis, in degrees per second, one value per sample.
         public let rate: [Double]
+        /// Sample index of each counted repetition's top.
+        public let peaks: [Int]
+        /// Unit vector of the main rotation axis in the strap's frame. Its sign is arbitrary.
+        public let axis: [Double]
 
-        public static let empty = Analysis(result: .none, angle: [], rate: [])
+        public static let empty = Analysis(result: .none, angle: [], rate: [], peaks: [], axis: [0, 0, 0])
     }
 
     /// Count repetitions in one set and keep the angle and rate signals.
@@ -211,7 +215,7 @@ public enum RepCounter {
         kept.sort()
 
         // Keep the peaks that stand out from their surroundings by 60 % of the swing.
-        var reps = 0
+        var peaks: [Int] = []
         for i in kept {
             var left = angle[i]
             var j = i - 1
@@ -225,12 +229,12 @@ public enum RepCounter {
                 right = min(right, angle[j])
                 j += 1
             }
-            if angle[i] - max(left, right) >= settings.prominenceFraction * p95 { reps += 1 }
+            if angle[i] - max(left, right) >= settings.prominenceFraction * p95 { peaks.append(i) }
         }
 
         let looksLikeSet = p95 >= settings.minSwingDegrees && share >= settings.minAxisShare
-        let result = Result(reps: looksLikeSet ? reps : 0, swingDegrees: p95, axisShare: share)
-        return Analysis(result: result, angle: angle, rate: rate)
+        let result = Result(reps: looksLikeSet ? peaks.count : 0, swingDegrees: p95, axisShare: share)
+        return Analysis(result: result, angle: angle, rate: rate, peaks: looksLikeSet ? peaks : [], axis: axis)
     }
 
     // MARK: - Filters

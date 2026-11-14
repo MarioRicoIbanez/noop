@@ -219,13 +219,19 @@ struct WorkoutsView: View {
                 if let postLogNote { postLogBanner(postLogNote) }
                 effortHero(rows: windowRows, effectiveRange: resolved, groups: groups)
                 summarySection(rows: windowRows, effectiveRange: resolved, groups: groups)
-                heatmapSection()
-                breakdownSection(groups: groups, rows: windowRows)
-                if let z = zonesSummary {
-                    zonesSection(z, totalSessions: windowRows.count)
-                }
-                recoveryTrendSection
+                // The session list is what this tab is opened for, so it comes before the charts; those
+                // wait folded underneath.
                 sessionsSection(rows: windowRows)
+                FoldSection(symbol: "chart.bar.fill", title: "Analysis",
+                            caption: "Calories, sports, zones, recovery",
+                            accent: SummaryStyle.activity, storageKey: "workouts.analysis") {
+                    heatmapSection()
+                    breakdownSection(groups: groups, rows: windowRows)
+                    if let z = zonesSummary {
+                        zonesSection(z, totalSessions: windowRows.count)
+                    }
+                    recoveryTrendSection
+                }
             }
         }
         .task(id: repo.refreshSeq) {

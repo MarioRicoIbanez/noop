@@ -65,13 +65,6 @@ private struct HealthSectionsStack: View {
             // so the ~1Hz HR stream re-renders only this subtree — the static
             // vitals grid below does not re-render on each HR tick.
             HeartRateSection()
-            // Fitness Age (weekly, computed by IntelligenceEngine and read back from the
-            // "fitness_age" metricSeries). Its own view depending only on `repo`/`profile`,
-            // so the live HR stream never re-renders it.
-            FitnessAgeSection()
-            // Vitality / Body Age (weekly, computed by IntelligenceEngine from the mortality-
-            // hazard model). Its own view depending only on repo/profile.
-            VitalitySection()
             // Screen-5 recovery detail: the CONTRIBUTORS to today's recovery as
             // labelled progress bars (HRV / Resting HR / Sleep / Respiratory), each
             // scored against the on-device baseline. Depends only on `repo`.
@@ -79,10 +72,26 @@ private struct HealthSectionsStack: View {
             // The static vitals grid is its own view depending only on `repo`,
             // so it is unaffected by live HR ticks.
             VitalsSection()
-            // v5 skin-temperature suite: the illness "heads-up", body clock, and (opt-in) cycle
-            // awareness, each driven by a pure StrandAnalytics engine result the analytics pass
-            // computed and AppModel publishes. Its own view depending on `model` + `repo`.
-            SkinTempSection()
+            // The weekly age estimates and the skin-temperature suite are read now and then, not daily,
+            // so they wait folded below the live and nightly numbers.
+            FoldSection(symbol: "figure.walk", title: "Fitness and body age",
+                        caption: "Weekly estimates",
+                        accent: SummaryStyle.tint, storageKey: "health.age") {
+                // Fitness Age (weekly, computed by IntelligenceEngine and read back from the
+                // "fitness_age" metricSeries). Its own view depending only on `repo`/`profile`.
+                FitnessAgeSection()
+                // Vitality / Body Age (weekly, computed by IntelligenceEngine from the mortality-
+                // hazard model). Its own view depending only on repo/profile.
+                VitalitySection()
+            }
+            FoldSection(symbol: "thermometer.medium", title: "Skin temperature",
+                        caption: "Illness heads-up, body clock, cycle",
+                        accent: SummaryStyle.vitals, storageKey: "health.skinTemp") {
+                // v5 skin-temperature suite: the illness "heads-up", body clock, and (opt-in) cycle
+                // awareness, each driven by a pure StrandAnalytics engine result the analytics pass
+                // computed and AppModel publishes. Its own view depending on `model` + `repo`.
+                SkinTempSection()
+            }
             // v5 deep-links: the records logbook + the multi-device fused record, reachable
             // from their honest Health home as drill-in rows (not their own destinations).
             HealthHubLinksSection()

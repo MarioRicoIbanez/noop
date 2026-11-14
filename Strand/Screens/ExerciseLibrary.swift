@@ -89,6 +89,76 @@ enum RepProfileStore {
     }
 }
 
+// MARK: - Movement signatures
+
+/// How one exercise moves the wrist: the axis it turns around, how far and how fast. Kept from the
+/// wearer's own sets so a finished set can be compared with the exercises already done.
+struct RepSignature: Codable {
+    var axis: [Double]
+    var swingDegrees: Double
+    var secondsPerRep: Double
+    var sets: Int
+}
+
+enum RepSignatureStore {
+    private static let key = "repCounter.signatures.v1"
+
+    static func all() -> [String: RepSignature] {
+        guard let data = UserDefaults.standard.data(forKey: key),
+              let stored = try? JSONDecoder().decode([String: RepSignature].self, from: data) else { return [:] }
+        return stored
+    }
+
+    /// Blend a finished set into the exercise's signature, or start over from it with `replace`.
+    static func learn(exerciseId: String, from set: RepSetDetector.DetectedSet, replace: Bool = false) {
+        guard !exerciseId.isEmpty, set.axis.count == 3 else { return }
+        var stored = all()
+        if let old = stored[exerciseId], !replace, old.axis.count == 3 {
+            let dot = old.axis[0] * set.axis[0] + old.axis[1] * set.axis[1] + old.axis[2] * set.axis[2]
+            let sign = dot < 0 ? -1.0 : 1.0
+            var axis = [0.0, 0.0, 0.0]
+            for i in 0..<3 { axis[i] = old.axis[i] * 0.7 + sign * set.axis[i] * 0.3 }
+            let norm = (axis[0] * axis[0] + axis[1] * axis[1] + axis[2] * axis[2]).squareRoot()
+            if norm > 0 { axis = axis.map { $0 / norm } }
+            stored[exerciseId] = RepSignature(axis: axis,
+                                              swingDegrees: old.swingDegrees * 0.7 + set.swingDegrees * 0.3,
+                                              secondsPerRep: old.secondsPerRep * 0.7 + set.secondsPerRep * 0.3,
+                                              sets: old.sets + 1)
+        } else {
+            stored[exerciseId] = RepSignature(axis: set.axis, swingDegrees: set.swingDegrees,
+                                              secondsPerRep: set.secondsPerRep, sets: 1)
+        }
+        if let data = try? JSONEncoder().encode(stored) {
+            UserDefaults.standard.set(data, forKey: key)
+        }
+    }
+
+    /// Whether a set moves like a stored signature: the same axis, and a swing and tempo within a
+    /// factor of two.
+    static func matches(_ set: RepSetDetector.DetectedSet, _ signature: RepSignature, minAxis: Double) -> Bool {
+        guard RepSetDetector.axisSimilarity(set.axis, signature.axis) >= minAxis else { return false }
+        guard signature.swingDegrees > 0, signature.secondsPerRep > 0 else { return true }
+        let swing = set.swingDegrees / signature.swingDegrees
+        let tempo = set.secondsPerRep / signature.secondsPerRep
+        return swing >= 0.5 && swing <= 2 && tempo >= 0.5 && tempo <= 2
+    }
+
+    /// The stored exercise a set resembles most, when one resembles it closely.
+    static func bestMatch(for set: RepSetDetector.DetectedSet, in signatures: [String: RepSignature],
+                          excluding: String?) -> String? {
+        var best: String?
+        var bestScore = 0.0
+        for (id, signature) in signatures where id != excluding && matches(set, signature, minAxis: 0.85) {
+            let score = RepSetDetector.axisSimilarity(set.axis, signature.axis)
+            if score > bestScore {
+                bestScore = score
+                best = id
+            }
+        }
+        return best
+    }
+}
+
 // MARK: - Muscle groups
 
 /// The muscle vocabulary of the exercise list, in the order the picker shows it.
@@ -203,6 +273,20 @@ enum RepSetStore {
         var stored = all()
         stored.append(record)
         if stored.count > 5_000 { stored.removeFirst(stored.count - 5_000) }
+        if let data = try? JSONEncoder().encode(stored) {
+            UserDefaults.standard.set(data, forKey: key)
+        }
+    }
+
+    /// Move a stored set to another exercise, or to none.
+    static func reassign(id: UUID, to exercise: LibraryExercise?, weightKg: Double) {
+        var stored = all()
+        guard let index = stored.lastIndex(where: { $0.id == id }) else { return }
+        stored[index].exerciseId = exercise?.id ?? ""
+        stored[index].name = exercise?.name ?? ""
+        stored[index].muscle = exercise?.muscle ?? ""
+        stored[index].secondary = exercise?.secondary ?? []
+        stored[index].weightKg = weightKg
         if let data = try? JSONEncoder().encode(stored) {
             UserDefaults.standard.set(data, forKey: key)
         }
