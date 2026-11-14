@@ -39,6 +39,15 @@ jobs:
           # The iPhone app's own version carries the run number in its last part (12.1.0 -> 12.1.<run>),
           # so every testing build is newer than the one before and a sideload source offers it as an update.
           echo "appver=${VER%.*}.${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+          # Keep the published build downloadable while this one compiles: when the rolling release
+          # already exists, leave it and its assets in place. Each job replaces its own asset when it
+          # finishes, and the sideload-source job restores the title. The delete-and-recreate below
+          # only runs for the very first build.
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" \
+              --title "NOOP Staging — base ${VER} · ${DATE} · building ${SHA}"
+            exit 0
+          fi
           # ROLLING release: recreate the single tag so stale (incl. old-version) assets never linger —
           # one stable URL, always the newest build, zero cleanup. (To KEEP a build, cut a one-off tag.)
           #
@@ -278,6 +287,7 @@ jobs:
           git add altstore-source.json
           git commit -m "Point the sideload source at testing build ${SHA}"
           git push origin HEAD:main
+          gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --title "NOOP Staging — base ${VER} · ${DATE} · ${SHA}"
 
   # Fork-only housekeeping: the disposable `noop-staging` branch exists ONLY to feed this build. Once every
   # platform job has finished (pass OR fail — always()), delete it so GitHub's "Compare & pull request"
