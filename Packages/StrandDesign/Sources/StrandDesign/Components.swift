@@ -485,22 +485,9 @@ public struct SegmentedPillControl<T: Hashable>: View {
                         .padding(.horizontal, equalWidth ? NoopMetrics.space1 : 9)
                         .background {
                             if sel {
-                                let selectedShape = RoundedRectangle(cornerRadius: 10, style: .continuous)
-                                selectedShape
-                                    .fill(
-                                        LinearGradient(
-                                            colors: [NoopVisualStyle.surfaceTop, NoopVisualStyle.surface],
-                                            startPoint: .top,
-                                            endPoint: .bottom
-                                        )
-                                    )
-                                    .overlay(
-                                        selectedShape.strokeBorder(
-                                            NoopVisualStyle.borderHighlight.opacity(0.62),
-                                            lineWidth: 0.75
-                                        )
-                                    )
-                                    .shadow(color: .black.opacity(0.20), radius: 4, x: 0, y: 2)
+                                // Flat selected segment: one solid fill, no gradient, border or shadow.
+                                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                                    .fill(NoopVisualStyle.selectedSegment)
                             }
                         }
                         .contentShape(RoundedRectangle(cornerRadius: 10, style: .continuous))
@@ -516,25 +503,9 @@ public struct SegmentedPillControl<T: Hashable>: View {
         .padding(3)
         .frame(maxWidth: equalWidth ? .infinity : nil)
         .background {
-            let trackShape = RoundedRectangle(cornerRadius: 13, style: .continuous)
-            trackShape
-                .fill(
-                    LinearGradient(
-                        colors: [NoopVisualStyle.inset, NoopVisualStyle.canvas.opacity(0.78)],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    )
-                )
-                .overlay(
-                    trackShape.strokeBorder(
-                        LinearGradient(
-                            colors: [NoopVisualStyle.borderHighlight.opacity(0.48), NoopVisualStyle.border],
-                            startPoint: .top,
-                            endPoint: .bottom
-                        ),
-                        lineWidth: 0.8
-                    )
-                )
+            // Flat track: the card surface colour, no gradient and no border.
+            RoundedRectangle(cornerRadius: 13, style: .continuous)
+                .fill(NoopVisualStyle.surface)
         }
     }
 }
@@ -597,7 +568,7 @@ public extension View {
 // CTAs. Drop in via `.buttonStyle(.noopPrimary)` etc. on any `Button`. All read off
 // the new gold tokens so they match Apple ⇄ Android. Pressed = subtle dim + scale.
 
-/// Primary call-to-action: gold-gradient fill, dark gold-deep ink (700), rounded 13.
+/// Primary call-to-action: flat accent fill (system green by default), ink from `goldDeepText`, rounded 13.
 public struct NoopPrimaryButtonStyle: ButtonStyle {
     public init() {}
     public func makeBody(configuration: Configuration) -> some View {
@@ -609,11 +580,8 @@ public struct NoopPrimaryButtonStyle: ButtonStyle {
             .frame(maxWidth: .infinity)
             .background(
                 RoundedRectangle(cornerRadius: 13, style: .continuous)
-                    .fill(LinearGradient(gradient: StrandPalette.goldGradient, startPoint: .topLeading, endPoint: .bottomTrailing))
+                    .fill(StrandPalette.gold)
             )
-            // A crisp, subtle NEUTRAL elevation — the gold cast-glow read as too much against the
-            // clean design, so it's a soft dark lift now, no bloom.
-            .shadow(color: .black.opacity(pressed ? 0.08 : 0.16), radius: 6, x: 0, y: 3)
             .opacity(pressed ? 0.9 : 1)
             .scaleEffect(pressed ? 0.98 : 1)
             .animation(StrandMotion.interactive, value: pressed)
@@ -621,7 +589,7 @@ public struct NoopPrimaryButtonStyle: ButtonStyle {
     }
 }
 
-/// Secondary: inset well + 1px white-12 border + primary text. Quieter than gold.
+/// Secondary: flat inset well + primary text (no border). Quieter than the accent fill.
 public struct NoopSecondaryButtonStyle: ButtonStyle {
     public init() {}
     public func makeBody(configuration: Configuration) -> some View {
@@ -633,7 +601,6 @@ public struct NoopSecondaryButtonStyle: ButtonStyle {
             .padding(.vertical, 11).padding(.horizontal, 18)
             .frame(maxWidth: .infinity)
             .background(shape.fill(StrandPalette.surfaceInset))
-            .overlay(shape.strokeBorder(StrandPalette.hairline, lineWidth: 1))
             .opacity(pressed ? 0.82 : 1)
             .scaleEffect(pressed ? 0.98 : 1)
             .animation(StrandMotion.interactive, value: pressed)
@@ -661,7 +628,7 @@ public struct NoopGhostButtonStyle: ButtonStyle {
 }
 
 public extension ButtonStyle where Self == NoopPrimaryButtonStyle {
-    /// Gold-gradient primary CTA.
+    /// Flat accent-fill primary CTA.
     static var noopPrimary: NoopPrimaryButtonStyle { .init() }
 }
 public extension ButtonStyle where Self == NoopSecondaryButtonStyle {
@@ -761,7 +728,7 @@ private struct PulseDot: View {
             }
             Circle().fill(color)
                 .frame(width: size, height: size)
-                .shadow(color: color.opacity(0.8), radius: pulsing ? 4 : 2)
+                .noopGlow(color.opacity(0.8), radius: pulsing ? 4 : 2)
         }
         .frame(width: size, height: size)
         .onAppear { if pulsing && !poseStill { animate = true } }

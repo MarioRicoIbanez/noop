@@ -7,27 +7,52 @@ import SwiftUI
 // bindings, while cards, gauges, typography, and chrome share one maintainable source of truth.
 
 public enum NoopVisualStyle {
-    // Neutral, low-chroma surfaces sampled from the supplied dark-mode reference.
-    public static let canvas = Color(light: "#F3F4F6", dark: "#1D1E23")
-    public static let surface = Color(light: "#FFFFFF", dark: "#2A2C34")
-    public static let surfaceTop = Color(light: "#FFFFFF", dark: "#30323B")
-    public static let surfaceBottom = Color(light: "#F4F5F7", dark: "#282A31")
-    public static let inset = Color(light: "#E8E9ED", dark: "#23252C")
+    // Dark appearance follows the iOS system palette on a pure black canvas: black canvas, #1C1C1E cards,
+    // #2C2C2E inset wells, #38383A separators. Light values are unchanged from the previous design.
+    public static let canvas = Color(light: "#F3F4F6", dark: "#000000")
+    public static let surface = Color(light: "#FFFFFF", dark: "#1C1C1E")
+    public static let surfaceTop = Color(light: "#FFFFFF", dark: "#1C1C1E")
+    public static let surfaceBottom = Color(light: "#F4F5F7", dark: "#1C1C1E")
+    public static let inset = Color(light: "#E8E9ED", dark: "#2C2C2E")
 
-    public static let border = Color(light: "#D8DAE0", dark: "#373A44")
-    public static let borderHighlight = Color(light: "#FFFFFF", dark: "#4B4E59")
-    public static let divider = Color(light: "#E4E5E9", dark: "#383A43")
+    public static let border = Color(light: "#D8DAE0", dark: "#38383A")
+    /// Only used for transient emphasis (hover / press / selected segment); resting cards draw no border.
+    public static let borderHighlight = Color(light: "#FFFFFF", dark: "#48484A")
+    public static let divider = Color(light: "#E4E5E9", dark: "#38383A")
 
-    public static let primaryText = Color(light: "#17181C", dark: "#F7F7FA")
-    public static let secondaryText = Color(light: "#555861", dark: "#C3C4CA")
-    public static let tertiaryText = Color(light: "#7D808A", dark: "#7D7F88")
+    public static let primaryText = Color(light: "#17181C", dark: "#FFFFFF")
+    public static let secondaryText = Color(light: "#555861", dark: "#8E8E93")
+    public static let tertiaryText = Color(light: "#7D808A", dark: "#636366")
+
+    /// Fill of the selected segment in a segmented control (#5A5A5F on dark).
+    public static let selectedSegment = Color(light: "#E3E4E8", dark: "#5A5A5F")
 
     public static let mint = Color(light: "#149A78", dark: "#69DDB8")
     public static let mintDeep = Color(light: "#0D765C", dark: "#13A982")
     public static let mintGlow = Color(light: "#38C99E", dark: "#54E6BD")
 
+    // The single accent and its tonal steps. Dark values are the approved design hexes; the light values
+    // are the same hues darkened so the greens keep contrast on a white card.
+    /// System green: the one accent (selected state, links, gauges at full value).
+    public static let green = Color(light: "#1E9E45", dark: "#30D158")
+    /// Deep green: sleep "deep", the low end of intensity ramps.
+    public static let greenDeep = Color(light: "#14663A", dark: "#1B7F49")
+    /// Mid green: sleep "light", mid intensity.
+    public static let greenMid = Color(light: "#2A9A55", dark: "#34B866")
+    /// Pale green: sleep "REM", the top of intensity ramps.
+    public static let greenSoft = Color(light: "#5CCB8A", dark: "#A6F2C0")
+    /// Neutral grey for "awake" and other non-data marks (system grey).
+    public static let neutralMark = Color(light: "#8E8E93", dark: "#8E8E93")
+    /// The only colours that are allowed to differ from the green family: real warnings.
+    public static let warning = Color(light: "#C77700", dark: "#FF9F0A")
+    public static let critical = Color(light: "#D70015", dark: "#FF453A")
+
+    /// Decorative glow, bloom and halo layers are off. The shared glow helpers (`additiveBloom`, gauge
+    /// tip halos, pulse-dot shadows) read this single switch, so flipping it back restores them.
+    public static let glowsEnabled = false
+
     public static let cardRadius: CGFloat = 22
-    public static let compactRadius: CGFloat = 16
+    public static let compactRadius: CGFloat = 20
     public static let pillRadius: CGFloat = 999
     public static let pagePadding: CGFloat = 16
     public static let cardPadding: CGFloat = 16
@@ -35,16 +60,14 @@ public enum NoopVisualStyle {
     public static let sectionGap: CGFloat = 26
 }
 
-/// Shared card/panel treatment: a solid surface on iOS, gradient and soft elevation elsewhere.
-/// `tint` is intentionally faint so metric identity never turns the whole card into a coloured tile.
+/// Shared card/panel treatment: a flat solid surface with continuous corners. No border, no shadow, no
+/// gradient and no tint wash on any platform. `tint` and `elevated` stay in the API so call sites keep
+/// compiling, but they no longer paint anything: metric identity lives in the card's content, not its fill.
 public struct NoopPanelSurface: View {
     public var tint: Color?
     public var cornerRadius: CGFloat
     public var elevated: Bool
     public var surfaceOpacity: Double
-    #if !os(iOS)
-    @Environment(\.colorScheme) private var scheme
-    #endif
 
     public init(
         tint: Color? = nil,
@@ -59,75 +82,24 @@ public struct NoopPanelSurface: View {
     }
 
     public var body: some View {
-        let shape = RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
-        #if os(iOS)
-        // Scrolling stacks contain many panels. Layered translucent gradients and blurred shadows
-        // multiply their compositing work, so iOS uses one theme-aware fill and a thin tinted rim.
-        // This changes decorative depth only; card geometry and the design-system colors stay the same.
-        shape
+        RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
             .fill(NoopVisualStyle.surface)
-            .overlay(shape.strokeBorder(
-                tint?.opacity(0.14) ?? NoopVisualStyle.borderHighlight.opacity(elevated ? 0.9 : 0.65),
-                lineWidth: 0.8
-            ))
             .opacity(surfaceOpacity)
-        #else
-        shape
-            .fill(
-                LinearGradient(
-                    colors: [NoopVisualStyle.surfaceTop, NoopVisualStyle.surfaceBottom],
-                    startPoint: .top,
-                    endPoint: .bottom
-                )
-            )
-            .overlay {
-                if let tint {
-                    shape.fill(
-                        LinearGradient(
-                            colors: [tint.opacity(0.055), tint.opacity(0.012), .clear],
-                            startPoint: .topLeading,
-                            endPoint: .bottomTrailing
-                        )
-                    )
-                }
-            }
-            .overlay(
-                shape.strokeBorder(
-                    LinearGradient(
-                        colors: [NoopVisualStyle.borderHighlight.opacity(0.72), NoopVisualStyle.border.opacity(0.52)],
-                        startPoint: .top,
-                        endPoint: .bottom
-                    ),
-                    lineWidth: 0.8
-                )
-            )
-            .shadow(
-                color: scheme == .dark ? .black.opacity(elevated ? 0.34 : 0.18) : .black.opacity(0.10),
-                radius: elevated ? 18 : 9,
-                x: 0,
-                y: elevated ? 10 : 5
-            )
-            .opacity(surfaceOpacity)
-        #endif
     }
 }
 
-/// Shared edge-to-edge chrome for sheet and split-view headers. Unlike a card it has no
-/// rounded outline or elevation, but it uses the same top-lit surface ramp and divider token.
+/// Shared edge-to-edge chrome for sheet and split-view headers: a flat surface with the divider token
+/// along its bottom edge (no gradient).
 public struct NoopChromeSurface: View {
     public init() {}
 
     public var body: some View {
-        LinearGradient(
-            colors: [NoopVisualStyle.surfaceTop, NoopVisualStyle.surfaceBottom],
-            startPoint: .top,
-            endPoint: .bottom
-        )
-        .overlay(alignment: .bottom) {
-            Rectangle()
-                .fill(NoopVisualStyle.divider)
-                .frame(height: 0.5)
-        }
+        NoopVisualStyle.surface
+            .overlay(alignment: .bottom) {
+                Rectangle()
+                    .fill(NoopVisualStyle.divider)
+                    .frame(height: 0.5)
+            }
     }
 }
 
