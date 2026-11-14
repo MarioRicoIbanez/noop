@@ -180,7 +180,6 @@ private struct BreathingContent: View {
 
     var body: some View {
         ScreenScaffold(title: "Breathe",
-                       subtitle: "Haptic-paced breathing · find your pace · calm down",
                        // Liquid finish: the same full-bleed day-of-sky backdrop Today + the other liquid
                        // tabs carry, so Breathe sits in one atmosphere.
                        topBackground: liquidScaffoldSky()) {
@@ -248,12 +247,26 @@ private struct BreathingContent: View {
     // MARK: - Breathe mode (the shipped fixed-pace trainer)
 
     @ViewBuilder private var breatheMode: some View {
-        statusRow
         orbCard
         controlRow
         if let line = outcomeLine { outcomeCard(line) }
-        readoutRow
-        coherenceCard
+        // The choices and the measurements wait folded, so the screen opens on the breath and one button.
+        FoldSection(symbol: "slider.horizontal.3", title: "Pace and length",
+                    caption: LocalizedStringKey(pace.label),
+                    accent: SummaryStyle.vitals, storageKey: "breathe.setup") {
+            StrandCard(padding: 18) {
+                VStack(spacing: 16) {
+                    pacePills
+                    durationPills
+                    audioCueToggle
+                }
+            }
+        }
+        FoldSection(symbol: "waveform.path.ecg", title: "Variability",
+                    accent: SummaryStyle.heart, storageKey: "breathe.readouts") {
+            readoutRow
+            coherenceCard
+        }
         if !live.bonded { hapticHint }
     }
 
@@ -330,24 +343,37 @@ private struct BreathingContent: View {
                 }
 
                 ZStack {
-                    ScenicHeroBackground(domain: .rest, starCount: 56)
-                        .clipShape(RoundedRectangle(cornerRadius: NoopMetrics.cardRadius, style: .continuous))
-                    breathingOrb
-                        .padding(.vertical, 6)
+                    BreathBloom(progress: reduceMotion ? 0.6 : orbProgress)
+                    bloomCentre
                 }
-                .frame(height: 320)
+                .frame(height: 300)
                 .frame(maxWidth: .infinity)
 
-                Text(running ? phaseWord : selectedTagline)
-                    .font(StrandFont.subhead)
-                    .foregroundStyle(running ? StrandPalette.restBright : StrandPalette.textSecondary)
+                if running {
+                    HStack {
+                        Text(sessionLength.targetSeconds.map { "\(timeString(sessionSeconds)) / \(timeString($0))" }
+                             ?? timeString(sessionSeconds))
+                            .font(StrandFont.number(17))
+                            .foregroundStyle(StrandPalette.textPrimary)
+                        Spacer()
+                        Text("\(breathCount) breaths")
+                            .font(.system(size: 16))
+                            .foregroundStyle(StrandPalette.textSecondary)
+                    }
+                } else {
+                    VStack(spacing: 4) {
+                        Text(selectedTagline)
+                            .font(.system(size: 16))
+                            .foregroundStyle(StrandPalette.textPrimary)
+                        if live.bonded {
+                            Text("Each vibration means the next step.")
+                                .font(.system(size: 15))
+                                .foregroundStyle(StrandPalette.textSecondary)
+                        }
+                    }
                     .multilineTextAlignment(.center)
-                    .animation(.easeInOut(duration: 0.2), value: phaseWord)
-                    .animation(.easeInOut(duration: 0.2), value: running)
-
-                pacePills
-                durationPills
-                audioCueToggle
+                    .fixedSize(horizontal: false, vertical: true)
+                }
             }
         }
     }
@@ -364,7 +390,7 @@ private struct BreathingContent: View {
                 Text("Audio cues")
                     .font(StrandFont.footnote)
                     .foregroundStyle(StrandPalette.textSecondary)
-                Text("Soft tone on each phase · respects silent mode")
+                Text("Soft tone on each phase")
                     .font(StrandFont.caption)
                     .foregroundStyle(StrandPalette.textTertiary)
                     .lineLimit(1)
@@ -469,6 +495,43 @@ private struct BreathingContent: View {
                     Button(String(localized: "Done")) { showEdu = false }
                 }
             }
+        }
+    }
+
+    /// What sits in the middle of the bloom: the step and its seconds while a session runs, the pulse
+    /// otherwise.
+    @ViewBuilder private var bloomCentre: some View {
+        if running {
+            VStack(spacing: 4) {
+                Text(phaseWord)
+                    .font(.system(size: 24, weight: .medium))
+                    .foregroundStyle(Color.white)
+                    .multilineTextAlignment(.center)
+                    .contentTransition(.opacity)
+                    .animation(.easeInOut(duration: 0.3), value: phaseWord)
+                if phaseDeadline != .distantFuture {
+                    TimelineView(.periodic(from: Date(), by: 0.25)) { timeline in
+                        Text(String(max(1, Int(phaseDeadline.timeIntervalSince(timeline.date).rounded(.up)))))
+                            .font(StrandFont.number(40))
+                            .foregroundStyle(Color.white.opacity(0.9))
+                            .contentTransition(.numericText())
+                    }
+                }
+            }
+            .shadow(color: .black.opacity(0.55), radius: 8, y: 1)
+            .padding(.horizontal, 24)
+        } else {
+            VStack(spacing: 2) {
+                Text(model.bpm.map { String($0) } ?? "–")
+                    .font(StrandFont.number(44))
+                    .foregroundStyle(Color.white)
+                    .contentTransition(.numericText())
+                Text(String(localized: "BPM"))
+                    .font(.system(size: 14))
+                    .tracking(0.8)
+                    .foregroundStyle(Color.white.opacity(0.7))
+            }
+            .shadow(color: .black.opacity(0.55), radius: 8, y: 1)
         }
     }
 
@@ -822,7 +885,9 @@ private struct BreathingContent: View {
         }
 
         if buzz {
-            let loops = BreathProtocolPlayer.loops(for: stage.type)
+            // One short pulse at every change of step, holds included: breathe until the strap taps, then
+            // do the next thing. The longer double pulse on the exhale read as a second cue.
+            let loops = stage.type == .textOnly ? 0 : 1
             if loops > 0 {
                 model.buzz(loops: UInt8(clamping: loops), gate: HapticPrefs.breathing)
             }
@@ -883,6 +948,43 @@ private struct BreathingContent: View {
         let m = total / 60
         let s = total % 60
         return String(format: "%02d:%02d", m, s)
+    }
+}
+
+// MARK: - Bloom
+
+/// The breath drawn as six soft discs that open into a flower on the way in and fold back into one on
+/// the way out.
+private struct BreathBloom: View {
+    /// 0 is folded (breath out), 1 is open (breath in).
+    var progress: CGFloat
+
+    var body: some View {
+        GeometryReader { geo in
+            let side = min(geo.size.width, geo.size.height)
+            let petal = side * 0.5
+            let reach = side * 0.25 * progress
+            ZStack {
+                ForEach(0..<6, id: \.self) { index in
+                    let angle = Double(index) / 6 * 2 * Double.pi
+                    Circle()
+                        .fill(
+                            LinearGradient(colors: [SummaryStyle.vitals.opacity(0.7), SummaryStyle.sleep.opacity(0.5)],
+                                           startPoint: .top, endPoint: .bottom)
+                        )
+                        .frame(width: petal, height: petal)
+                        .offset(x: CGFloat(cos(angle)) * reach, y: CGFloat(sin(angle)) * reach)
+                        .blendMode(.screen)
+                }
+            }
+            .compositingGroup()
+            .frame(width: side, height: side)
+            .scaleEffect(0.5 + 0.5 * progress)
+            .rotationEffect(.degrees(Double(progress) * 60))
+            .opacity(0.6 + 0.4 * Double(progress))
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+        .accessibilityHidden(true)
     }
 }
 
@@ -1264,13 +1366,9 @@ private struct CalmModeView: View {
                     StatePill(canRun ? "Ready" : "Strap needed",
                               tone: canRun ? .neutral : .warning, showsDot: true)
                 }
-                Text("The strap buzzes a gentle rhythm just below your current heart rate, a felt metronome to relax toward. It trails your heart down rather than yanking it, and stops on its own.")
-                    .font(StrandFont.subhead)
-                    .foregroundStyle(StrandPalette.textSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                Text("A relaxation rhythm, not cardiac control. It never paces below a safe rate and you can stop anytime. If your heart rate doesn't settle, we'll say so plainly.")
-                    .font(StrandFont.footnote)
-                    .foregroundStyle(StrandPalette.textTertiary)
+                Text("The strap taps a slow, steady beat just under your pulse so your heart can settle to it. It is not a breathing cue, and it stops by itself.")
+                    .font(.system(size: 17))
+                    .foregroundStyle(StrandPalette.textPrimary)
                     .fixedSize(horizontal: false, vertical: true)
             }
         }
@@ -1282,7 +1380,7 @@ private struct CalmModeView: View {
     private var startCard: some View {
         StrandCard {
             VStack(spacing: NoopMetrics.rowSpacing) {
-                NoopButton("Calm me · 3 min", systemImage: "heart.fill",
+                NoopButton("Calm me for 3 min", systemImage: "heart.fill",
                            kind: .primary, fullWidth: true) {
                     controller.startCalmMe()
                 }
@@ -1339,7 +1437,7 @@ private struct CalmModeView: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
 
                 if let h0 = controller.calmStartHR {
-                    Text("Started at \(h0) bpm · the rhythm trails your heart down.")
+                    Text("Started at \(h0) bpm")
                         .font(StrandFont.footnote)
                         .foregroundStyle(StrandPalette.textTertiary)
                         .frame(maxWidth: .infinity, alignment: .leading)

@@ -1,6 +1,12 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "Each vibration means the next step.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Each vibration means the next step."}}, "es": {"stringUnit": {"state": "translated", "value": "Cada vibración indica el paso siguiente."}}}},
+    "Pace and length": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Pace and length"}}, "es": {"stringUnit": {"state": "translated", "value": "Ritmo y duración"}}}},
+    "The strap taps a slow, steady beat just under your pulse so your heart can settle to it. It is not a breathing cue, and it stops by itself.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "The strap taps a slow, steady beat just under your pulse so your heart can settle to it. It is not a breathing cue, and it stops by itself."}}, "es": {"stringUnit": {"state": "translated", "value": "La pulsera marca un compás lento y constante, un poco por debajo de tu pulso, para que el corazón se acompase. No indica cuándo respirar y se para sola."}}}},
+    "Calm me for 3 min": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Calm me for 3 min"}}, "es": {"stringUnit": {"state": "translated", "value": "Cálmame 3 min"}}}},
+    "Soft tone on each phase": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Soft tone on each phase"}}, "es": {"stringUnit": {"state": "translated", "value": "Tono suave en cada fase"}}}},
+    "Started at %lld bpm": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Started at %lld bpm"}}, "es": {"stringUnit": {"state": "translated", "value": "Empezaste en %lld ppm"}}}},
     "Automatic sets": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Automatic sets"}}, "es": {"stringUnit": {"state": "translated", "value": "Series automáticas"}}}},
     "Start by hand": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Start by hand"}}, "es": {"stringUnit": {"state": "translated", "value": "Empezar a mano"}}}},
     "reps": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "reps"}}, "es": {"stringUnit": {"state": "translated", "value": "repeticiones"}}}},
