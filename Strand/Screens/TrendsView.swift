@@ -297,6 +297,9 @@ struct TrendsView: View {
                        onRefresh: { await repo.refresh() },
                        lazy: true,
                        topBackground: liquidScaffoldSky()) {
+            if !repo.days.isEmpty {
+                TrendsHighlights(days: repo.days)
+            }
             if repo.days.isEmpty {
                 ComingSoon(what: repo.loaded
                     ? "Trends need history to draw. Import your WHOOP export in Data Sources to see weeks, months and years instantly."

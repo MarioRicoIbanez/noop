@@ -1,6 +1,14 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "Period": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Period"}}, "es": {"stringUnit": {"state": "translated", "value": "Periodo"}}}},
+    "This period": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "This period"}}, "es": {"stringUnit": {"state": "translated", "value": "Este periodo"}}}},
+    "The period before": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "The period before"}}, "es": {"stringUnit": {"state": "translated", "value": "El periodo anterior"}}}},
+    "Average per night": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Average per night"}}, "es": {"stringUnit": {"state": "translated", "value": "Media por noche"}}}},
+    "Not enough nights yet to compare.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Not enough nights yet to compare."}}, "es": {"stringUnit": {"state": "translated", "value": "Aún no hay noches suficientes para comparar."}}}},
+    "On average you sleep %lld minutes more than in the period before.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "On average you sleep %lld minutes more than in the period before."}}, "es": {"stringUnit": {"state": "translated", "value": "De media duermes %lld minutos más que en el periodo anterior."}}}},
+    "On average you sleep %lld minutes less than in the period before.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "On average you sleep %lld minutes less than in the period before."}}, "es": {"stringUnit": {"state": "translated", "value": "De media duermes %lld minutos menos que en el periodo anterior."}}}},
+    "On average you sleep the same as in the period before.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "On average you sleep the same as in the period before."}}, "es": {"stringUnit": {"state": "translated", "value": "De media duermes lo mismo que en el periodo anterior."}}}},
     "Body age": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Body age"}}, "es": {"stringUnit": {"state": "translated", "value": "Edad biológica"}}}},
     "%@ years against your real age": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "%@ years against your real age"}}, "es": {"stringUnit": {"state": "translated", "value": "%@ años respecto a tu edad real"}}}},
     "Appears after a week of steps, pulse and sleep.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Appears after a week of steps, pulse and sleep."}}, "es": {"stringUnit": {"state": "translated", "value": "Aparece tras una semana de pasos, pulso y sueño."}}}},

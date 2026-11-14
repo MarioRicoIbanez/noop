@@ -55,6 +55,9 @@ struct FullDayChartView: View {
     /// #623: true when the current SpO2/respiration metric is genuinely unsupported on the active strap —
     /// a 5.0-family strap that has NEVER produced it (4.0-only wire signals) — vs merely an empty window.
     @State private var metricUnsupported = false
+    /// Tracks this strap can never fill (a 5.0/MG sends no SpO₂ or raw respiration stream), left out
+    /// of the picker so an always-empty tab does not read as a fault.
+    @State private var hiddenMetrics: Set<Repository.TimelineMetric> = []
 
     @State private var series: Repository.TimelineSeries = .empty
     // #979 spin-off — day annotations, mirroring the classic Today's Overview HR markers: the main
@@ -95,6 +98,7 @@ struct FullDayChartView: View {
         .task(id: annotationKey) { await reloadAnnotations() }
         .task { await landOnLatestDayIfNeeded() }
         .task(id: metric) { await resolveMetricUnsupported() }   // #623
+        .task(id: repo.deviceId) { await resolveHiddenMetrics() }
         .task(id: repo.deviceId) { sourceName = repo.activeDeviceDisplayName() }
     }
 
@@ -111,6 +115,20 @@ struct FullDayChartView: View {
             return
         }
         metricUnsupported = !(await repo.strapHasEverProduced(metric))
+    }
+
+    /// Leaves out of the picker the tracks a 5.0/MG has never produced.
+    private func resolveHiddenMetrics() async {
+        guard repo.activeStrapIsWhoop5() else {
+            hiddenMetrics = []
+            return
+        }
+        var hidden: Set<Repository.TimelineMetric> = []
+        for candidate in [Repository.TimelineMetric.spo2, .respiration] {
+            if !(await repo.strapHasEverProduced(candidate)) { hidden.insert(candidate) }
+        }
+        hiddenMetrics = hidden
+        if hidden.contains(metric) { metric = .hr }
     }
 
     /// Annotations re-read only when the shown day changes or fresh strap data lands — deliberately NOT
@@ -132,7 +150,8 @@ struct FullDayChartView: View {
 
     private var metricPills: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            SegmentedPillControl(Repository.TimelineMetric.allCases, selection: $metric) { $0.title }
+            SegmentedPillControl(Repository.TimelineMetric.allCases.filter { !hiddenMetrics.contains($0) },
+                                 selection: $metric) { $0.title }
                 .padding(.vertical, NoopMetrics.space1 / 2)
         }
     }
