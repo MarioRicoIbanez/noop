@@ -73,7 +73,9 @@ enum PuffinExperiment {
     /// ON. Mirrors the Android `NoopPrefs.KEY_SPO2_CANDIDATE_DISPLAY`.
     static let spo2CandidateDisplayKey = "noopSpo2CandidateDisplay"
 
-    static var spo2CandidateDisplayEnabled: Bool { UserDefaults.standard.bool(forKey: spo2CandidateDisplayKey) }
+    static var spo2CandidateDisplayEnabled: Bool {
+        UserDefaults.standard.object(forKey: spo2CandidateDisplayKey) as? Bool ?? true
+    }
 
     /// Opt-in "Personal daytime-stress baseline" (#463): score TODAY's intraday stress timeline against a
     /// PERSONAL cross-day rolling baseline (Oura-style `.baselineRelative`) instead of the day's own calm

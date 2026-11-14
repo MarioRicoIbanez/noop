@@ -57,7 +57,18 @@ struct SummaryVital: Identifiable {
 }
 
 enum SummaryVitals {
-    static func build(days: [DailyMetric]) -> [SummaryVital] {
+    /// The strap's own nightly oxygen figure, read from the computed series. Unverified: nobody has
+    /// compared it with a reference oximeter. Empty when the experimental display is switched off.
+    @MainActor
+    static func loadOxygenEstimate(_ repo: Repository) async -> [String: Double] {
+        guard PuffinExperiment.spo2CandidateDisplayEnabled else { return [:] }
+        let points = await repo.exploreSeries(key: "spo2_candidate", source: "my-whoop", days: 45)
+        return Dictionary(points.map { ($0.day, $0.value) }, uniquingKeysWith: { first, _ in first })
+    }
+
+    /// `oxygenEstimate` is the strap's unverified nightly oxygen figure by day; it fills in only where
+    /// no calibrated value exists.
+    static func build(days: [DailyMetric], oxygenEstimate: [String: Double] = [:]) -> [SummaryVital] {
         let recent = Array(days.sorted { $0.day < $1.day }.suffix(45))
 
         func make(_ id: String, _ title: LocalizedStringKey, _ unit: String, decimals: Int,
@@ -85,7 +96,7 @@ enum SummaryVitals {
             make("rhr", "Pulse", "bpm", decimals: 0, minSD: 1) { d in d.restingHr.map { Double($0) } },
             make("resp", "Breathing", "rpm", decimals: 1, minSD: 0.2) { $0.respRateBpm },
             make("skin", "Temperature", "°", decimals: 1, signed: true, minSD: 0.1) { $0.skinTempDevC },
-            make("spo2", "Oxygen", "%", decimals: 0, minSD: 0.4) { $0.spo2Pct },
+            make("spo2", "Oxygen", "%", decimals: 0, minSD: 0.4) { $0.spo2Pct ?? oxygenEstimate[$0.day] },
         ]
     }
 }
@@ -277,11 +288,12 @@ struct VitalRangeTrack: View {
 struct SummaryView: View {
     @EnvironmentObject private var repo: Repository
     @EnvironmentObject private var router: NavRouter
+    @State private var oxygenEstimate: [String: Double] = [:]
 
     var body: some View {
         let days = repo.days.sorted { $0.day < $1.day }
         let latest = days.last
-        let vitals = SummaryVitals.build(days: days)
+        let vitals = SummaryVitals.build(days: days, oxygenEstimate: oxygenEstimate)
 
         ScreenScaffold(title: nil, onRefresh: { await repo.refresh() }) {
             header
@@ -294,6 +306,9 @@ struct SummaryView: View {
                 effortCard(days: days)
             }
             .buttonStyle(.plain)
+        }
+        .task(id: repo.refreshSeq) {
+            oxygenEstimate = await SummaryVitals.loadOxygenEstimate(repo)
         }
     }
 
@@ -572,9 +587,10 @@ struct VitalNightsChart: View {
 /// Pushed from the Summary vitals card: each vital with its last 30 nights.
 struct VitalsDetailView: View {
     @EnvironmentObject private var repo: Repository
+    @State private var oxygenEstimate: [String: Double] = [:]
 
     var body: some View {
-        let vitals = SummaryVitals.build(days: repo.days)
+        let vitals = SummaryVitals.build(days: repo.days, oxygenEstimate: oxygenEstimate)
         let measured = vitals.filter { $0.value != nil && $0.hasRange }
         let inRange = measured.filter { !$0.outOfRange }.count
 
@@ -608,6 +624,16 @@ struct VitalsDetailView: View {
                 RoundedRectangle(cornerRadius: 16, style: .continuous)
                     .strokeBorder(Color.white.opacity(0.085), lineWidth: 0.5)
             )
+
+            if !oxygenEstimate.isEmpty {
+                Text("Oxygen is the strap's own estimate and has not been verified against an oximeter.")
+                    .font(.system(size: 13))
+                    .foregroundStyle(SummaryStyle.tertiary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .task(id: repo.refreshSeq) {
+            oxygenEstimate = await SummaryVitals.loadOxygenEstimate(repo)
         }
     }
 

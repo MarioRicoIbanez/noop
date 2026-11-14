@@ -1,6 +1,18 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "Rep counter": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Rep counter"}}, "es": {"stringUnit": {"state": "translated", "value": "Contador de repeticiones"}}}},
+    "Counts repetitions from the strap's motion sensor. Experimental.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Counts repetitions from the strap's motion sensor. Experimental."}}, "es": {"stringUnit": {"state": "translated", "value": "Cuenta repeticiones con el sensor de movimiento de la pulsera. Experimental."}}}},
+    "Current set": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Current set"}}, "es": {"stringUnit": {"state": "translated", "value": "Serie actual"}}}},
+    "Start set": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Start set"}}, "es": {"stringUnit": {"state": "translated", "value": "Empezar serie"}}}},
+    "Finish set": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Finish set"}}, "es": {"stringUnit": {"state": "translated", "value": "Terminar serie"}}}},
+    "Could not start. Another raw capture is running.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Could not start. Another raw capture is running."}}, "es": {"stringUnit": {"state": "translated", "value": "No se pudo empezar. Hay otra captura en marcha."}}}},
+    "Waiting for motion data": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Waiting for motion data"}}, "es": {"stringUnit": {"state": "translated", "value": "Esperando datos de movimiento"}}}},
+    "Counting": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Counting"}}, "es": {"stringUnit": {"state": "translated", "value": "Contando"}}}},
+    "Connect the strap to count repetitions.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Connect the strap to count repetitions."}}, "es": {"stringUnit": {"state": "translated", "value": "Conecta la pulsera para contar repeticiones."}}}},
+    "Start, do your set, then finish.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Start, do your set, then finish."}}, "es": {"stringUnit": {"state": "translated", "value": "Empieza, haz la serie y termina."}}}},
+    "Count your sets with the strap's motion sensor.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Count your sets with the strap's motion sensor."}}, "es": {"stringUnit": {"state": "translated", "value": "Cuenta tus series con el sensor de movimiento de la pulsera."}}}},
+    "Oxygen is the strap's own estimate and has not been verified against an oximeter.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Oxygen is the strap's own estimate and has not been verified against an oximeter."}}, "es": {"stringUnit": {"state": "translated", "value": "El oxígeno es una estimación de la propia pulsera y no está verificada con un pulsioxímetro."}}}},
     "Vitals": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Vitals"}}, "es": {"stringUnit": {"state": "translated", "value": "Constantes"}}}},
     "Variability": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Variability"}}, "es": {"stringUnit": {"state": "translated", "value": "Variabilidad"}}}},
     "Pulse": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Pulse"}}, "es": {"stringUnit": {"state": "translated", "value": "Pulso"}}}},

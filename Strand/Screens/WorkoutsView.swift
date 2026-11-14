@@ -187,6 +187,12 @@ struct WorkoutsView: View {
                        // The day-of-sky liquid backdrop, matching Today / Health / Sleep / Trends: a fixed,
                        // full-bleed time-of-day sky behind the scroll content (it does not scroll).
                        topBackground: liquidScaffoldSky()) {
+            NavigationLink {
+                RepCounterView()
+            } label: {
+                RepCounterEntryCard()
+            }
+            .buttonStyle(.plain)
             if allRows.isEmpty {
                 VStack(alignment: .leading, spacing: NoopMetrics.space4) {
                     ComingSoon(what: loaded
