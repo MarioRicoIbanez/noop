@@ -130,6 +130,21 @@ public struct AppleHealthImporter {
                 break
             }
         }
+        // LOCALISED export: a non-English Health app names the root file in the device locale
+        // (`exportación.xml`, `экспорт.xml`), not `export.xml`. Accept the single `.xml` at the archive
+        // root or in `apple_health_export/`, leaving out the clinical `export_cda.xml` that every
+        // export carries beside it. Only when there is exactly one candidate.
+        if target == nil {
+            var candidates: [Entry] = []
+            for entry in archive where entry.type == .file {
+                let parts = entry.path.split(separator: "/").map(String.init)
+                guard let name = parts.last?.lowercased(), name.hasSuffix(".xml"), name != "export_cda.xml" else { continue }
+                let atRoot = parts.count == 1
+                let inExportFolder = parts.count == 2 && parts[0].lowercased() == "apple_health_export"
+                if atRoot || inExportFolder { candidates.append(entry) }
+            }
+            if candidates.count == 1 { target = candidates[0] }
+        }
         guard let entry = target else { throw ImportError.missingEntry("export.xml") }
 
         // Decompress export.xml to a temp file (chunks go straight to disk, so RAM stays bounded),
@@ -232,7 +247,10 @@ public struct AppleHealthImporter {
             includingPropertiesForKeys: nil,
             options: [.skipsHiddenFiles]
         ) else { return nil }
-        let xmls = entries.filter { $0.pathExtension.lowercased() == "xml" }
+        // `export_cda.xml` sits beside the main file in every export, so it never counts as a candidate.
+        let xmls = entries.filter {
+            $0.pathExtension.lowercased() == "xml" && $0.lastPathComponent.lowercased() != "export_cda.xml"
+        }
         return xmls.count == 1 ? xmls[0] : nil
     }
 }

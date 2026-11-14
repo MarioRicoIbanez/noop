@@ -140,6 +140,9 @@ public struct ImportCoordinator {
 
         let names = try entryFilenames(of: url, isDirectory: isDir.boolValue)
         if names.contains("export.xml") { return .appleHealth }
+        // A localised export names its main file in the device language, but always carries the
+        // clinical `export_cda.xml` beside it.
+        if names.contains("export_cda.xml") { return .appleHealth }
         let whoopNames: Set<String> = [
             "physiological_cycles.csv", "sleeps.csv", "workouts.csv", "journal_entries.csv",
         ]
