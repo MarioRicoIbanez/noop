@@ -256,7 +256,7 @@ struct IntervalTimerView: View {
     }
 
     private var controls: some View {
-        HStack(spacing: NoopMetrics.space3) {
+        NoopButtonRow(spacing: NoopMetrics.space3) {
             NoopButton(running ? "Pause" : (isFinished ? "Restart" : "Start"),
                        systemImage: running ? "pause.fill" : "play.fill",
                        kind: .primary, fullWidth: true) {

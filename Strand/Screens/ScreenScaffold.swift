@@ -172,13 +172,9 @@ struct ComingSoon: View {
                 .font(StrandFont.headline)
                 .foregroundStyle(StrandPalette.accent)
                 .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: 8) {
-                Text("Coming together")
-                    .font(StrandFont.headline).foregroundStyle(StrandPalette.textPrimary)
-                Text(what)
-                    .font(StrandFont.body).foregroundStyle(StrandPalette.textSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+            Text(what)
+                .font(StrandFont.body).foregroundStyle(StrandPalette.textPrimary)
+                .fixedSize(horizontal: false, vertical: true)
         }
         .padding(20).frame(maxWidth: .infinity, alignment: .leading)
         .frostedCardSurface()

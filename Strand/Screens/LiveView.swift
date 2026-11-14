@@ -359,29 +359,26 @@ struct LiveView: View {
 
     private var sessionPrompt: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text("Ready for a marked effort.")
-                .font(StrandFont.headline)
-                .foregroundStyle(StrandPalette.textPrimary)
-            Text(activeConnection
-                 ? "Start a workout when the stream matters. NOOP records the interval, HR, peak, average and effort from the same live feed."
-                 : "Connect the strap first, then mark a workout from the live stream.")
-                .font(StrandFont.subhead)
-                .foregroundStyle(StrandPalette.textSecondary)
-                .fixedSize(horizontal: false, vertical: true)
+            if !activeConnection {
+                Text("Connect the strap first, then mark a workout from the live stream.")
+                    .font(StrandFont.body)
+                    .foregroundStyle(StrandPalette.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 
     private var sessionActions: some View {
-        HStack(spacing: NoopMetrics.rowSpacing) {
+        NoopButtonRow(spacing: NoopMetrics.rowSpacing) {
             // All three routed through the unified button system: a filled primary for the lead
             // action, secondary surfaces for the supporting two — sentence-case, single line, 48pt.
-            NoopButton("Start workout", systemImage: "figure.run", kind: .primary) {
+            NoopButton("Start workout", systemImage: "figure.run", kind: .primary, fullWidth: true) {
                 showStartSport = true
             }
             .disabled(!activeConnection)
             .help("Track a workout manually. Records heart rate and effort until you end it.")
 
-            NoopButton("Refresh", systemImage: "arrow.clockwise", kind: .secondary) {
+            NoopButton("Refresh", systemImage: "arrow.clockwise", kind: .secondary, fullWidth: true) {
                 model.getBattery()
             }
             .disabled(!activeConnection)
@@ -389,7 +386,7 @@ struct LiveView: View {
 
             // Manual HRV snapshot (#127) — a still, seated 60s R-R reading. Needs the live R-R
             // stream, so it's gated on a bonded connection just like the workout/refresh actions.
-            NoopButton("HRV reading", systemImage: "waveform.path.ecg", kind: .secondary) {
+            NoopButton("HRV reading", systemImage: "waveform.path.ecg", kind: .secondary, fullWidth: true) {
                 showHRVSnapshot = true
             }
             .disabled(!activeConnection)
@@ -427,7 +424,7 @@ struct LiveView: View {
                 // one reachable without opening the live view, while Pause — the reversible one — was
                 // not. Pause/Resume is one toggle (a paused session has exactly one sensible action), and
                 // End moves to its own row so a destructive tap is not adjacent to a routine one.
-                HStack(spacing: NoopMetrics.rowSpacing) {
+                NoopButtonRow(spacing: NoopMetrics.rowSpacing) {
                     NoopButton(w.isPaused ? "Resume" : "Pause",
                                systemImage: w.isPaused ? "play.fill" : "pause.fill",
                                kind: .secondary, fullWidth: true) {

@@ -137,7 +137,7 @@ public struct NoopButtonStyle: ButtonStyle {
             .font(StrandFont.headline.weight(.semibold))
             .tracking(NoopButtonMetrics.tracking)
             .lineLimit(1)
-            .minimumScaleFactor(0.9)
+            .minimumScaleFactor(0.75)
             .foregroundStyle(appearance.label)
             .frame(maxWidth: fullWidth ? .infinity : nil)
             .padding(.horizontal, NoopButtonMetrics.hPadding)
@@ -230,3 +230,24 @@ public struct NoopButton: View {
     .preferredColorScheme(.dark)
 }
 #endif
+
+// MARK: - Button row
+
+/// Buttons side by side when their full labels fit, stacked when they do not, so a label is never
+/// cut short on a narrow phone or in a long language.
+public struct NoopButtonRow<Content: View>: View {
+    private let spacing: CGFloat
+    private let content: Content
+
+    public init(spacing: CGFloat = NoopMetrics.rowSpacing, @ViewBuilder content: () -> Content) {
+        self.spacing = spacing
+        self.content = content()
+    }
+
+    public var body: some View {
+        ViewThatFits(in: .horizontal) {
+            HStack(spacing: spacing) { content }
+            VStack(spacing: spacing) { content }
+        }
+    }
+}

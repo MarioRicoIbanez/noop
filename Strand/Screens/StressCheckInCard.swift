@@ -72,15 +72,15 @@ struct StressCheckInCard: View {
                             .fixedSize(horizontal: false, vertical: true)
                     }
 
-                    HStack(spacing: NoopMetrics.rowSpacing) {
-                        NoopButton("Breathe now", systemImage: "wind", kind: .primary) {
+                    NoopButtonRow(spacing: NoopMetrics.rowSpacing) {
+                        NoopButton("Breathe now", systemImage: "wind", kind: .primary, fullWidth: true) {
                             center.dismiss()
                             onBreatheNow()
                         }
 
-                        NoopButton("Not now", kind: .secondary) { center.dismiss() }
+                        NoopButton("Not now", kind: .secondary, fullWidth: true) { center.dismiss() }
 
-                        NoopButton("Turn off", kind: .tertiary) {
+                        NoopButton("Turn off", kind: .tertiary, fullWidth: true) {
                             BiofeedbackPrefs.checkInEnabled = false
                             center.dismiss()
                         }

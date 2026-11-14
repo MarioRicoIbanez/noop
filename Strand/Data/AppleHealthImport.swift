@@ -22,6 +22,55 @@ enum AppleHealthImport {
     static func stepsInt(_ v: Double) -> Int { Int(v.rounded()) }
 
 
+    /// Staged intervals grouped into nights: a gap of more than an hour starts a new session, and a
+    /// session needs half an hour asleep to count. In-bed-only intervals (a phone, not a watch) carry
+    /// no stages and are left out.
+    static func sleepSessions(_ intervals: [SleepStageInterval]) -> [CachedSleepSession] {
+        var staged: [(start: Int, end: Int, stage: String)] = []
+        for iv in intervals {
+            let name: String
+            switch iv.stage {
+            case .asleepDeep: name = "deep"
+            case .asleepREM: name = "rem"
+            case .asleepCore, .asleepUnspecified: name = "light"
+            case .awake: name = "wake"
+            case .inBed, .unknown: continue
+            }
+            let start = Int(iv.start.timeIntervalSince1970), end = Int(iv.end.timeIntervalSince1970)
+            if end > start { staged.append((start, end, name)) }
+        }
+        staged.sort { $0.start < $1.start }
+
+        var sessions: [CachedSleepSession] = []
+        var current: [(start: Int, end: Int, stage: String)] = []
+        func close() {
+            defer { current.removeAll() }
+            // A night starts at the first sleep and ends at the last one.
+            guard let first = current.firstIndex(where: { $0.stage != "wake" }),
+                  let last = current.lastIndex(where: { $0.stage != "wake" }) else { return }
+            let segments = Array(current[first...last])
+            let asleep = segments.filter { $0.stage != "wake" }.reduce(0) { $0 + ($1.end - $1.start) }
+            let startTs = segments[0].start
+            let endTs = segments.map(\.end).max() ?? startTs
+            guard asleep >= 1_800, endTs > startTs else { return }
+            let payload: [[String: Any]] = segments.map { ["start": $0.start, "end": $0.end, "stage": $0.stage] }
+            let json = (try? JSONSerialization.data(withJSONObject: payload))
+                .flatMap { String(data: $0, encoding: .utf8) }
+            sessions.append(CachedSleepSession(
+                startTs: startTs, endTs: endTs,
+                efficiency: min(100, Double(asleep) / Double(endTs - startTs) * 100),
+                restingHr: nil, avgHrv: nil, stagesJSON: json))
+        }
+        var lastEnd = 0
+        for segment in staged {
+            if !current.isEmpty, segment.start - lastEnd > 3_600 { close() }
+            current.append(segment)
+            lastEnd = max(lastEnd, segment.end)
+        }
+        close()
+        return sessions
+    }
+
     /// The Apple Health mapping revision, stamped into the Import test-mode parser line. Bump when this
     /// importer's aggregate->store mapping changes.
     static let importerVersion = 1
@@ -84,6 +133,10 @@ enum AppleHealthImport {
                        distanceM: w.distanceM, zonesJSON: nil, notes: nil, steps: nil)
         }
         let workoutsWritten = try await store.upsertWorkouts(workouts, deviceId: deviceId)
+
+        // Nights. The export carries the watch's stage intervals; keep them as sessions so the Sleep
+        // screen can draw each imported night, not only its totals.
+        _ = try await store.upsertSleepSessions(sleepSessions(result.sleepIntervals), deviceId: deviceId)
 
         // Import & Data Ingest test mode: emit the per-stage / reject / day-delta trace iff the mode is on
         // (the caller passes a non-nil `trace` only when TestCentre.active(.dataImport)). The numbers are

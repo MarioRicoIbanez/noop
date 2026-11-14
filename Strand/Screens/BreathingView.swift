@@ -515,14 +515,14 @@ private struct BreathingContent: View {
     // MARK: - Controls
 
     private var controlRow: some View {
-        HStack(spacing: NoopMetrics.space3) {
+        NoopButtonRow(spacing: NoopMetrics.space3) {
             NoopButton(running ? "Stop session" : "Start session",
                        systemImage: running ? "stop.fill" : "play.fill",
                        kind: running ? .destructive : .primary, fullWidth: true) {
                 running ? stop() : start()
             }
 
-            NoopButton("Test buzz", systemImage: "waveform.path", kind: .secondary) {
+            NoopButton("Test buzz", systemImage: "waveform.path", kind: .secondary, fullWidth: true) {
                 model.buzz(loops: 1)
             }
             .disabled(!live.bonded)

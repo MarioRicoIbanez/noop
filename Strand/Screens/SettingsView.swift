@@ -1422,12 +1422,12 @@ struct SettingsView: View {
                 Text(strapStatusDetail)
                     .font(StrandFont.subhead)
                     .foregroundStyle(StrandPalette.textSecondary)
-                HStack(spacing: NoopMetrics.space3) {
-                    NoopButton("Re-scan", systemImage: "arrow.clockwise", kind: .primary) {
+                NoopButtonRow(spacing: NoopMetrics.space3) {
+                    NoopButton("Re-scan", systemImage: "arrow.clockwise", kind: .primary, fullWidth: true) {
                         model.scan()
                     }
 
-                    NoopButton("Disconnect", systemImage: "xmark.circle", kind: .secondary) {
+                    NoopButton("Disconnect", systemImage: "xmark.circle", kind: .secondary, fullWidth: true) {
                         model.disconnect()
                     }
                     .disabled(!live.connected && !live.bonded)

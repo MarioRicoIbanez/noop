@@ -628,6 +628,13 @@ struct SummaryLiveCard: View {
                     }
                 }
                 .padding(.top, 10)
+                Rectangle().fill(SummaryStyle.rule).frame(height: 0.5).padding(.top, 12)
+                HStack(alignment: .top, spacing: 0) {
+                    liveFigure("Variability", LiveBreathing.rmssd(rrMillis: live.rrRecent), "ms")
+                    liveFigure("Breathing est.", LiveBreathing.breathsPerMinute(rrMillis: live.rrRecent), "rpm")
+                    liveFigure("Beat interval", live.rrRecent.last.map(Double.init), "ms")
+                }
+                .padding(.top, 12)
             }
             .contentShape(Rectangle())
         }
@@ -637,6 +644,19 @@ struct SummaryLiveCard: View {
             trace.append(Double(hr))
             if trace.count > 120 { trace.removeFirst(trace.count - 120) }
         }
+    }
+
+    /// One live figure with its label above. A dash until the strap has sent enough beats.
+    private func liveFigure(_ label: LocalizedStringKey, _ value: Double?, _ unit: String) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(label)
+                .font(.system(size: 14))
+                .foregroundStyle(SummaryStyle.secondary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.8)
+            SummaryValue(text: value.map { String(Int($0.rounded())) } ?? "–", unit: unit, size: 22)
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var status: LocalizedStringKey {

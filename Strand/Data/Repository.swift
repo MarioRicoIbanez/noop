@@ -958,8 +958,12 @@ final class Repository: ObservableObject {
         let computed = await unionComputedDailyMetrics(store: store, from: fromDay, to: toDay)
         let apple = (try? await store.dailyMetrics(deviceId: Self.appleHealthSource, from: fromDay, to: toDay)) ?? []
         let activityFile = (try? await store.dailyMetrics(deviceId: Self.activityFileSource, from: fromDay, to: toDay)) ?? []
-        let impSleep = await unionSleepSessions(store: store, from: lo, to: hi)
+        // Apple Health nights fill the days no strap covered; a strap's copy of the same night wins.
+        let appleSleep = (try? await store.sleepSessions(deviceId: Self.appleHealthSource, from: lo, to: hi,
+                                                         limit: 4000)) ?? []
+        let impSleep = Self.dedupBlocks(await unionSleepSessions(store: store, from: lo, to: hi) + appleSleep)
         let compSleep = await unionComputedSleepSessions(store: store, from: lo, to: hi)
+        let importedWithApple = Self.fillingFromApple(imported, apple: apple)
 
         // #2525: the Charge baselines' inputs, read on the main actor before detaching: today's local day
         // (the same local-calendar key the engine anchors its fold on) and the two recalibration epochs the
@@ -992,7 +996,8 @@ final class Repository: ObservableObject {
             return MergedCaches(
                 importedSleep: fig,
                 days: Self.mergeActivityFileSteps(
-                    into: Self.mergeDaily(imported: imported, computed: computed, userEditedDays: editedDays),
+                    into: Self.mergeDaily(imported: importedWithApple, computed: computed,
+                                          userEditedDays: editedDays),
                     activityFile
                 ),
                 // From the two buckets BEFORE `mergeDaily` blends them: the rule needs to know which nights
@@ -1085,6 +1090,25 @@ final class Repository: ObservableObject {
             } else {
                 byDay[d.day] = d
             }
+        }
+        return byDay.values.sorted { $0.day < $1.day }
+    }
+
+    /// Imported rows with Apple Health filling what they lack: whole days no strap covered, and the
+    /// empty fields of days one did. Apple's heart-rate variability is SDNN, a different measure from
+    /// the strap's, so it is never used as the day's HRV.
+    nonisolated static func fillingFromApple(_ imported: [DailyMetric], apple: [DailyMetric]) -> [DailyMetric] {
+        guard !apple.isEmpty else { return imported }
+        var byDay = Dictionary(imported.map { ($0.day, $0) }, uniquingKeysWith: { first, _ in first })
+        for row in apple {
+            let fallback = DailyMetric(
+                day: row.day, totalSleepMin: row.totalSleepMin, efficiency: row.efficiency,
+                deepMin: row.deepMin, remMin: row.remMin, lightMin: row.lightMin,
+                disturbances: row.disturbances, restingHr: row.restingHr, avgHrv: nil,
+                recovery: nil, strain: nil, exerciseCount: row.exerciseCount,
+                spo2Pct: row.spo2Pct, skinTempDevC: nil, respRateBpm: row.respRateBpm,
+                steps: row.steps, activeKcalEst: row.activeKcalEst)
+            byDay[row.day] = byDay[row.day].map { $0.fillingNilFields(from: fallback) } ?? fallback
         }
         return byDay.values.sorted { $0.day < $1.day }
     }

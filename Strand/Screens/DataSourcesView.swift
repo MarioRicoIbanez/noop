@@ -139,7 +139,7 @@ struct DataSourcesView: View {
              tint: StrandPalette.accent,
              status: StatePill(hasWhoop ? "Imported" : "Nothing imported",
                                tone: hasWhoop ? .accent : .neutral),
-             subtitle: String(localized: "Import your full WHOOP history (recovery, strain, sleep, workouts) from a data export (.zip). Works for WHOOP 4.0, 5.0 and MG. Get one at app.whoop.com → Data Management.")) {
+             subtitle: String(localized: "Your WHOOP history from a data export (.zip).")) {
             let importingWhoop = model.isImporting(.whoop)
             HStack(spacing: NoopMetrics.space3) {
                 Button {
@@ -164,7 +164,7 @@ struct DataSourcesView: View {
     private var appleHealthCard: some View {
         card(title: "Apple Health", icon: "heart.fill",
              tint: StrandPalette.metricCyan,
-             subtitle: String(localized: "Import an Apple Health export (Health app → profile → Export All Health Data → export.zip). 7 years of HR, HRV, sleep, SpO₂, steps and more, streamed locally. Large exports take a minute or two.")) {
+             subtitle: String(localized: "Your Apple Health export (export.zip): sleep, heart rate, steps and workouts.")) {
             let importingAppleHealth = model.isImporting(.appleHealth)
             HStack(spacing: NoopMetrics.space3) {
                 Button { presentImporter(.appleHealth) } label: {
@@ -203,7 +203,7 @@ struct DataSourcesView: View {
     private var xiaomiCard: some View {
         card(title: "Xiaomi Smart Band (Mi Band)", icon: "figure.walk.motion",
              tint: StrandPalette.metricAmber,
-             subtitle: String(localized: "Import your Mi Band history (steps, heart rate, resting HR, sleep stages, SpO₂, stress and sleep score) straight from the Mi Fitness app. On your iPhone: Files → On My iPhone → Mi Fitness, long-press the folder → Compress, then choose the .zip here. Fully offline; no Xiaomi account or Bluetooth needed. Smart Band 8/9/10.")) {
+             subtitle: String(localized: "Your Mi Band history from the Mi Fitness folder, zipped.")) {
             let importingXiaomi = model.isImporting(.xiaomi)
             HStack(spacing: NoopMetrics.space3) {
                 Button { presentImporter(.xiaomi) } label: {
@@ -223,7 +223,7 @@ struct DataSourcesView: View {
     private var nutritionCard: some View {
         card(title: String(localized: "Nutrition (.csv)"), icon: "fork.knife",
              tint: StrandPalette.metricAmber,
-             subtitle: String(localized: "Import daily nutrition totals from a Cronometer or MacroFactor CSV export: calories in, protein, carbs, fat (and weight if present). Other trackers work too if the file has a date column and daily totals.")) {
+             subtitle: String(localized: "Daily nutrition totals from a Cronometer or MacroFactor CSV.")) {
             HStack(spacing: NoopMetrics.space3) {
                 Button { presentImporter(.nutrition) } label: {
                     Label(nutritionImporting ? "Importing…" : "Choose .csv…", systemImage: "tray.and.arrow.down")
@@ -242,7 +242,7 @@ struct DataSourcesView: View {
     private var liftingCard: some View {
         card(title: String(localized: "Lifting log (Hevy / Liftosaur)"), icon: "dumbbell.fill",
              tint: DomainTheme.effort.color,
-             subtitle: String(localized: "Import your strength-training history from a Hevy CSV export or a Liftosaur JSON export. Each workout becomes a Strength session with a training-volume estimate (weight × reps). It's a volume figure, not a measured strain. It never changes your Effort.")) {
+             subtitle: String(localized: "Strength history from a Hevy CSV or a Liftosaur JSON.")) {
             HStack(spacing: NoopMetrics.space3) {
                 Button { presentImporter(.lifting) } label: {
                     Label(liftingImporting ? "Importing…" : "Choose export…", systemImage: "tray.and.arrow.down")
@@ -261,7 +261,7 @@ struct DataSourcesView: View {
     private var activityFileCard: some View {
         card(title: String(localized: "Workout file (GPX / TCX / FIT)"), icon: "point.topleft.down.curvedto.point.bottomright.up",
              tint: StrandPalette.metricAmber,
-             subtitle: String(localized: "Import a single exported workout file from any brand (Garmin, Coros, Suunto, Wahoo, Polar, Strava, Apple) straight off your device. GPS route, distance, heart rate and calories come in where the file has them. Fully offline; nothing leaves \(Platform.deviceNounPhrase).")) {
+             subtitle: String(localized: "One exported workout file from any brand.")) {
             HStack(spacing: NoopMetrics.space3) {
                 Button { presentImporter(.activityFile) } label: {
                     Label(activityFileImporting ? "Importing…" : "Choose .gpx / .tcx / .fit…", systemImage: "tray.and.arrow.down")
@@ -280,7 +280,7 @@ struct DataSourcesView: View {
     private var wearableCard: some View {
         card(title: String(localized: "Oura / Fitbit / Garmin export"), icon: "figure.mind.and.body",
              tint: StrandPalette.metricPurple,
-             subtitle: String(localized: "Import your own data export from Oura, Fitbit or Garmin: sleep, resting heart rate, HRV, steps and more, where the export has them. Download it from the brand's app (Oura: Account → Export Data; Fitbit: Google Takeout; Garmin: Export Your Data), then choose the file here. Fully offline; nothing leaves \(Platform.deviceNounPhrase). Each brand's own readiness or sleep score is kept for reference only. Your scores stay yours.")) {
+             subtitle: String(localized: "Your data export from Oura, Fitbit or Garmin.")) {
             HStack(spacing: NoopMetrics.space3) {
                 Button { presentImporter(.wearable) } label: {
                     Label(wearableImporting ? "Importing…" : "Choose export…", systemImage: "tray.and.arrow.down")

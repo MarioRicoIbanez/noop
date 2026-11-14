@@ -196,7 +196,7 @@ struct WorkoutsView: View {
             if allRows.isEmpty {
                 VStack(alignment: .leading, spacing: NoopMetrics.space4) {
                     ComingSoon(what: loaded
-                        ? "No workouts yet. They come from your WHOOP and Apple Health history. Import in Data Sources to bring them in, or add one you tracked elsewhere."
+                        ? "No workouts yet. Start one, or import your history in Data Sources."
                         : "Loading your sessions…")
                     if loaded {
                         workoutActionRow
@@ -625,7 +625,7 @@ struct WorkoutsView: View {
     /// #459 / PERF: the live-workout button is `WorkoutStartControl`, a leaf that owns `AppModel` itself
     /// so this screen doesn't have to — see the comment on `profile`/`intelligence` above.
     private var workoutActionRow: some View {
-        HStack(spacing: NoopMetrics.rowSpacing) {
+        NoopButtonRow(spacing: NoopMetrics.rowSpacing) {
             WorkoutStartControl()
                 .frame(maxWidth: .infinity)
             addWorkoutButton

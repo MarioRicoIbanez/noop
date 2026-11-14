@@ -471,36 +471,73 @@ struct RootTabView: View {
             ScreenScaffold(title: "More", subtitle: "Everything else, one tap away",
                            onRefresh: { await repo.refresh() },
                            topBackground: liquidScaffoldSky()) {
-                moreSection("Essentials") {
-                    MoreRow("Live", "waveform.path.ecg", .live)
-                    MoreRow("Health", "heart.text.square.fill", .health)
-                    if coachEnabled { MoreRow("Coach", "sparkles", .coach) }
-                    MoreRow("Alarms", "alarm.fill", .alarms)
-                    MoreRow("Data Sources", "externaldrive.fill", .dataSources)
-                    MoreRow("Settings", "gearshape.fill", .settings)
+                moreSection("Your body") {
+                    MoreRow("Health", "heart.text.square.fill", .health,
+                            caption: "Vital signs and long-term markers")
+                    MoreRow("Vital signs", "waveform.path.ecg.rectangle.fill", .vitals,
+                            caption: "Last night against your usual range")
+                    MoreRow("Stress", "bolt.heart.fill", .stress,
+                            caption: "How loaded your body is through the day")
+                    MoreRow("Body age", "figure.walk", .bodyAge,
+                            caption: "What your habits say about your age")
+                    MoreRow("Rhythm", "waveform.path", .rhythm,
+                            caption: "Checks the night's heartbeat for irregular beats")
                 }
-                moreSection("Advanced") {
-                    MoreRow("What Moves You", "wand.and.sparkles", .insightsHub)
-                    MoreRow("Intelligence", "brain.head.profile", .intelligence)
-                    MoreRow("Insights", "lightbulb.fill", .insights)
-                    MoreRow("Explore", "square.grid.2x2.fill", .explore)
-                    MoreRow("Compare", "rectangle.split.2x1.fill", .compare)
-                    MoreRow("Lift Log", "dumbbell.fill", .liftLog)
-                    MoreRow("Lab Book", "books.vertical.fill", .labBook)
-                    MoreRow("Stress", "bolt.heart.fill", .stress)
-                    MoreRow("Breathe", "wind", .breathe)
-                    MoreRow("Intervals", "timer", .intervals)
-                    MoreRow("Rhythm", "waveform.path", .rhythm)
-                    MoreRow("Your Data, Fused", "square.stack.3d.up.fill", .fusedRecord)
-                    MoreRow("Apple Health", "heart.fill", .appleHealth)
-                    MoreRow("Mi Band", "figure.walk.motion", .miBand)
-                    MoreRow("Backup & Sync", "externaldrive.fill.badge.icloud", .backupSync)
-                    MoreRow("Shortcuts Export", "square.and.arrow.up.fill", .shortcutsExport)
-                    MoreRow("NOOP Limitations", "list.bullet.rectangle", .noopLimitations)
-                    MoreRow("Automations", "wand.and.stars", .automations)
-                    MoreRow("Test Centre", "stethoscope", .testCentre)
-                    MoreRow("Siri & Shortcuts", "mic.fill", .siriShortcuts)
-                    MoreRow("Power saving", "battery.25", .powerSaving)
+                moreSection("Train") {
+                    MoreRow("Rep counter", "repeat", .repCounter,
+                            caption: "Counts your sets from wrist motion")
+                    MoreRow("Lift Log", "dumbbell.fill", .liftLog,
+                            caption: "Weights, sets and reps you write down")
+                    MoreRow("Intervals", "timer", .intervals,
+                            caption: "Timer for work and rest rounds")
+                    MoreRow("Breathe", "wind", .breathe,
+                            caption: "Guided breathing paced by the strap")
+                }
+                moreSection("Understand") {
+                    if coachEnabled {
+                        MoreRow("Coach", "sparkles", .coach, caption: "Ask questions about your data")
+                    }
+                    MoreRow("What Moves You", "wand.and.sparkles", .insightsHub,
+                            caption: "Which habits change your recovery")
+                    MoreRow("Explore", "square.grid.2x2.fill", .explore,
+                            caption: "Every signal, charted over time")
+                    MoreRow("Compare", "rectangle.split.2x1.fill", .compare,
+                            caption: "Two signals on one chart")
+                    MoreRow("Lab Book", "books.vertical.fill", .labBook,
+                            caption: "Blood tests and health records you keep")
+                    MoreRow("Intelligence", "brain.head.profile", .intelligence,
+                            caption: "How each day's scores were calculated")
+                }
+                moreSection("Strap") {
+                    MoreRow("Live", "dot.radiowaves.left.and.right", .live,
+                            caption: "Connection, live readings and sync")
+                    MoreRow("Alarms", "alarm.fill", .alarms,
+                            caption: "Wake up with a buzz on your wrist")
+                    MoreRow("Automations", "wand.and.stars", .automations,
+                            caption: "Double tap the strap to run a shortcut")
+                    MoreRow("Power saving", "battery.25", .powerSaving,
+                            caption: "Make the strap's battery last longer")
+                    MoreRow("NOOP Limitations", "list.bullet.rectangle", .noopLimitations,
+                            caption: "What this strap can and cannot read")
+                }
+                moreSection("Data") {
+                    MoreRow("Data Sources", "externaldrive.fill", .dataSources,
+                            caption: "Import from Apple Health or WHOOP")
+                    MoreRow("Apple Health", "heart.fill", .appleHealth,
+                            caption: "Everything you imported from Health")
+                    MoreRow("Your Data, Fused", "square.stack.3d.up.fill", .fusedRecord,
+                            caption: "Which source each number comes from")
+                    MoreRow("Backup & Sync", "externaldrive.fill.badge.icloud", .backupSync,
+                            caption: "Save or restore a copy of your data")
+                    MoreRow("Shortcuts Export", "square.and.arrow.up.fill", .shortcutsExport,
+                            caption: "Send your numbers to Shortcuts")
+                    MoreRow("Siri & Shortcuts", "mic.fill", .siriShortcuts,
+                            caption: "Ask Siri for your scores")
+                }
+                moreSection("App") {
+                    MoreRow("Settings", "gearshape.fill", .settings, caption: "Profile, units and appearance")
+                    MoreRow("Test Centre", "stethoscope", .testCentre,
+                            caption: "Diagnostics for when something fails")
                 }
             }
             // The rows push MoreDestination VALUES so a re-tap of the More tab can pop them off the
@@ -522,56 +559,22 @@ struct RootTabView: View {
         .tabItem { Label("More", systemImage: "ellipsis") }
     }
 
-    /// One titled, COLLAPSIBLE group in the More index (S2): the app's overline (UPPERCASE) becomes a
-    /// tappable header with a disclosure chevron; tapping it expands/collapses the grouped rows card.
-    /// Insights + Body default open, Data + App default collapsed (the `expandedMoreSections` seed) so the
-    /// list is shorter at rest without dropping a single row. The grouped card is unchanged: a single
-    /// `NoopCard` holding a `VStack(spacing: 0)` whose `MoreRow`s draw their own hairlines, clipped to the
-    /// card's rounded shape so the last divider is trimmed inside the corners. Same idiom Settings/Health use.
+    /// One titled group in the More index: a plain heading over a card of rows. Always open, so every
+    /// destination is visible without unfolding anything.
     @ViewBuilder
     private func moreSection<Rows: View>(_ title: String,
                                          @ViewBuilder rows: @escaping () -> Rows) -> some View {
-        let isOpen = expandedMoreSections.contains(title)
         VStack(alignment: .leading, spacing: 10) {
-            // Tappable overline header: the same ALL-CAPS tracked label as before, now with a trailing
-            // chevron that rotates open. A plain Button (not a SwiftUI DisclosureGroup) so the header keeps
-            // the exact strandOverline styling and the card layout below stays identical to before.
-            Button {
-                withAnimation(.timingCurve(0.22, 1, 0.36, 1, duration: 0.24)) {
-                    // Persist the toggle via the CSV-backed @AppStorage so the choice survives leaving and
-                    // re-entering the More tab and relaunch (#860 item 2). MoreSectionPrefs owns encode/decode.
-                    var open = expandedMoreSections
-                    if isOpen { open.remove(title) } else { open.insert(title) }
-                    expandedMoreSectionsCSV = MoreSectionPrefs.encode(open)
-                }
-            } label: {
-                HStack(spacing: 6) {
-                    Text(LocalizedStringKey(title)).strandOverline()
-                    Spacer(minLength: 8)
-                    Image(systemName: "chevron.down")
-                        .font(.system(size: 11, weight: .semibold))
-                        .foregroundStyle(StrandPalette.textTertiary)
-                        .rotationEffect(.degrees(isOpen ? 0 : -90))
-                }
+            Text(LocalizedStringKey(title))
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(StrandPalette.textPrimary)
                 .frame(maxWidth: .infinity, alignment: .leading)
-                .contentShape(Rectangle())
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel(Text(title))
-            .accessibilityValue(Text(isOpen ? String(localized: "Expanded") : String(localized: "Collapsed")))
-            .accessibilityHint(Text(isOpen ? String(localized: "Double tap to collapse") : String(localized: "Double tap to expand")))
-
-            if isOpen {
-                // Zero internal padding so each MoreRow owns its own comfortable insets + height; the rows
-                // supply their own hairline separators (drawn at the bottom of every row but the last via the
-                // divider overlay) so the group reads as one continuous grouped list, matching Settings/Health.
-                NoopCard(padding: 0) {
-                    VStack(spacing: 0) { rows() }
-                        // Clip the rows column to the card's rounded shape so the last row's bottom hairline is
-                        // trimmed inside the corners (the card draws its surface in the BACKGROUND and doesn't
-                        // clip content itself, so without this the final divider would run past the rounded edge).
-                        .clipShape(RoundedRectangle(cornerRadius: NoopMetrics.cardRadius, style: .continuous))
-                }
+                .accessibilityAddTraits(.isHeader)
+            // Zero internal padding so each MoreRow owns its insets; the rows draw their own hairlines
+            // and the clip trims the last one inside the card's rounded corners.
+            NoopCard(padding: 0) {
+                VStack(spacing: 0) { rows() }
+                    .clipShape(RoundedRectangle(cornerRadius: NoopMetrics.cardRadius, style: .continuous))
             }
         }
     }
@@ -586,6 +589,7 @@ private enum MoreDestination: Hashable {
     case live, workouts, liftLog, health, labBook, stress, breathe, intervals, rhythm
     case fusedRecord, appleHealth, miBand, dataSources, backupSync, shortcutsExport, noopLimitations
     case alarms, automations, testCentre, siriShortcuts, powerSaving, settings
+    case repCounter, vitals, bodyAge
 
     @ViewBuilder var destination: some View {
         switch self {
@@ -617,6 +621,9 @@ private enum MoreDestination: Hashable {
         case .siriShortcuts:   SiriShortcutsSettingsView()
         case .powerSaving:     PowerSavingView()
         case .settings:        SettingsView()
+        case .repCounter:      RepCounterView()
+        case .vitals:          VitalsDetailView()
+        case .bodyAge:         BodyAgeDetailView()
         }
     }
 }
@@ -631,8 +638,11 @@ private struct MoreRow: View {
     let icon: String
     let route: MoreDestination
 
-    init(_ title: LocalizedStringKey, _ icon: String, _ route: MoreDestination) {
-        self.title = title; self.icon = icon; self.route = route
+    let caption: LocalizedStringKey?
+
+    init(_ title: LocalizedStringKey, _ icon: String, _ route: MoreDestination,
+         caption: LocalizedStringKey? = nil) {
+        self.title = title; self.icon = icon; self.route = route; self.caption = caption
     }
 
     var body: some View {
@@ -645,15 +655,24 @@ private struct MoreRow: View {
                     .font(.system(size: 17, weight: .regular))
                     .foregroundStyle(StrandPalette.accent)
                     .frame(width: 26, alignment: .center)
-                Text(title)
-                    .font(StrandFont.body)
-                    .foregroundStyle(StrandPalette.textPrimary)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(title)
+                        .font(.system(size: 17))
+                        .foregroundStyle(StrandPalette.textPrimary)
+                    if let caption {
+                        Text(caption)
+                            .font(.system(size: 14))
+                            .foregroundStyle(StrandPalette.textSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
+                }
                 Spacer(minLength: 8)
                 Image(systemName: "chevron.right")
                     .font(.system(size: 13, weight: .semibold))
                     .foregroundStyle(StrandPalette.textTertiary)
             }
             .padding(.horizontal, 16)
+            .padding(.vertical, 9)
             .frame(minHeight: 44)
             .frame(maxWidth: .infinity, alignment: .leading)
             .contentShape(Rectangle())

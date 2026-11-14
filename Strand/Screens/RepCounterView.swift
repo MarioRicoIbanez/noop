@@ -28,6 +28,10 @@ final class RepCounterLive: ObservableObject {
     static let shared = RepCounterLive()
 
     @Published private(set) var isCounting = false
+    /// True while the screen has asked the strap for motion; the traces move even between sets.
+    @Published private(set) var isListening = false
+    /// Motion frames (one a second) received since listening started.
+    @Published private(set) var framesReceived = 0
     @Published private(set) var reps = 0
     /// Repetitions the wearer marked by hand in the current set.
     @Published private(set) var marks = 0
@@ -53,6 +57,26 @@ final class RepCounterLive: ObservableObject {
     private static let maxSeconds = 300
 
     private init() {}
+
+    /// The screen opened the motion stream.
+    func startListening() {
+        guard !isListening else { return }
+        isListening = true
+        framesReceived = 0
+    }
+
+    /// The screen closed the motion stream.
+    func stopListening() {
+        isListening = false
+        if !isCounting {
+            gx.removeAll(keepingCapacity: true)
+            gy.removeAll(keepingCapacity: true)
+            gz.removeAll(keepingCapacity: true)
+            angleTrace = []
+            gyroTrace = [[], [], []]
+            swingDegrees = 0
+        }
+    }
 
     /// Start a set. A known exercise counts with the settings learned for it.
     func begin(exercise: LibraryExercise?) {
@@ -104,16 +128,26 @@ final class RepCounterLive: ObservableObject {
 
     /// Called for every frame the collector sees; ignores anything that is not a motion frame.
     func ingest(frame: [UInt8]) {
-        guard isCounting, secondsReceived < Self.maxSeconds else { return }
+        guard isListening || isCounting else { return }
+        guard !isCounting || secondsReceived < Self.maxSeconds else { return }
         guard let columns = Whoop5RawImu.rawColumns(frame), columns.count >= 600 else { return }
+        framesReceived += 1
         for i in 0..<100 {
             gx.append(Double(columns[300 + i]) * Self.gyroScale)
             gy.append(Double(columns[400 + i]) * Self.gyroScale)
             gz.append(Double(columns[500 + i]) * Self.gyroScale)
         }
-        secondsReceived += 1
+        if !isCounting, gx.count > 1_000 {
+            // Between sets only the last ten seconds are kept, enough to draw the traces.
+            gx.removeFirst(gx.count - 1_000)
+            gy.removeFirst(gy.count - 1_000)
+            gz.removeFirst(gz.count - 1_000)
+        }
         let analysis = RepCounter.analyse(gx: gx, gy: gy, gz: gz, settings: settings)
-        if analysis.result.reps > reps { reps = analysis.result.reps }
+        if isCounting {
+            secondsReceived += 1
+            if analysis.result.reps > reps { reps = analysis.result.reps }
+        }
         gyroTrace = [Self.recent(gx), Self.recent(gy), Self.recent(gz)]
         angleTrace = Self.recent(analysis.angle)
         if let low = angleTrace.min(), let high = angleTrace.max() { swingDegrees = high - low }
@@ -156,8 +190,18 @@ struct RepCounterView: View {
         .sheet(isPresented: $choosing) {
             ExercisePickerView(selection: $exercise)
         }
+        .onAppear { listen() }
+        .onChange(of: live.encryptedBond) { _ in listen() }
+        .onChange(of: live.connected) { connected in
+            // A dropped link ends the stream on the strap; ask again once it is back.
+            if connected { listen() } else { counter.stopListening() }
+        }
         .onDisappear {
-            if counter.isCounting { finish() }
+            if counter.isCounting { counter.finish() }
+            if counter.isListening {
+                counter.stopListening()
+                Task { await model.ble.stopGroundTruthRawCapture() }
+            }
         }
     }
 
@@ -245,7 +289,7 @@ struct RepCounterView: View {
     }
 
     private var motionCard: some View {
-        SummaryCard(symbol: "gyroscope", title: "Motion", trailing: "Last 10 seconds") {
+        SummaryCard(symbol: "gyroscope", title: "Motion", trailing: motionStatus) {
             HStack(alignment: .firstTextBaseline) {
                 Text("Elevation")
                     .font(.system(size: 13))
@@ -313,18 +357,31 @@ struct RepCounterView: View {
         return "Start, do your set, then finish."
     }
 
-    private func start() {
+    private var motionStatus: LocalizedStringKey {
+        if !counter.isListening { return "No signal" }
+        return counter.framesReceived == 0 ? "Waiting for motion data" : "Live"
+    }
+
+    /// Ask the strap for motion as soon as the screen is up and the pairing allows it, so the traces
+    /// move before the first set.
+    private func listen() {
+        guard live.connected, live.encryptedBond, !counter.isListening else { return }
         startFailed = false
         guard model.ble.startGroundTruthRawCapture(sessionId: "rep-counter") else {
             startFailed = true
             return
         }
+        counter.startListening()
+    }
+
+    private func start() {
+        listen()
+        guard counter.isListening else { return }
         counter.begin(exercise: exercise)
     }
 
     private func finish() {
         counter.finish()
-        Task { await model.ble.stopGroundTruthRawCapture() }
     }
 }
 

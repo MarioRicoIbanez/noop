@@ -385,7 +385,6 @@ final class Collector {
     private func recordGroundTruthImu(_ frame: [UInt8]) {
         _ = ImuSessionFileStore.shared.append(deviceId: deviceId, frame: frame,
             receivedAtMs: Int64(Date().timeIntervalSince1970 * 1_000))
-        RepCounterLive.shared.ingest(frame: frame)
     }
 
     /// Flush WHILE the window is still active so the just-captured frames get persisted as raw,

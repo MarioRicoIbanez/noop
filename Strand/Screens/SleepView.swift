@@ -2074,7 +2074,7 @@ struct SleepView: View {
     private var emptyState: some View {
         SleepFreshnessNote(latestWakeTs: nil)
         if repo.loaded {
-            ComingSoon(what: "No nights here yet. Import your WHOOP export in Data Sources to see every night, your sleep stages and trends straight away. Or open Intelligence to see last night computed from the strap after you wear it to bed.")
+            ComingSoon(what: "No nights yet. Wear the strap to bed, or import your history in Data Sources.")
         } else {
             ComingSoon(what: "Loading your sleep history…")
         }
@@ -2523,7 +2523,7 @@ struct SleepMarkCard: View {
                         .font(StrandFont.footnote)
                         .foregroundStyle(StrandPalette.textTertiary)
                         .fixedSize(horizontal: false, vertical: true)
-                    HStack(spacing: NoopMetrics.gap) {
+                    NoopButtonRow(spacing: NoopMetrics.gap) {
                         // Routed through the unified NoopButton system so the two marks sit identically
                         // (sentence-case label, leading icon at 8pt, controlHeight=48, no glow).
                         NoopButton("Going to sleep", systemImage: "moon.zzz.fill",
@@ -2635,7 +2635,7 @@ private struct SleepFreshnessNote: View {
                             symbol: "arrow.triangle.2.circlepath")
         case .notDetected:
             DataPendingNote(title: "Last night's sleep wasn't detected",
-                            message: "Sync finished, but NOOP couldn't confidently identify a sleep window. Keep the strap connected and try Sync again; the older night below is still your latest detected sleep.",
+                            message: "The strap synced, but no night was found in its data.",
                             symbol: "moon.zzz")
         case nil:
             EmptyView()
