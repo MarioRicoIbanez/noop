@@ -1,6 +1,6 @@
 {
   "name": "NOOP (Mario)",
-  "identifier": "com.mariorico.noop.altstore",
+  "identifier": "com.noopapp.noop.altstore.fork",
   "sourceURL": "https://raw.githubusercontent.com/MarioRicoIbanez/noop/main/altstore-source.json",
   "subtitle": "A standalone WHOOP app — your strap, your device, fully offline.",
   "description": "An AltStore / SideStore source for NOOP, the independent open-source WHOOP companion. Add this source to get one-tap updates for the sideloaded iOS build.\n\nNOOP is not affiliated with WHOOP. It reads a strap you own, directly over Bluetooth, on your own device — no WHOOP app, no subscription, no cloud.",
@@ -20,12 +20,12 @@
       "screenshotURLs": [],
       "versions": [
         {
-          "version": "12.1.0",
+          "version": "12.1.6",
           "buildVersion": "439",
           "date": "2026-11-14",
-          "localizedDescription": "Fork build with the redesign in progress.",
+          "localizedDescription": "Testing build ac39ed4.",
           "downloadURL": "https://github.com/MarioRicoIbanez/noop/releases/download/testing-latest/NOOP-ios-unsigned-v12.1.0.ipa",
-          "size": 21937627,
+          "size": 22087448,
           "minOSVersion": "17.0"
         }
       ],
@@ -43,12 +43,12 @@
           "NSMotionUsageDescription": "NOOP reads your iPhone's step count for a walking or running workout to show steps in the activity summary. It stays on your device. Nothing leaves it."
         }
       },
-      "version": "12.1.0",
+      "version": "12.1.6",
       "buildVersion": "439",
       "versionDate": "2026-11-14",
-      "versionDescription": "Fork build with the redesign in progress.",
+      "versionDescription": "Testing build ac39ed4.",
       "downloadURL": "https://github.com/MarioRicoIbanez/noop/releases/download/testing-latest/NOOP-ios-unsigned-v12.1.0.ipa",
-      "size": 21937627,
+      "size": 22087448,
       "minOSVersion": "17.0"
     }
   ],
