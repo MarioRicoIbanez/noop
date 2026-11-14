@@ -8,11 +8,11 @@ import WhoopProtocol
 import WhoopStore
 import OuraProtocol
 
-/// Live — the connected strap in real time, in the liquid finish. Built on the shared design system
-/// (ScreenScaffold chrome + day-of-sky backdrop, StrandPalette, StrandFont) and the liquid vocabulary
-/// (LiquidVessel for the live BPM gauge, LiquidThread for the live HR trace, LiquidTube for the effort
-/// bars, frosted `card {}` surfaces, LiquidPressStyle on tappable rows) so it lines up with the Today
-/// screen instead of the old flat-card layout.
+/// Live — the connected strap in real time. Top to bottom: a status line (connection, battery, wear,
+/// last sync), any pairing or reconnect notice, the live heart rate with its trace and the two
+/// beat-to-beat figures, the session card, the connect / buzz / disconnect buttons and the Devices
+/// row, then the signal checks and the strap log, folded. Built on ScreenScaffold and the Summary
+/// cards, in the strap's blue with the heart rate in red.
 ///
 /// LiveState (which publishes at ~1 Hz while a strap streams) is observed ONLY in leaf views
 /// (`LiveHeartReadout`, `LivePhysiology`, `LiveHeaderStats`, `LiveSignalTrustRail`, `ActiveWorkoutLive`,
@@ -112,6 +112,7 @@ struct LiveView: View {
                        topBackground: liquidScaffoldSky()) {
             VStack(alignment: .leading, spacing: NoopMetrics.sectionGap) {
                 consoleHeader
+                    .staggeredAppear(index: 0)
                 // Can't-connect-at-all guidance: the strap wiped its bond (firmware update / WHOOP app
                 // re-bond), so connects loop on "Peer removed pairing information". Show the re-pair steps
                 // right here instead of silently retrying. (5/MG firmware reset, 2026-06)
@@ -132,6 +133,7 @@ struct LiveView: View {
                 // `auth OK` — the same "no link yet" slot the WHOOP callout fills.
                 if activeIsOura, ringPhase != .authenticated { ringConnectCallout }
                 bodyConsole
+                    .staggeredAppear(index: 1)
                 // Low-bandwidth fallback note (#80): the radio couldn't sustain the WHOOP 4 R10/R11 raw
                 // realtime burst, so live HR is riding the standard BLE Heart-Rate profile instead. Live HR
                 // still works — this is informational, not an error — so it sits right under the readout in
@@ -216,190 +218,137 @@ struct LiveView: View {
             .background(NoopPanelSurface(cornerRadius: 22, surfaceOpacity: cardOpacity))
     }
 
-    // MARK: - Console header
+    // MARK: - Status line
 
-    /// The console's top band: the connection pill + a connection-mode badge (+ a live SYNCING badge
-    /// while a history offload runs), with battery / worn / last-sync stats pushed to the trailing edge.
-    /// The high-frequency stats (battery / worn / sync) live in the `LiveHeaderStats` leaf so their
-    /// notifies don't re-render the whole screen.
+    /// The status at the top of the screen: one line saying whether the device is connected (and a
+    /// sync counter while a history offload runs), then the device name with battery, wear and last
+    /// sync. The battery / worn / sync figures live in the `LiveHeaderStats` leaf so their notifies
+    /// don't re-render the whole screen.
     private var consoleHeader: some View {
-        card {
-            ViewThatFits(in: .horizontal) {
-                HStack(alignment: .center, spacing: 12) {
-                    connectionPill
-                    if showsModeBadge {
-                        SourceBadge(connectionModeBadge, tint: connectionModeColor)
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 10) {
+                connectionPill
+                Spacer(minLength: 8)
+                if live.backfilling {
+                    HStack(spacing: 5) {
+                        Image(systemName: "arrow.triangle.2.circlepath")
+                            .accessibilityHidden(true)
+                        Text("Syncing \(live.syncChunksThisSession)")
                     }
-                    if live.backfilling {
-                        SourceBadge("SYNCING \(live.syncChunksThisSession)", tint: StrandPalette.metricCyan)
-                    }
-                    Spacer(minLength: 8)
-                    LiveHeaderStats(activeConnection: activeConnection, activeIsWhoop: activeIsWhoop,
-                                    deviceName: activeDeviceName)
-                }
-                VStack(alignment: .leading, spacing: 12) {
-                    HStack(spacing: 12) {
-                        connectionPill
-                        if showsModeBadge {
-                            SourceBadge(connectionModeBadge, tint: connectionModeColor)
-                        }
-                        if live.backfilling {
-                            SourceBadge("SYNCING \(live.syncChunksThisSession)", tint: StrandPalette.metricCyan)
-                        }
-                        Spacer(minLength: 0)
-                    }
-                    LiveHeaderStats(activeConnection: activeConnection, activeIsWhoop: activeIsWhoop,
-                                    deviceName: activeDeviceName)
+                    .font(.system(size: 15))
+                    .foregroundStyle(SummaryStyle.vitals)
+                    .lineLimit(1)
                 }
             }
+            LiveHeaderStats(activeConnection: activeConnection, activeIsWhoop: activeIsWhoop,
+                            deviceName: activeDeviceName)
         }
-    }
-
-    private var connectionModeBadge: LocalizedStringKey {
-        if activeConnection && live.encryptedBond { return "FULL BOND" }
-        if activeConnection { return "LIVE HR ONLY" }
-        if ringStreaming { return "STREAMING" }
-        if live.connected { return "CONNECTING" }
-        if live.encryptedBond { return "PAIRED" }
-        return "OFFLINE"
-    }
-
-    /// Whether to render the connection-mode SourceBadge. When fully offline the `connectionPill`
-    /// already reads "● Disconnected" in metricRose, so the duplicate rose "OFFLINE" badge is pure
-    /// redundancy — suppress it. We keep the badge for every informative state (FULL BOND / LIVE HR
-    /// ONLY / CONNECTING / PAIRED), where it adds signal beyond the pill. The gate matches exactly the
-    /// branch where `connectionModeBadge` would return "OFFLINE".
-    private var showsModeBadge: Bool {
-        !(!activeConnection && !live.connected && !live.encryptedBond)
-    }
-
-    private var connectionModeColor: Color {
-        if (activeConnection && live.encryptedBond) || ringStreaming { return StrandPalette.accent }
-        if activeConnection || live.connected { return StrandPalette.statusWarning }
-        return StrandPalette.metricRose
+        .padding(.horizontal, 4)
     }
 
     private var connectionPill: some View {
         // Distinguish a GENUINE encrypted bond from the 5/MG live-HR shortcut that flips `bonded` true
-        // over the unbonded standard profile (#69): green "Bonded · streaming" only when encryptedBond,
-        // amber "Live HR (not fully paired)" otherwise. The pairingHintBanner below gives the how-to.
+        // over the unbonded standard profile (#69): blue "Streaming" only when encryptedBond, amber
+        // "Live HR (not fully paired)" otherwise. The pairingHintBanner below gives the how-to.
         let (label, color): (String, Color) =
-            (activeConnection && live.encryptedBond) ? (String(localized: "Bonded · streaming"), StrandPalette.accent)
+            (activeConnection && live.encryptedBond) ? (String(localized: "Streaming"), SummaryStyle.vitals)
             : activeConnection ? (String(localized: "Live HR (not fully paired)"), StrandPalette.statusWarning)
-            : ringStreaming ? (String(localized: "Streaming"), StrandPalette.accent)
+            : ringStreaming ? (String(localized: "Streaming"), SummaryStyle.vitals)
             : live.connected ? (String(localized: "Connected"), StrandPalette.statusWarning)
-            : live.encryptedBond ? (String(localized: "Paired · idle"), StrandPalette.statusWarning)
+            : live.encryptedBond ? (String(localized: "Paired, idle"), StrandPalette.statusWarning)
             : (String(localized: "Disconnected"), StrandPalette.metricRose)
-        return HStack(spacing: 8) {
-            Circle().fill(color).frame(width: 9, height: 9)
-            Text(label).font(StrandFont.subhead).foregroundStyle(StrandPalette.textPrimary)
+        return HStack(spacing: 10) {
+            Circle().fill(color).frame(width: 10, height: 10)
+                .accessibilityHidden(true)
+            Text(label)
+                .font(.system(size: 20, weight: .semibold))
+                .foregroundStyle(SummaryStyle.primary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.75)
         }
-        .padding(.horizontal, 14).padding(.vertical, 8)
-        .background(StrandPalette.surfaceInset, in: Capsule())
-        .overlay(Capsule().strokeBorder(StrandPalette.hairline, lineWidth: 1))
     }
 
-    // MARK: - Body console (live BPM vessel + live physiology)
+    // MARK: - Heart rate card (live BPM + live physiology)
 
-    /// The console's centrepiece: a live BPM LiquidVessel beside a live-physiology stack (R-R tube,
-    /// rolling RMSSD, last frame/event). Side-by-side on a wide window (Mac), stacked on a narrow one
-    /// (iPhone) via ViewThatFits. Both halves are leaf views that own LiveState so the 1 Hz HR / R-R
-    /// notifies re-render only them, not the whole console. The card carries the Effort tint world.
+    /// The screen's centrepiece: the live heart rate with its trace, and under a rule the two
+    /// beat-to-beat figures. Both halves are leaf views that own LiveState so the 1 Hz HR / R-R
+    /// notifies re-render only them, not the whole screen.
     private var bodyConsole: some View {
-        card {
-            ViewThatFits(in: .horizontal) {
-                HStack(alignment: .center, spacing: NoopMetrics.space6) {
-                    LiveHeartReadout(activeIsWhoop: activeIsWhoop, activeIsOura: activeIsOura, hrMax: model.profile.hrMax)
-                        .frame(minWidth: 260, maxWidth: 340)
-                    Divider().overlay(StrandPalette.hairline)
-                    LivePhysiology(activeIsWhoop: activeIsWhoop)
-                        .frame(maxWidth: .infinity, alignment: .leading)
-                }
-                VStack(alignment: .leading, spacing: 18) {
-                    LiveHeartReadout(activeIsWhoop: activeIsWhoop, activeIsOura: activeIsOura, hrMax: model.profile.hrMax)
-                    Divider().overlay(StrandPalette.hairline)
-                    LivePhysiology(activeIsWhoop: activeIsWhoop)
-                }
-            }
+        SummaryCard(symbol: "heart.fill", title: "Heart rate", accent: SummaryStyle.heart) {
+            LiveHeartReadout(activeIsWhoop: activeIsWhoop, activeIsOura: activeIsOura, hrMax: model.profile.hrMax)
+                .padding(.top, 10)
+            Rectangle().fill(SummaryStyle.rule).frame(height: 0.5)
+                .padding(.top, 12)
+            LivePhysiology(activeIsWhoop: activeIsWhoop)
+                .padding(.top, 12)
         }
     }
 
-    // MARK: - Signal trust
+    // MARK: - Signal checks
 
-    /// The "Signal Trust" rail — one tile per signal that has to be current for the console to be
-    /// trustworthy (HR, R-R, connection, history sync, battery, wear). The whole rail is a leaf that
-    /// owns LiveState so its 1 Hz value refresh doesn't re-render the parent screen.
+    /// The signal checks: one row per signal that has to be current for the screen to be trustworthy
+    /// (HR, R-R, connection, history sync, battery, wear, last frame and event). The whole list is a
+    /// leaf that owns LiveState so its 1 Hz value refresh doesn't re-render the parent screen.
     private var signalTrustRail: some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.gap) {
-            SectionHeader("Signal Trust", overline: "Proof that the console is current")
-            LiveSignalTrustRail(activeConnection: activeConnection, activeIsWhoop: activeIsWhoop)
-        }
+        LiveSignalTrustRail(activeConnection: activeConnection, activeIsWhoop: activeIsWhoop)
     }
 
     // MARK: - Session console (record / inspect the current stream)
 
     @ViewBuilder private var sessionConsole: some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.gap) {
-            SectionHeader("Session", overline: "Record or inspect the current stream")
-            if let w = model.activeWorkout {
-                activeWorkoutCard(w)
-            } else {
-                card {
-                    ViewThatFits(in: .horizontal) {
-                        HStack(alignment: .center, spacing: 14) {
-                            sessionPrompt
-                            Spacer(minLength: 12)
-                            sessionActions
-                        }
-                        VStack(alignment: .leading, spacing: 14) {
-                            sessionPrompt
-                            sessionActions
-                        }
-                    }
+        if let w = model.activeWorkout {
+            activeWorkoutCard(w)
+        } else {
+            SummaryCard(symbol: "figure.run", title: "Session", accent: SummaryStyle.activity) {
+                VStack(alignment: .leading, spacing: 12) {
+                    sessionPrompt
+                    sessionActions
                 }
-                if let last = model.lastWorkout {
-                    workoutSavedRow(last)
-                }
+                .padding(.top, 12)
+            }
+            if let last = model.lastWorkout {
+                workoutSavedRow(last)
             }
         }
     }
 
-    private var sessionPrompt: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            if !activeConnection {
-                Text("Connect the strap first, then mark a workout from the live stream.")
-                    .font(StrandFont.body)
-                    .foregroundStyle(StrandPalette.textSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
+    @ViewBuilder private var sessionPrompt: some View {
+        if !activeConnection {
+            Text("Connect the strap first, then mark a workout from the live stream.")
+                .font(.system(size: 15))
+                .foregroundStyle(SummaryStyle.secondary)
+                .fixedSize(horizontal: false, vertical: true)
         }
     }
 
     private var sessionActions: some View {
-        NoopButtonRow(spacing: NoopMetrics.rowSpacing) {
+        VStack(spacing: NoopMetrics.rowSpacing) {
             // All three routed through the unified button system: a filled primary for the lead
-            // action, secondary surfaces for the supporting two — sentence-case, single line, 48pt.
+            // action on its own row, secondary surfaces for the supporting two, which stack when
+            // their labels do not fit side by side.
             NoopButton("Start workout", systemImage: "figure.run", kind: .primary, fullWidth: true) {
                 showStartSport = true
             }
             .disabled(!activeConnection)
             .help("Track a workout manually. Records heart rate and effort until you end it.")
 
-            NoopButton("Refresh", systemImage: "arrow.clockwise", kind: .secondary, fullWidth: true) {
-                model.getBattery()
-            }
-            .disabled(!activeConnection)
-            .help("Refresh strap battery and connection state.")
+            NoopButtonRow(spacing: NoopMetrics.rowSpacing) {
+                NoopButton("Refresh", systemImage: "arrow.clockwise", kind: .secondary, fullWidth: true) {
+                    model.getBattery()
+                }
+                .disabled(!activeConnection)
+                .help("Refresh strap battery and connection state.")
 
-            // Manual HRV snapshot (#127) — a still, seated 60s R-R reading. Needs the live R-R
-            // stream, so it's gated on a bonded connection just like the workout/refresh actions.
-            NoopButton("HRV reading", systemImage: "waveform.path.ecg", kind: .secondary, fullWidth: true) {
-                showHRVSnapshot = true
+                // Manual HRV snapshot (#127) — a still, seated 60s R-R reading. Needs the live R-R
+                // stream, so it's gated on a bonded connection just like the workout/refresh actions.
+                NoopButton("HRV reading", systemImage: "waveform.path.ecg", kind: .secondary, fullWidth: true) {
+                    showHRVSnapshot = true
+                }
+                .disabled(!activeConnection)
+                .help(activeConnection
+                      ? "Take a 60-second seated HRV reading from the live R-R stream."
+                      : "Connect your strap first. The reading needs the live R-R stream.")
             }
-            .disabled(!activeConnection)
-            .help(activeConnection
-                  ? "Take a 60-second seated HRV reading from the live R-R stream."
-                  : "Connect your strap first. The reading needs the live R-R stream.")
         }
     }
 
@@ -455,57 +404,69 @@ struct LiveView: View {
         let mins = Int((row.durationS ?? 0) / 60)
         let parts = [String(localized: "\(mins) min"), row.avgHr.map { String(localized: "\($0) avg bpm") },
                      row.strain.map { String(localized: "effort \(UnitFormatter.effortDisplay($0, scale: effortScale))") }].compactMap { $0 }
-        return HStack(spacing: 8) {
-            Image(systemName: "checkmark.circle.fill").foregroundStyle(StrandPalette.accent)
-            Text("Workout saved · \(parts.joined(separator: " · "))")
-                .font(StrandFont.footnote).foregroundStyle(StrandPalette.textSecondary)
+        return HStack(alignment: .top, spacing: 8) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 16))
+                .foregroundStyle(SummaryStyle.tint)
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Workout saved")
+                    .font(.system(size: 15, weight: .medium))
+                    .foregroundStyle(SummaryStyle.primary)
+                Text(parts.joined(separator: ", "))
+                    .font(.system(size: 15))
+                    .foregroundStyle(SummaryStyle.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
             Spacer(minLength: 0)
         }
         .padding(.horizontal, 4)
     }
 
-    private func reconnectGuideBanner(_ guide: String) -> some View {
-        HStack(alignment: .top, spacing: 10) {
-            Image(systemName: "exclamationmark.triangle.fill")
-                .foregroundStyle(StrandPalette.statusWarning)
+    /// The shared layout of the pairing, reconnect and standard-HR notices: a glyph, a headline, the
+    /// explanation, and an optional closing line, on a raised surface edged in the notice's colour.
+    private func noticeBanner(symbol: String, tint: Color, title: LocalizedStringKey, detail: String,
+                              closing: LocalizedStringKey? = nil) -> some View {
+        HStack(alignment: .top, spacing: 12) {
+            Image(systemName: symbol)
+                .font(.system(size: 17))
+                .foregroundStyle(tint)
                 .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: 3) {
-                Text("Can't connect: your strap's pairing was reset")
-                    .font(StrandFont.subhead).foregroundStyle(StrandPalette.textPrimary)
-                Text(guide)
-                    .font(StrandFont.footnote).foregroundStyle(StrandPalette.textSecondary)
+            VStack(alignment: .leading, spacing: 4) {
+                Text(title)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(SummaryStyle.primary)
                     .fixedSize(horizontal: false, vertical: true)
+                Text(detail)
+                    .font(.system(size: 15))
+                    .foregroundStyle(SummaryStyle.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+                if let closing {
+                    Text(closing)
+                        .font(.system(size: 15))
+                        .foregroundStyle(SummaryStyle.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
             Spacer(minLength: 0)
         }
-        .padding(NoopMetrics.space3)
-        .background(NoopPanelSurface(cornerRadius: 18))
-        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous)
-            .strokeBorder(StrandPalette.statusWarning.opacity(0.5), lineWidth: 1))
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Reconnect help: \(guide)")
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .livePanel(edge: tint.opacity(0.5), edgeWidth: 1)
+    }
+
+    private func reconnectGuideBanner(_ guide: String) -> some View {
+        noticeBanner(symbol: "exclamationmark.triangle.fill", tint: StrandPalette.statusWarning,
+                     title: "Can't connect: your strap's pairing was reset", detail: guide)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Reconnect help: \(guide)")
     }
 
     private func pairingHintBanner(_ hint: String) -> some View {
-        HStack(alignment: .top, spacing: 10) {
-            Image(systemName: "exclamationmark.triangle.fill")
-                .foregroundStyle(StrandPalette.statusWarning)
-                .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: 3) {
-                Text("Live HR works. Free the strap to unlock buzz, alarms & sync")
-                    .font(StrandFont.subhead).foregroundStyle(StrandPalette.textPrimary)
-                Text(hint)
-                    .font(StrandFont.footnote).foregroundStyle(StrandPalette.textSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            Spacer(minLength: 0)
-        }
-        .padding(NoopMetrics.space3)
-        .background(NoopPanelSurface(cornerRadius: 18))
-        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous)
-            .strokeBorder(StrandPalette.statusWarning.opacity(0.5), lineWidth: 1))
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Pairing help: \(hint)")
+        noticeBanner(symbol: "exclamationmark.triangle.fill", tint: StrandPalette.statusWarning,
+                     title: "Live HR works. Free the strap to unlock buzz, alarms & sync", detail: hint)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Pairing help: \(hint)")
     }
 
     /// Whether the low-bandwidth standard-HR fallback note should render. The note explains that live HR
@@ -518,31 +479,14 @@ struct LiveView: View {
     }
 
     /// Calm inline note for the #80 low-bandwidth fallback. Unlike the amber pairing/reconnect banners this
-    /// is NOT a warning — live HR is working — so it uses the accent (health-green) treatment with a signal
-    /// glyph. Mirrors the banner layout (icon + headline + one-line explanation) for visual consistency.
+    /// is NOT a warning — live HR is working — so it takes the strap's blue with a signal glyph. Same
+    /// layout as the banners (icon + headline + explanation) for visual consistency.
     private func standardHRNote(_ detail: String) -> some View {
-        HStack(alignment: .top, spacing: 10) {
-            Image(systemName: "antenna.radiowaves.left.and.right")
-                .foregroundStyle(StrandPalette.accent)
-                .accessibilityHidden(true)
-            VStack(alignment: .leading, spacing: 3) {
-                Text("Standard HR mode (low bandwidth)")
-                    .font(StrandFont.subhead).foregroundStyle(StrandPalette.textPrimary)
-                Text(detail)
-                    .font(StrandFont.footnote).foregroundStyle(StrandPalette.textSecondary)
-                    .fixedSize(horizontal: false, vertical: true)
-                Text("Other metrics (R-R, frames, battery, history) need a full sync.")
-                    .font(StrandFont.footnote).foregroundStyle(StrandPalette.textTertiary)
-                    .fixedSize(horizontal: false, vertical: true)
-            }
-            Spacer(minLength: 0)
-        }
-        .padding(NoopMetrics.space3)
-        .background(NoopPanelSurface(tint: StrandPalette.accent, cornerRadius: 18))
-        .overlay(RoundedRectangle(cornerRadius: 18, style: .continuous)
-            .strokeBorder(StrandPalette.accent.opacity(0.4), lineWidth: 1))
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Standard HR mode, low bandwidth. \(detail)")
+        noticeBanner(symbol: "antenna.radiowaves.left.and.right", tint: SummaryStyle.vitals,
+                     title: "Standard HR mode (low bandwidth)", detail: detail,
+                     closing: "Other metrics (R-R, frames, battery, history) need a full sync.")
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Standard HR mode, low bandwidth. \(detail)")
     }
 
     // MARK: - Strap picker
@@ -550,9 +494,11 @@ struct LiveView: View {
     /// Pick the strap family to scan for. Switching the selection drops the current strap's bond so the
     /// newly-picked one connects fresh — letting a user move between a WHOOP 4 and a 5/MG.
     private var modelPicker: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 10) {
-                Text("Strap").font(StrandFont.caption).foregroundStyle(StrandPalette.textSecondary)
+        VStack(alignment: .leading, spacing: 4) {
+            HStack(spacing: 12) {
+                Text("Strap")
+                    .font(.system(size: 15))
+                    .foregroundStyle(SummaryStyle.secondary)
                 SegmentedPillControl(
                     WhoopModel.allCases,
                     selection: Binding(
@@ -570,54 +516,39 @@ struct LiveView: View {
                 Spacer()
             }
             // Proactive 5/MG guidance: the strap bonds to one host at a time, so if it's still paired in
-            // the official WHOOP app a scan here finds nothing. Shown the moment 5/MG is picked — not only
+            // the official WHOOP app a scan here finds nothing. Offered the moment 5/MG is picked — not only
             // after a failed scan (#130) or a bond-refusal (which is the separate `pairingHint` banner).
             if selectedModel == .whoop5mg { whoop5PairingNote }
         }
+        .padding(.horizontal, 4)
     }
 
     private var whoop5PairingNote: some View {
-        HStack(alignment: .top, spacing: 8) {
-            Image(systemName: "info.circle").foregroundStyle(StrandPalette.accent)
+        InfoFold(title: "Scan finds nothing?") {
             Text("WHOOP 5.0/MG pairs with one app at a time. If a scan finds nothing, unpair it in the official WHOOP app and fully close that app, then Scan again.")
-                .font(StrandFont.footnote)
-                .foregroundStyle(StrandPalette.textSecondary)
+                .font(.system(size: 15))
+                .foregroundStyle(SummaryStyle.secondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
     }
 
     // MARK: - Offline connect callout
 
-    /// The above-the-fold primary Connect affordance, shown only while `!live.connected`. Promotes the
-    /// formerly-inert "Scan and connect…" caption into a frosted card with a real, full-width
-    /// `scanButton` (the same one `controls` renders below), so the offline state has an obvious action
-    /// up top instead of burying it past the Signal Trust grid. Shared with macOS — the wide layout
-    /// shows it stacked above the console, and `scanButton` already styles full-width.
+    /// The above-the-fold primary Connect affordance, shown only while `!live.connected`: a card naming
+    /// the band Scan will connect to over a real, full-width `scanButton` (the same one `controls`
+    /// renders below), so the offline state has an obvious action up top. Shared with macOS.
     @ViewBuilder private var offlineConnectCallout: some View {
-        card {
+        SummaryCard(symbol: "antenna.radiowaves.left.and.right", title: "Start a live stream",
+                    accent: SummaryStyle.vitals) {
             VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 10) {
-                    Image(systemName: "antenna.radiowaves.left.and.right")
-                        .foregroundStyle(StrandPalette.accent)
-                        .accessibilityHidden(true)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Start a live stream")
-                            .font(StrandFont.headline)
-                            .foregroundStyle(StrandPalette.textPrimary)
-                        // Name the band Scan will connect to, and point pairing/switching at Devices — so
-                        // an offline user knows both what this button does and where to add a different band.
-                        Text("Scan connects to \(activeDeviceName). To pair or switch bands, open Devices.")
-                            .font(StrandFont.subhead)
-                            .foregroundStyle(StrandPalette.textSecondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    Spacer(minLength: 0)
-                }
+                Text(activeDeviceName)
+                    .font(.system(size: 17, weight: .medium))
+                    .foregroundStyle(SummaryStyle.primary)
+                    .lineLimit(1)
                 scanButton
             }
+            .padding(.top, 12)
         }
-        .overlay(RoundedRectangle(cornerRadius: 22, style: .continuous)
-            .strokeBorder(StrandPalette.accent.opacity(0.30), lineWidth: 1))
     }
 
     // MARK: - Manage devices link
@@ -628,29 +559,33 @@ struct LiveView: View {
     /// macOS selects the Devices sidebar item, iOS presents the Devices screen.
     private var manageDevicesRow: some View {
         Button { router.openDevices() } label: {
-            HStack(spacing: 12) {
+            HStack(spacing: 14) {
                 Image(systemName: "badge.plus.radiowaves.right")
-                    .font(StrandFont.headline)
-                    .foregroundStyle(StrandPalette.accent)
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(SummaryStyle.vitals)
+                    .frame(width: 36, height: 36)
+                    .background(RoundedRectangle(cornerRadius: 9, style: .continuous)
+                        .fill(SummaryStyle.vitals.opacity(0.16)))
                     .accessibilityHidden(true)
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Manage devices")
-                        .font(StrandFont.subhead)
-                        .foregroundStyle(StrandPalette.textPrimary)
-                    Text(manageDevicesDetail)
-                        .font(StrandFont.footnote)
-                        .foregroundStyle(StrandPalette.textSecondary)
+                        .font(.system(size: 17, weight: .medium))
+                        .foregroundStyle(SummaryStyle.primary)
+                    Text(activeDeviceName)
+                        .font(.system(size: 14))
+                        .foregroundStyle(SummaryStyle.secondary)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.7)
                 }
-                Spacer(minLength: 0)
+                Spacer(minLength: 8)
                 Image(systemName: "chevron.right")
-                    .font(StrandFont.footnote)
-                    .foregroundStyle(StrandPalette.textTertiary)
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(SummaryStyle.tertiary)
                     .accessibilityHidden(true)
             }
-            .padding(NoopMetrics.space3)
-            .background(NoopPanelSurface(cornerRadius: 18))
+            .padding(.horizontal, 16)
+            .frame(minHeight: 64)
+            .frame(maxWidth: .infinity, alignment: .leading)
+            .livePanel()
             .contentShape(Rectangle())
         }
         .buttonStyle(LiquidPressStyle())
@@ -658,31 +593,23 @@ struct LiveView: View {
         .accessibilityHint("Opens the Devices screen, where you pair and switch bands.")
     }
 
-    /// One-line subtitle for the Manage-devices row — names the active band and reads correctly whether
-    /// it's the live link ("Connected to …") or just the band Scan would target ("… is your active band").
-    private var manageDevicesDetail: String {
-        activeConnection
-            ? String(localized: "Connected to \(activeDeviceName). Pair or switch bands in Devices.")
-            : String(localized: "\(activeDeviceName) is your active band. Pair or switch bands in Devices.")
-    }
-
     // MARK: - Controls
 
     private var controls: some View {
         // Three equal thirds can't hold all three labels at a legible size on a phone — the longest
         // ("Scan & Connect") truncates to "Scan &…" even after shrink-to-fit (#175). So on iOS the
-        // primary action takes a full-width row and the two secondary actions share the row beneath;
-        // macOS keeps the single three-up row, where the window is always wide enough. (#175)
+        // primary action takes a full-width row and the two secondary actions share the row beneath,
+        // stacking when their labels do not fit; macOS keeps the three-up row while it fits. (#175)
         #if os(iOS)
         VStack(spacing: NoopMetrics.rowSpacing) {
             scanButton
-            HStack(spacing: NoopMetrics.rowSpacing) {
+            NoopButtonRow(spacing: NoopMetrics.rowSpacing) {
                 buzzButton
                 disconnectButton
             }
         }
         #else
-        HStack(spacing: NoopMetrics.rowSpacing) {
+        NoopButtonRow(spacing: NoopMetrics.rowSpacing) {
             scanButton
             buzzButton
             disconnectButton
@@ -693,30 +620,26 @@ struct LiveView: View {
     // MARK: - Ring controls (#2305)
 
     /// The ring's above-the-fold card while it is not yet authenticated: the honest phase line and the
-    /// only ring reconnect in the app. Same slot and shape as `offlineConnectCallout`, which is WHOOP-only.
+    /// only ring reconnect in the app, with what Reconnect does behind an explanation row. Same slot
+    /// as `offlineConnectCallout`, which is WHOOP-only.
     @ViewBuilder private var ringConnectCallout: some View {
-        card {
+        SummaryCard(symbol: "antenna.radiowaves.left.and.right", title: "Oura ring",
+                    accent: SummaryStyle.vitals) {
             VStack(alignment: .leading, spacing: 12) {
-                HStack(spacing: 10) {
-                    Image(systemName: "antenna.radiowaves.left.and.right")
-                        .foregroundStyle(StrandPalette.accent)
-                        .accessibilityHidden(true)
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text(LiveRingCopy.status(ringPhase, streaming: false))
-                            .font(StrandFont.headline)
-                            .foregroundStyle(StrandPalette.textPrimary)
-                        Text("Reconnect drops the current link, if any, and connects to the ring again. To pair or switch bands, open Devices.")
-                            .font(StrandFont.subhead)
-                            .foregroundStyle(StrandPalette.textSecondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                    Spacer(minLength: 0)
-                }
+                Text(LiveRingCopy.status(ringPhase, streaming: false))
+                    .font(.system(size: 17, weight: .medium))
+                    .foregroundStyle(SummaryStyle.primary)
+                    .fixedSize(horizontal: false, vertical: true)
                 ringReconnectButton
+                InfoFold {
+                    Text("Reconnect drops the current link, if any, and connects to the ring again. To pair or switch bands, open Devices.")
+                        .font(.system(size: 15))
+                        .foregroundStyle(SummaryStyle.secondary)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
+            .padding(.top, 12)
         }
-        .overlay(RoundedRectangle(cornerRadius: 22, style: .continuous)
-            .strokeBorder(StrandPalette.accent.opacity(0.30), lineWidth: 1))
     }
 
     /// The ring's row in the `controls` slot: one primary action. No Buzz (the ring has no haptic) and no
@@ -725,9 +648,10 @@ struct LiveView: View {
     private var ringControls: some View {
         VStack(alignment: .leading, spacing: NoopMetrics.rowSpacing) {
             Text(LiveRingCopy.status(ringPhase, streaming: ringStreaming))
-                .font(StrandFont.footnote)
-                .foregroundStyle(StrandPalette.textSecondary)
+                .font(.system(size: 15))
+                .foregroundStyle(SummaryStyle.secondary)
                 .fixedSize(horizontal: false, vertical: true)
+                .padding(.horizontal, 4)
             ringReconnectButton
         }
     }
@@ -839,34 +763,49 @@ private struct LiveHeaderStats: View {
     }
 
     var body: some View {
-        HStack(spacing: 16) {
-            stat(String(localized: "Device"), deviceName)
-            stat(String(localized: "Battery"), batteryLabel)
-            stat(String(localized: "Worn"), liveLink ? (wornNow ? String(localized: "Yes") : String(localized: "No")) : "—")
-            stat(String(localized: "Last sync"), lastSyncLabel)
+        VStack(alignment: .leading, spacing: 8) {
+            Text(deviceName)
+                .font(.system(size: 15))
+                .foregroundStyle(SummaryStyle.secondary)
+                .lineLimit(1)
+            // Side by side while the three fit, one under another when they do not, so none is cut.
+            ViewThatFits(in: .horizontal) {
+                HStack(spacing: 18) { stats }
+                VStack(alignment: .leading, spacing: 6) { stats }
+            }
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private func stat(_ title: String, _ value: String) -> some View {
-        VStack(alignment: .trailing, spacing: 1) {
-            Text(title.uppercased())
-                .font(StrandFont.footnote)
-                .foregroundStyle(StrandPalette.textTertiary)
+    @ViewBuilder private var stats: some View {
+        stat("battery.75percent", String(localized: "Battery"), batteryLabel)
+        stat("sensor.tag.radiowaves.forward", String(localized: "Worn"),
+             liveLink ? (wornNow ? String(localized: "Worn") : String(localized: "Not worn")) : "—")
+        stat("arrow.triangle.2.circlepath", String(localized: "Last sync"), lastSyncLabel)
+    }
+
+    /// One figure of the status line: a glyph and its value. `title` is what VoiceOver reads before it.
+    private func stat(_ symbol: String, _ title: String, _ value: String) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: symbol)
+                .font(.system(size: 14))
+                .foregroundStyle(SummaryStyle.vitals)
             Text(value)
-                .font(StrandFont.captionNumber)
-                .foregroundStyle(StrandPalette.textSecondary)
+                .font(SummaryStyle.number(15, .regular))
+                .foregroundStyle(SummaryStyle.primary)
                 .lineLimit(1)
-                .minimumScaleFactor(0.7)
         }
+        .fixedSize()
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(title): \(value)")
     }
 
     private var lastSyncLabel: String { LiveSyncFormat.lastSyncLabel(live.lastSyncedAt) }
 }
 
-/// The console centrepiece's HR half: a live BPM LiquidVessel (fills to the HR-zone fraction) with the
-/// count-up numeral over it, the zone label, and the trust caption. Owns LiveState so the ~1 Hz HR notify
-/// re-renders only this leaf. The vessel replaces the old flat pulse-ring, the count-up number replaces
-/// the CountUpText numeral.
+/// The heart rate card's top half: a beating heart beside the count-up numeral, the zone label, the
+/// last two minutes as a trace, and one status line while there is no reading. Owns LiveState so the
+/// ~1 Hz HR notify re-renders only this leaf.
 private struct LiveHeartReadout: View {
     /// Resolved by the parent (#2075); this leaf does not re-derive it.
     let activeIsWhoop: Bool
@@ -880,193 +819,126 @@ private struct LiveHeartReadout: View {
     private var displayHR: Int? { model.bpm }
     private var activeConnection: Bool { activeIsWhoop && live.connected && live.bonded }
 
-    /// The live HR zone for the focal readout's colour world (presentation only). 0 = below Zone 1.
+    /// The live HR zone for the zone label (presentation only). 0 = below Zone 1.
     private var liveZone: Int {
         guard let bpm = displayHR else { return 0 }
         return model.profile.hrZoneSet.zoneNumber(forBPM: Double(bpm))
     }
 
-    /// The focal vessel / numeral colour: the live HR-zone hue when streaming, the Effort world otherwise.
-    private var hrTint: Color {
-        guard displayHR != nil else { return StrandPalette.textTertiary }
-        return liveZone >= 1 ? StrandPalette.hrZoneColor(liveZone) : StrandPalette.effortColor
-    }
-
-    /// The vessel fill: HR as a fraction of the profile's max HR (nil = empty, no data yet).
-    private var hrFrac: Double? {
-        guard let bpm = displayHR, hrMax > 0 else { return nil }
-        return max(0.02, min(1, Double(bpm) / Double(hrMax)))
-    }
-
     @State private var shown: Double = 0
+    /// The last two minutes of live heart rate, one value a second, drawn under the numeral.
+    @State private var trace: [Double] = []
+    private let tick = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
 
     var body: some View {
-        let tint = hrTint
-        return VStack(alignment: .center, spacing: NoopMetrics.space2) {
-            Text("HEART RATE")
-                .font(StrandFont.overline)
-                .tracking(StrandFont.overlineTracking)
-                .foregroundStyle(StrandPalette.textSecondary)
-            ZStack {
-                // The live BPM gauge: a liquid vessel that fills to the HR-zone fraction and sloshes.
-                LiquidVessel(value: hrFrac, tint: tint, animated: displayHR != nil)
-                    .frame(width: 210, height: 210)
-                VStack(spacing: 0) {
-                    // The big focal HR numeral counts up to the live value (the hero number); a crisp
-                    // em-dash while there's no HR yet.
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(alignment: .center, spacing: 12) {
+                BeatingHeart(bpm: displayHR, size: 28)
+                HStack(alignment: .firstTextBaseline, spacing: 6) {
+                    // The big focal HR numeral counts up to the live value (the hero number); a dash
+                    // while there's no HR yet.
                     if displayHR != nil {
-                        CountUpNumber(value: shown, font: StrandFont.rounded(88, weight: .semibold))
-                            .foregroundStyle(tint)
-                            .shadow(color: .black.opacity(0.4), radius: 6, y: 1)
+                        CountUpNumber(value: shown, font: SummaryStyle.number(76, .light))
+                            .foregroundStyle(SummaryStyle.primary)
                     } else {
-                        Text("—")
-                            .font(StrandFont.rounded(88, weight: .semibold))
-                            .foregroundStyle(StrandPalette.textTertiary)
+                        Text("–")
+                            .font(SummaryStyle.number(76, .light))
+                            .foregroundStyle(SummaryStyle.tertiary)
                     }
                     Text("bpm")
-                        .font(StrandFont.caption)
-                        .foregroundStyle(StrandPalette.textSecondary)
-                    if liveZone >= 1 {
-                        Text("ZONE \(liveZone)")
-                            .font(StrandFont.overline)
-                            .tracking(StrandFont.overlineTracking)
-                            .foregroundStyle(tint)
-                            .padding(.top, NoopMetrics.space1)
-                    }
+                        .font(.system(size: 20))
+                        .foregroundStyle(SummaryStyle.secondary)
                 }
-                .allowsHitTesting(false)   // taps fall through to the vessel → splash
+                .lineLimit(1)
+                Spacer(minLength: 8)
+                if liveZone >= 1 {
+                    Text("Zone \(liveZone)")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(StrandPalette.hrZoneColor(liveZone))
+                        .lineLimit(1)
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 6)
+                        .background(Capsule().fill(StrandPalette.hrZoneColor(liveZone).opacity(0.16)))
+                }
             }
-            .frame(width: 210, height: 210)
             .accessibilityElement(children: .ignore)
             .accessibilityLabel(displayHR.map { "Heart rate \($0) beats per minute" } ?? "Heart rate not available")
-            Text(signalTrustSummary)
-                .font(StrandFont.footnote)
-                .foregroundStyle(StrandPalette.textTertiary)
-                .multilineTextAlignment(.center)
-                .fixedSize(horizontal: false, vertical: true)
+            if trace.count >= 2 {
+                MotionTraceLine(values: trace)
+                    .frame(height: 56)
+                    .accessibilityHidden(true)
+            }
+            if let caption = statusCaption {
+                Text(caption)
+                    .font(.system(size: 15))
+                    .foregroundStyle(SummaryStyle.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
-        .frame(maxWidth: .infinity)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .onAppear { rollTo(displayHR) }
         .onChangeCompat(of: displayHR) { rollTo($0) }
+        .onReceive(tick) { _ in
+            // The trace only holds a current stream: it empties when the reading goes away.
+            guard let hr = displayHR else {
+                if !trace.isEmpty { trace.removeAll() }
+                return
+            }
+            trace.append(Double(hr))
+            if trace.count > 120 { trace.removeFirst(trace.count - 120) }
+        }
     }
 
-    /// Roll the count-up numeral to the new HR, matching the vessel's fill animation.
+    /// Roll the count-up numeral to the new HR.
     private func rollTo(_ v: Int?) {
         guard let v else { shown = 0; return }
         withAnimation(.easeOut(duration: 0.6)) { shown = Double(v) }
     }
 
-    private var signalTrustSummary: String {
-        if activeConnection && live.encryptedBond { return String(localized: "Encrypted stream: deep controls and history sync available.") }
-        if activeConnection { return String(localized: "Live heart rate is flowing; full strap controls need an encrypted bond.") }
+    /// One short line under the numeral while there is no reading; nil once heart rate is flowing,
+    /// when the status line at the top of the screen already says so.
+    private var statusCaption: String? {
+        if displayHR != nil { return nil }
         // A ring reads its OWN phase (#2305, #2304): `live.connected` here is whichever source last
         // wrote it, and under a ring parked in the nonce handshake it read "Connected, waiting for a
-        // streaming state" for an hour (#2303). The ring's phase is what the console should say.
+        // streaming state" for an hour (#2303). The ring's phase is what the card should say.
         if activeIsOura { return LiveRingCopy.status(model.ouraLinkPhase, streaming: live.connected && live.streamingLiveHR) }
         if live.connected { return String(localized: "Connected, waiting for a streaming state.") }
-        // The actionable "Scan and connect…" CTA now lives in `offlineConnectCallout` above the fold, so
-        // this caption stays a calm empty-state descriptor rather than a second, competing CTA.
-        return String(localized: "Live heart rate appears here once a strap is connected.")
+        // The actionable Scan button lives in `offlineConnectCallout` above this card, so this stays
+        // a calm empty-state line rather than a second, competing call to action.
+        return String(localized: "No live stream.")
     }
 }
 
-/// The console centrepiece's physiology half: the live R-R thread/tube, rolling RMSSD, and the
-/// R-R / Frame / Event proof tiles. Owns LiveState so the ~1 Hz R-R / frame notifies re-render only
-/// this leaf, never the whole console.
+/// The heart rate card's bottom half: the rolling variability and the latest beat interval, side by
+/// side. Owns LiveState so the ~1 Hz R-R notifies re-render only this leaf, never the whole screen.
 private struct LivePhysiology: View {
     @EnvironmentObject private var live: LiveState
     /// Resolved by the parent (#2075). Passed rather than observed so this leaf keeps owning only
-    /// LiveState, which is what makes the ~1 Hz R-R / frame notifies re-render it alone.
+    /// LiveState, which is what makes the ~1 Hz R-R notifies re-render it alone.
     let activeIsWhoop: Bool
 
     private var activeConnection: Bool { activeIsWhoop && live.connected && live.bonded }
-    /// Oura ring actively streaming live HR — trusted stream without a WHOOP bond (see LiveView.ringStreaming).
-    private var ringStreaming: Bool { live.connected && live.streamingLiveHR }
 
     var body: some View {
-        VStack(alignment: .leading, spacing: NoopMetrics.space4) {
-            HStack(alignment: .firstTextBaseline) {
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("LIVE PHYSIOLOGY")
-                        .font(StrandFont.overline)
-                        .tracking(StrandFont.overlineTracking)
-                        .foregroundStyle(StrandPalette.textSecondary)
-                    Text(connectionModeDetail)
-                        .font(StrandFont.headline)
-                        .foregroundStyle(StrandPalette.textPrimary)
-                }
-                Spacer()
-                if let rmssd = rollingRMSSD {
-                    VStack(alignment: .trailing, spacing: 2) {
-                        Text("RMSSD")
-                            .font(StrandFont.footnote)
-                            .foregroundStyle(StrandPalette.textTertiary)
-                        Text("\(Int(rmssd.rounded())) ms")
-                            .font(StrandFont.number(24))
-                            .foregroundStyle(StrandPalette.metricCyan)
-                    }
-                    .accessibilityElement(children: .combine)
-                    .accessibilityLabel("Rolling RMSSD \(Int(rmssd.rounded())) milliseconds")
-                }
-            }
-            rrTrace
-            HStack(spacing: NoopMetrics.gap) {
-                // Offline: show a muted "Offline" word (dimmed to textTertiary) instead of three bare
-                // accent-coloured em-dashes that read as broken live readouts. Once there's an active
-                // stream the real values (and their cyan/green/amber accents) return.
-                proofMetric("R-R", activeConnection ? rrSummary : String(localized: "Offline"),
-                            StrandPalette.metricCyan, offline: !activeConnection)
-                proofMetric(String(localized: "Frame"), activeConnection ? (live.lastFrameType ?? "—") : String(localized: "Offline"),
-                            StrandPalette.accent, offline: !activeConnection)
-                proofMetric(String(localized: "Event"), activeConnection ? (live.lastEvent ?? "—") : String(localized: "Offline"),
-                            StrandPalette.statusWarning, offline: !activeConnection)
-            }
+        HStack(alignment: .top, spacing: 0) {
+            figure("Variability", rollingRMSSD.map { Int($0.rounded()) })
+            // Offline the interval is a dash rather than the last value a previous link left behind.
+            figure("Beat interval", activeConnection ? live.rr.last : nil)
         }
     }
 
-    /// The recent R-R buffer as a liquid thread — the proof the console is genuinely live (a single HR
-    /// number can look frozen; a moving trace can't). Empty state shows a calm caption.
-    private var rrTrace: some View {
-        let values = Array(live.rrRecent.suffix(18)).map(Double.init)
-        return VStack(alignment: .leading, spacing: 8) {
-            if values.count >= 2 {
-                // The liquid HR thread, tinted cyan for R-R — matches the Today live-HR trace.
-                LiquidThread(bpm: values, tint: StrandPalette.metricCyan, height: 44, animated: true)
-                    .accessibilityHidden(true)
-            } else {
-                // Empty: a muted static tube so the strip reads as "waiting", not broken.
-                LiquidTube(frac: 0, tint: StrandPalette.metricCyan, height: 12, animated: false)
-                    .accessibilityHidden(true)
-            }
-            Text(values.isEmpty
-                 ? String(localized: "Waiting for R-R intervals.")
-                 : String(localized: "Recent intervals: \(values.suffix(5).map { String(Int($0)) }.joined(separator: " · ")) ms"))
-                .font(StrandFont.footnote)
-                .foregroundStyle(StrandPalette.textTertiary)
+    /// One live figure in milliseconds with its label above. A dash until there is a value.
+    private func figure(_ label: LocalizedStringKey, _ value: Int?) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Text(label)
+                .font(.system(size: 15))
+                .foregroundStyle(SummaryStyle.secondary)
                 .lineLimit(1)
-                .minimumScaleFactor(0.7)
-        }
-    }
-
-    /// One R-R / Frame / Event proof tile. When `offline` is true the value is dimmed to textTertiary
-    /// (regardless of the passed accent) so an idle tile reads as a muted empty state rather than a
-    /// broken live readout. The callers pass a word ("Offline") instead of a bare em-dash in that case.
-    private func proofMetric(_ label: String, _ value: String, _ tint: Color, offline: Bool = false) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(label.uppercased())
-                .font(StrandFont.footnote)
-                .foregroundStyle(StrandPalette.textTertiary)
-            Text(value)
-                .font(StrandFont.captionNumber)
-                .foregroundStyle(offline ? StrandPalette.textTertiary : tint)
-                .lineLimit(1)
-                .minimumScaleFactor(0.6)
+                .minimumScaleFactor(0.8)
+            SummaryValue(text: value.map { String($0) } ?? "–", unit: "ms", size: 24)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(NoopMetrics.rowSpacing)
-        .background(NoopPanelSurface(cornerRadius: 14))
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(label): \(value)")
     }
 
     /// A "feel" RMSSD over the recent R-R buffer — time-gap-unaware on purpose (a live indicator, not a
@@ -1077,18 +949,6 @@ private struct LivePhysiology: View {
         let diffs = zip(values.dropFirst(), values).map { $0 - $1 }
         let meanSquare = diffs.map { $0 * $0 }.reduce(0, +) / Double(diffs.count)
         return sqrt(meanSquare)
-    }
-
-    private var rrSummary: String {
-        guard let last = live.rr.last else { return "—" }
-        return "\(last) ms"
-    }
-
-    private var connectionModeDetail: String {
-        if activeConnection && live.encryptedBond { return String(localized: "Full strap stream is active.") }
-        if activeConnection || ringStreaming { return String(localized: "Heart rate stream is active.") }
-        if live.connected { return String(localized: "Radio connected, stream not yet trusted.") }
-        return String(localized: "No live stream.")
     }
 }
 
@@ -1126,17 +986,33 @@ private struct LiveSignalTrustRail: View {
     }
 
     var body: some View {
-        LazyVGrid(columns: [GridItem(.adaptive(minimum: 168), spacing: NoopMetrics.gap)],
-                  spacing: NoopMetrics.gap) {
-            ForEach(Array(signalTiles.enumerated()), id: \.element.id) { idx, tile in
+        let tiles = signalTiles
+        let recent = live.rrRecent.suffix(5).map { String($0) }.joined(separator: "  ")
+        VStack(alignment: .leading, spacing: 0) {
+            ForEach(Array(tiles.enumerated()), id: \.element.id) { idx, tile in
+                if idx > 0 {
+                    Rectangle().fill(SummaryStyle.rule).frame(height: 0.5)
+                }
                 SignalTrustTile(tile: tile)
-                    .staggeredAppear(index: idx)
+            }
+            if !recent.isEmpty {
+                Rectangle().fill(SummaryStyle.rule).frame(height: 0.5)
+                Text(String(localized: "Recent intervals: \(recent) ms"))
+                    .font(SummaryStyle.number(15, .regular))
+                    .foregroundStyle(SummaryStyle.secondary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+                    .frame(minHeight: 44)
             }
         }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 4)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .livePanel()
     }
 
     private var connectionModeColor: Color {
-        if (activeConnection && live.encryptedBond) || ringStreaming { return StrandPalette.accent }
+        if (activeConnection && live.encryptedBond) || ringStreaming { return SummaryStyle.vitals }
         if activeConnection || live.connected { return StrandPalette.statusWarning }
         return StrandPalette.metricRose
     }
@@ -1145,7 +1021,7 @@ private struct LiveSignalTrustRail: View {
         guard let pct = activeBatteryPct.map({ Double($0) }) else { return StrandPalette.textTertiary }
         if pct <= 15 { return StrandPalette.metricRose }
         if pct <= 30 { return StrandPalette.statusWarning }
-        return StrandPalette.accent
+        return SummaryStyle.vitals
     }
 
     private var rollingRMSSD: Double? {
@@ -1168,13 +1044,13 @@ private struct LiveSignalTrustRail: View {
                   value: displayHR.map { "\($0) bpm" } ?? String(localized: "Missing"),
                   detail: (activeConnection || ringStreaming) ? String(localized: "Streaming now") : String(localized: "No active stream"),
                   icon: "waveform.path.ecg",
-                  tint: displayHR == nil ? StrandPalette.textTertiary : StrandPalette.accent,
+                  tint: displayHR == nil ? StrandPalette.textTertiary : SummaryStyle.heart,
                   frac: displayHR.map { min(1, Double($0) / Double(max(1, model.profile.hrMax))) }),
             .init(title: String(localized: "R-R intervals"),
                   value: live.rrRecent.isEmpty ? String(localized: "Missing") : String(localized: "\(live.rrRecent.count) recent"),
                   detail: rollingRMSSD.map { String(localized: "RMSSD \(Int($0.rounded())) ms") } ?? String(localized: "Needs interval frames"),
                   icon: "point.3.connected.trianglepath.dotted",
-                  tint: live.rrRecent.isEmpty ? StrandPalette.textTertiary : StrandPalette.metricCyan,
+                  tint: live.rrRecent.isEmpty ? StrandPalette.textTertiary : SummaryStyle.heart,
                   frac: live.rrRecent.isEmpty ? nil : min(1, Double(live.rrRecent.count) / 30)),
             .init(title: String(localized: "Connection"),
                   value: activeConnection && live.encryptedBond ? String(localized: "Encrypted") : activeConnection ? String(localized: "Partial") : ringStreaming ? String(localized: "Streaming") : live.connected ? String(localized: "Connected") : String(localized: "Offline"),
@@ -1186,7 +1062,7 @@ private struct LiveSignalTrustRail: View {
                   value: live.backfilling ? String(localized: "\(live.syncChunksThisSession) chunks") : LiveSyncFormat.lastSyncLabel(live.lastSyncedAt),
                   detail: syncDetail,
                   icon: "clock.arrow.circlepath",
-                  tint: live.backfilling ? StrandPalette.metricCyan : StrandPalette.textSecondary,
+                  tint: live.backfilling ? SummaryStyle.vitals : StrandPalette.textSecondary,
                   frac: live.backfilling ? 0.6 : (live.lastSyncedAt == nil ? nil : 1)),
             .init(title: String(localized: "Battery"),
                   value: activeBatteryPct.map { "\($0)%" } ?? String(localized: "Unknown"),
@@ -1208,8 +1084,22 @@ private struct LiveSignalTrustRail: View {
                   value: liveLink ? (wornNow ? String(localized: "On wrist") : String(localized: "Off wrist")) : String(localized: "Unknown"),
                   detail: liveLink ? (wornNow ? String(localized: "Eligible for live physiology") : String(localized: "Wear the strap for scoring")) : String(localized: "Connect to read wear state"),
                   icon: "sensor.tag.radiowaves.forward",
-                  tint: !liveLink ? StrandPalette.textTertiary : wornNow ? StrandPalette.accent : StrandPalette.statusWarning,
-                  frac: !liveLink ? nil : (wornNow ? 1 : 0.25))
+                  tint: !liveLink ? StrandPalette.textTertiary : wornNow ? SummaryStyle.vitals : StrandPalette.statusWarning,
+                  frac: !liveLink ? nil : (wornNow ? 1 : 0.25)),
+            // The last frame type and the last strap event, as the strap reported them. Offline they
+            // read "Offline" rather than the value a previous link left behind.
+            .init(title: String(localized: "Frame"),
+                  value: activeConnection ? (live.lastFrameType ?? "—") : String(localized: "Offline"),
+                  detail: "",
+                  icon: "square.stack.3d.up",
+                  tint: activeConnection ? SummaryStyle.vitals : StrandPalette.textTertiary,
+                  frac: nil),
+            .init(title: String(localized: "Event"),
+                  value: activeConnection ? (live.lastEvent ?? "—") : String(localized: "Offline"),
+                  detail: "",
+                  icon: "bell",
+                  tint: activeConnection ? SummaryStyle.vitals : StrandPalette.textTertiary,
+                  frac: nil)
         ]
     }
 }
@@ -1240,9 +1130,10 @@ private struct ActiveWorkoutLive: View {
 
     private func stat(_ title: String, _ value: String, tint: Color = StrandPalette.textPrimary) -> some View {
         VStack(alignment: .leading, spacing: 2) {
-            Text(title.uppercased()).font(StrandFont.overline).tracking(StrandFont.overlineTracking)
-                .foregroundStyle(StrandPalette.textSecondary)
-            Text(value).font(StrandFont.number(17))
+            Text(title).font(.system(size: 14))
+                .foregroundStyle(SummaryStyle.secondary)
+                .lineLimit(1).minimumScaleFactor(0.8)
+            Text(value).font(SummaryStyle.number(22, .regular))
                 .foregroundStyle(tint).lineLimit(1).minimumScaleFactor(0.6)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -1285,16 +1176,26 @@ private struct LiveLogCard: View {
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            HStack(spacing: 12) {
-                Text("STRAP LOG").font(StrandFont.overline).tracking(StrandFont.overlineTracking)
-                    .foregroundStyle(StrandPalette.textSecondary)
-                Spacer()
+            HStack(spacing: 20) {
                 // Export the log so people can attach it to a bug report (issue #17 — macOS users
                 // had no way to share it). Copy → clipboard; Save… → a .txt file.
-                Button("Copy") { copyStrapLog() }
-                    .buttonStyle(.plain).font(StrandFont.mono).foregroundStyle(StrandPalette.accent)
-                Button("Save…") { saveStrapLog() }
-                    .buttonStyle(.plain).font(StrandFont.mono).foregroundStyle(StrandPalette.accent)
+                Button { copyStrapLog() } label: {
+                    Text("Copy")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundStyle(SummaryStyle.vitals)
+                        .frame(minWidth: 44, minHeight: 44)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                Button { saveStrapLog() } label: {
+                    Text("Save…")
+                        .font(.system(size: 15, weight: .medium))
+                        .foregroundStyle(SummaryStyle.vitals)
+                        .frame(minWidth: 44, minHeight: 44)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                Spacer()
             }
             if scenePhase == .background {
                 // Same height so returning to the app does not shift the card's layout.
@@ -1308,12 +1209,16 @@ private struct LiveLogCard: View {
             Divider().overlay(StrandPalette.hairline)
             NavigationLink(destination: TestCentreView()) {
                 HStack(spacing: 8) {
-                    Image(systemName: "testtube.2").foregroundStyle(StrandPalette.accent)
-                    Text("Open Test Centre to report a bug").font(StrandFont.mono)
-                        .foregroundStyle(StrandPalette.accent)
+                    Image(systemName: "testtube.2").foregroundStyle(SummaryStyle.vitals)
+                    Text("Open Test Centre to report a bug")
+                        .font(.system(size: 15))
+                        .foregroundStyle(SummaryStyle.vitals)
                     Spacer()
-                    Image(systemName: "chevron.right").foregroundStyle(StrandPalette.textSecondary)
+                    Image(systemName: "chevron.right")
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundStyle(SummaryStyle.tertiary)
                 }
+                .frame(minHeight: 44)
                 .contentShape(Rectangle())
             }
             .buttonStyle(.plain)
@@ -1398,22 +1303,20 @@ private enum LiveSyncFormat {
     }
 }
 
-// MARK: - Signal Trust tile
+// MARK: - Signal check row
 
-/// One card in the Signal Trust rail: a small liquid vessel gauge + ALL-CAPS title, a coloured value,
-/// and a one-line detail. The whole card is combined into a single accessibility element so VoiceOver
-/// reads "Heart rate: 62 bpm. Streaming now." rather than three disjoint fragments.
+/// One row of the signal checks: a glyph in the signal's colour, the signal's name with a one-line
+/// detail under it, and the value at the trailing edge. The whole row is combined into a single
+/// accessibility element so VoiceOver reads "Heart rate: 62 bpm. Streaming now." rather than three
+/// disjoint fragments.
 private struct SignalTrustTile: View {
-    @AppStorage(CardAppearancePrefs.opacityKey) private var cardOpacityPercent = CardAppearancePrefs.defaultPercent
-    private var cardOpacity: Double { max(0, min(1, Double(cardOpacityPercent) / 100)) }
-
     struct Model: Identifiable {
         let title: String
         let value: String
         let detail: String
         let icon: String
         let tint: Color
-        /// 0...1 fill for the tile's liquid gauge (nil = empty / no reading).
+        /// 0...1 level of the signal (nil = no reading).
         let frac: Double?
         var id: String { title }
     }
@@ -1421,36 +1324,53 @@ private struct SignalTrustTile: View {
     let tile: Model
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 8) {
-                // The signal's liquid gauge — a static-posed small vessel (no per-frame cost).
-                LiquidVessel(value: tile.frac, tint: tile.tint, animated: false)
-                    .frame(width: 22, height: 22)
-                    .accessibilityHidden(true)
-                Text(tile.title.uppercased())
-                    .font(StrandFont.overline)
-                    .tracking(StrandFont.overlineTracking)
-                    .foregroundStyle(StrandPalette.textSecondary)
-                Spacer(minLength: 0)
+        HStack(alignment: .center, spacing: 12) {
+            Image(systemName: tile.icon)
+                .font(.system(size: 16))
+                .foregroundStyle(tile.tint)
+                .frame(width: 26)
+                .accessibilityHidden(true)
+            VStack(alignment: .leading, spacing: 2) {
+                Text(tile.title)
+                    .font(.system(size: 16))
+                    .foregroundStyle(SummaryStyle.primary)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
+                if !tile.detail.isEmpty {
+                    Text(tile.detail)
+                        .font(.system(size: 14))
+                        .foregroundStyle(SummaryStyle.secondary)
+                        .lineLimit(3)
+                        .fixedSize(horizontal: false, vertical: true)
+                }
             }
+            Spacer(minLength: 8)
             Text(tile.value)
-                .font(StrandFont.headline)
+                .font(SummaryStyle.number(16, .medium))
                 .foregroundStyle(tile.tint)
                 .lineLimit(1)
-                .minimumScaleFactor(0.65)
-            Text(tile.detail)
-                .font(StrandFont.footnote)
-                .foregroundStyle(StrandPalette.textTertiary)
-                .lineLimit(2)
-                .minimumScaleFactor(0.8)
-                .fixedSize(horizontal: false, vertical: true)
+                .minimumScaleFactor(0.7)
         }
-        .padding(14)
-        .frame(minHeight: 112, alignment: .top)
+        .padding(.vertical, 10)
+        .frame(minHeight: 56)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(NoopPanelSurface(cornerRadius: 20, surfaceOpacity: cardOpacity))
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(tile.title): \(tile.value). \(tile.detail)")
+        .accessibilityLabel(spokenLabel)
+    }
+
+    /// What VoiceOver reads for the row: name and value, then the detail when there is one.
+    private var spokenLabel: String {
+        tile.detail.isEmpty ? "\(tile.title): \(tile.value)" : "\(tile.title): \(tile.value). \(tile.detail)"
+    }
+}
+
+// MARK: - Shared surface
+
+private extension View {
+    /// The flat raised surface the Summary cards sit on, for this screen's rows and notices.
+    func livePanel(edge: Color = Color.white.opacity(0.085), edgeWidth: CGFloat = 0.5) -> some View {
+        background(RoundedRectangle(cornerRadius: 16, style: .continuous).fill(StrandPalette.surfaceRaised))
+            .overlay(RoundedRectangle(cornerRadius: 16, style: .continuous).strokeBorder(edge, lineWidth: edgeWidth))
     }
 }
 
