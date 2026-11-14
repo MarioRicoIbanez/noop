@@ -58,9 +58,6 @@ struct HealthView: View {
 private struct HealthSectionsStack: View {
     var body: some View {
         VStack(alignment: .leading, spacing: NoopMetrics.sectionGap) {
-            // Manual "Sync now" + honest sync status (#364). Its own view so the ~1Hz HR stream
-            // doesn't re-render it; depends on `live` (connection/backfill state) + `model`.
-            SyncStatusSection()
             // The live HR section is its own view: it owns `live`/`profile`,
             // so the ~1Hz HR stream re-renders only this subtree — the static
             // vitals grid below does not re-render on each HR tick.
@@ -95,6 +92,10 @@ private struct HealthSectionsStack: View {
             // v5 deep-links: the records logbook + the multi-device fused record, reachable
             // from their honest Health home as drill-in rows (not their own destinations).
             HealthHubLinksSection()
+            // Manual "Sync now" + honest sync status (#364). Its own view so the ~1Hz HR stream
+            // doesn't re-render it; depends on `live` (connection/backfill state) + `model`. Last on the
+            // screen: it is an occasional action, not something read every day.
+            SyncStatusSection()
         }
     }
 }
@@ -174,10 +175,13 @@ private struct SyncStatusSection: View {
                         ? "Pulls your strap's stored history immediately, without waiting for the next automatic sync."
                         : (live.backfilling ? "A sync is already in progress." : "Connect your strap first."))
 
-                    Text(helperText)
-                        .font(StrandFont.footnote)
-                        .foregroundStyle(StrandPalette.textTertiary)
-                        .fixedSize(horizontal: false, vertical: true)
+                    // The helper line is shown only when the button cannot be used, where it says why.
+                    if !live.connected || !live.historyReady {
+                        Text(helperText)
+                            .font(StrandFont.subhead)
+                            .foregroundStyle(StrandPalette.textSecondary)
+                            .fixedSize(horizontal: false, vertical: true)
+                    }
                 }
             }
         }
@@ -593,10 +597,12 @@ private struct RecoveryContributorsSection: View {
                     }
                 }
             }
-            Text("Baselines are learned on-device over your first 14 days. Until then, typical ranges apply.")
-                .font(StrandFont.footnote)
-                .foregroundStyle(StrandPalette.textTertiary)
-                .fixedSize(horizontal: false, vertical: true)
+            InfoFold(title: "About your ranges") {
+                Text("Baselines are learned on-device over your first 14 days. Until then, typical ranges apply.")
+                    .font(StrandFont.subhead)
+                    .foregroundStyle(StrandPalette.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 
@@ -1381,10 +1387,12 @@ private struct VitalsSection: View {
                         .staggeredAppear(index: idx)
                 }
             }
-            Text("Once NOOP has 14 nights of history, in-range compares each vital to your own baseline (approximate, not medical advice); until then, typical adult ranges apply.")
-                .font(StrandFont.footnote)
-                .foregroundStyle(StrandPalette.textTertiary)
-                .fixedSize(horizontal: false, vertical: true)
+            InfoFold(title: "About your ranges") {
+                Text("Once NOOP has 14 nights of history, in-range compares each vital to your own baseline (approximate, not medical advice); until then, typical adult ranges apply.")
+                    .font(StrandFont.subhead)
+                    .foregroundStyle(StrandPalette.textSecondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
         .task(id: PuffinExperiment.spo2CandidateDisplayEnabled) {
             // #1118: load the per-night HRV over-count flags (always — no toggle) so the HRV tile can
@@ -1580,10 +1588,10 @@ private struct HealthHubLinksSection: View {
         VStack(alignment: .leading, spacing: NoopMetrics.gap) {
             SectionHeader("Records & sources", overline: "On \(Platform.deviceNounPhrase)")
             linkRow(title: String(localized: "Lab Book"),
-                    subtitle: String(localized: "Keep your bloods, BP and body numbers private, on \(Platform.deviceNounPhrase)."),
+                    subtitle: String(localized: "Blood tests and body numbers"),
                     symbol: "books.vertical.fill", tint: StrandPalette.metricCyan) { router.openLabBook() }
             linkRow(title: String(localized: "Your Data, Fused"),
-                    subtitle: String(localized: "The best-sourced number per metric across every band you use."),
+                    subtitle: String(localized: "Which source each number comes from"),
                     symbol: "square.stack.3d.up.fill", tint: StrandPalette.accent) { router.openFusedRecord() }
         }
     }

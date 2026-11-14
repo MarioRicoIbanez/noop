@@ -354,11 +354,7 @@ struct IntervalTimerView: View {
     private func configStepper(title: String, unit: String?, value: Binding<Int>,
                                range: ClosedRange<Int>, step: Int, tint: Color) -> some View {
         HStack {
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title).font(StrandFont.headline).foregroundStyle(StrandPalette.textPrimary)
-                Text("\(range.lowerBound)-\(range.upperBound)\(unit.map { " \($0)" } ?? "") · step \(step)")
-                    .font(StrandFont.footnote).foregroundStyle(StrandPalette.textTertiary)
-            }
+            Text(title).font(StrandFont.headline).foregroundStyle(StrandPalette.textPrimary)
             Spacer()
             HStack(alignment: .firstTextBaseline, spacing: 4) {
                 Text("\(value.wrappedValue)")

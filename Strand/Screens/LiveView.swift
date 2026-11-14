@@ -108,8 +108,7 @@ struct LiveView: View {
     @State private var showHRVSnapshot = false
 
     var body: some View {
-        ScreenScaffold(title: "Live Body Console",
-                       subtitle: "Current physiology, strap trust, and session controls in one working view.",
+        ScreenScaffold(title: "Live",
                        topBackground: liquidScaffoldSky()) {
             VStack(alignment: .leading, spacing: NoopMetrics.sectionGap) {
                 consoleHeader
@@ -140,7 +139,6 @@ struct LiveView: View {
                 if Self.shouldShowStandardHRNote(live.standardHRMode) {
                     standardHRNote(live.standardHRMode ?? "")
                 }
-                signalTrustRail
                 sessionConsole
                 // Show the strap picker whenever we're not actively streaming, so a user with both a
                 // WHOOP 4 and a 5/MG can switch between them. (It used to hide once `bonded`, which is
@@ -157,7 +155,16 @@ struct LiveView: View {
                     ringControls
                 }
                 manageDevicesRow
-                LiveLogCard()
+                // The signal checks and the strap log are for when something looks wrong, so they wait
+                // folded under the controls.
+                FoldSection(symbol: "checkmark.shield.fill", title: "Signal checks",
+                            accent: SummaryStyle.vitals, storageKey: "live.trust") {
+                    signalTrustRail
+                }
+                FoldSection(symbol: "text.alignleft", title: "Strap log",
+                            accent: Color(white: 0.5), storageKey: "live.log") {
+                    LiveLogCard()
+                }
             }
         }
         .onAppear { refreshLiveSession(); consumeActiveWorkoutRequest() }

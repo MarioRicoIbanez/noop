@@ -877,10 +877,16 @@ struct BodyAgeDetailView: View {
                     .foregroundStyle(SummaryStyle.secondary)
             }
 
-            Text("An estimate, not a measurement and not medical advice. It starts from the age in your profile and moves it by four habits from the last 30 days, each converted to years with a published mortality study (Paluch 2022 for steps, Zhang 2016 for resting pulse, Yin 2017 for sleep duration, Windred 2024 for sleep regularity). The four effects overlap in real life, so their sum overstates the total.")
-                .font(.system(size: 13))
-                .foregroundStyle(SummaryStyle.tertiary)
+            Text("An estimate, not a measurement and not medical advice.")
+                .font(.system(size: 15))
+                .foregroundStyle(SummaryStyle.secondary)
                 .fixedSize(horizontal: false, vertical: true)
+            InfoFold(title: "How it is calculated") {
+                Text("An estimate, not a measurement and not medical advice. It starts from the age in your profile and moves it by four habits from the last 30 days, each converted to years with a published mortality study (Paluch 2022 for steps, Zhang 2016 for resting pulse, Yin 2017 for sleep duration, Windred 2024 for sleep regularity). The four effects overlap in real life, so their sum overstates the total.")
+                    .font(.system(size: 15))
+                    .foregroundStyle(SummaryStyle.secondary)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
         }
     }
 

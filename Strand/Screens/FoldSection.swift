@@ -86,6 +86,44 @@ struct FoldSection<Content: View>: View {
     }
 }
 
+// MARK: - Explanations
+
+/// An explanation kept behind one quiet row until it is asked for, so a screen shows its numbers
+/// first and its method on request.
+struct InfoFold<Content: View>: View {
+    var title: LocalizedStringKey = "How it works"
+    @ViewBuilder var content: () -> Content
+    @State private var open = false
+
+    var body: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            Button {
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.88)) { open.toggle() }
+            } label: {
+                HStack(spacing: 8) {
+                    Image(systemName: "info.circle")
+                        .font(.system(size: 15))
+                    Text(title)
+                        .font(.system(size: 15))
+                    Spacer(minLength: 8)
+                    Image(systemName: "chevron.down")
+                        .font(.system(size: 12, weight: .semibold))
+                        .rotationEffect(.degrees(open ? 180 : 0))
+                }
+                .foregroundStyle(SummaryStyle.secondary)
+                .frame(minHeight: 44)
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            if open {
+                content()
+                    .transition(.opacity)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+}
+
 // MARK: - Motion
 
 /// Cards settle into place as they scroll onto the screen: slightly smaller and dimmer at the edge,

@@ -581,11 +581,10 @@ struct RootTabView: View {
                 .foregroundStyle(StrandPalette.textPrimary)
                 .frame(maxWidth: .infinity, alignment: .leading)
                 .accessibilityAddTraits(.isHeader)
-            // Zero internal padding so each MoreRow owns its insets; the rows draw their own hairlines
-            // and the clip trims the last one inside the card's rounded corners.
-            NoopCard(padding: 0) {
-                VStack(spacing: 0) { rows() }
-                    .clipShape(RoundedRectangle(cornerRadius: NoopMetrics.cardRadius, style: .continuous))
+            // Two columns of tiles: an icon and a name each, nothing to read.
+            LazyVGrid(columns: [GridItem(.flexible(), spacing: 10), GridItem(.flexible(), spacing: 10)],
+                      spacing: 10) {
+                rows()
             }
             .environment(\.moreRowTint, tint)
         }
@@ -673,45 +672,37 @@ private struct MoreRow: View {
 
     var body: some View {
         NavigationLink(value: route) {
-            HStack(spacing: 14) {
-                // Pin the icon to the accent explicitly. A plain inherited tint gets re-resolved by iOS to
-                // its default blue a beat after first render — so the icons flashed green→blue (#184). The
-                // explicit foregroundStyle on the image overrides that; the title keeps the primary colour.
+            VStack(alignment: .leading, spacing: 12) {
+                // Pin the icon colour explicitly. A plain inherited tint gets re-resolved by iOS to its
+                // default blue a beat after first render, so the icons flashed green→blue (#184).
                 Image(systemName: icon)
-                    .font(.system(size: 17, weight: .regular))
+                    .font(.system(size: 17, weight: .semibold))
                     .foregroundStyle(tint)
-                    .frame(width: 26, alignment: .center)
-                VStack(alignment: .leading, spacing: 2) {
-                    Text(title)
-                        .font(.system(size: 17))
-                        .foregroundStyle(StrandPalette.textPrimary)
-                    if let caption {
-                        Text(caption)
-                            .font(.system(size: 14))
-                            .foregroundStyle(StrandPalette.textSecondary)
-                            .fixedSize(horizontal: false, vertical: true)
-                    }
-                }
-                Spacer(minLength: 8)
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 13, weight: .semibold))
-                    .foregroundStyle(StrandPalette.textTertiary)
+                    .frame(width: 38, height: 38)
+                    .background(RoundedRectangle(cornerRadius: 10, style: .continuous).fill(tint.opacity(0.16)))
+                    .accessibilityHidden(true)
+                Text(title)
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(StrandPalette.textPrimary)
+                    .lineLimit(2)
+                    .multilineTextAlignment(.leading)
+                    .minimumScaleFactor(0.85)
+                    .frame(maxWidth: .infinity, minHeight: 40, alignment: .topLeading)
             }
-            .padding(.horizontal, 16)
-            .padding(.vertical, 9)
-            .frame(minHeight: 44)
+            .padding(14)
             .frame(maxWidth: .infinity, alignment: .leading)
+            .background(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .fill(StrandPalette.surfaceRaised)
+            )
+            .overlay(
+                RoundedRectangle(cornerRadius: 16, style: .continuous)
+                    .strokeBorder(Color.white.opacity(0.085), lineWidth: 0.5)
+            )
             .contentShape(Rectangle())
-            // Hairline under every row; the grouped container clips the last one's overflow so the bottom
-            // edge stays clean (the divider sits inside the card's rounded corners).
-            .overlay(alignment: .bottom) {
-                Rectangle()
-                    .fill(StrandPalette.hairline)
-                    .frame(height: 1)
-                    .padding(.leading, 16)
-            }
         }
-        .buttonStyle(.plain)
+        .buttonStyle(LiquidPressStyle())
+        .accessibilityHint(caption.map { Text($0) } ?? Text(verbatim: ""))
     }
 }
 

@@ -1,6 +1,24 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "How it works": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "How it works"}}, "es": {"stringUnit": {"state": "translated", "value": "Cómo funciona"}}}},
+    "About your ranges": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "About your ranges"}}, "es": {"stringUnit": {"state": "translated", "value": "Sobre tus rangos"}}}},
+    "Blood tests and body numbers": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Blood tests and body numbers"}}, "es": {"stringUnit": {"state": "translated", "value": "Analíticas y medidas corporales"}}}},
+    "About these numbers": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "About these numbers"}}, "es": {"stringUnit": {"state": "translated", "value": "Sobre estos números"}}}},
+    "How it is calculated": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "How it is calculated"}}, "es": {"stringUnit": {"state": "translated", "value": "Cómo se calcula"}}}},
+    "Experimental. Not a diagnosis, not an ECG and not a medical device.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Experimental. Not a diagnosis, not an ECG and not a medical device."}}, "es": {"stringUnit": {"state": "translated", "value": "Experimental. No es un diagnóstico, ni un ECG, ni un dispositivo médico."}}}},
+    "Read the full notice": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Read the full notice"}}, "es": {"stringUnit": {"state": "translated", "value": "Leer el aviso completo"}}}},
+    "How to read it": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "How to read it"}}, "es": {"stringUnit": {"state": "translated", "value": "Cómo leerlo"}}}},
+    "How it is measured": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "How it is measured"}}, "es": {"stringUnit": {"state": "translated", "value": "Cómo se mide"}}}},
+    "An estimate, not a measurement and not medical advice.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "An estimate, not a measurement and not medical advice."}}, "es": {"stringUnit": {"state": "translated", "value": "Una estimación, no una medida ni un consejo médico."}}}},
+    "Ranked from your data": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Ranked from your data"}}, "es": {"stringUnit": {"state": "translated", "value": "Ordenado según tus datos"}}}},
+    "Not enough logged days yet. Keep logging.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Not enough logged days yet. Keep logging."}}, "es": {"stringUnit": {"state": "translated", "value": "Aún faltan días registrados. Sigue registrando."}}}},
+    "What it needs": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "What it needs"}}, "es": {"stringUnit": {"state": "translated", "value": "Qué necesita"}}}},
+    "Personal curve": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Personal curve"}}, "es": {"stringUnit": {"state": "translated", "value": "Curva personal"}}}},
+    "Log alcohol or late caffeine with an amount to see your own curve.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Log alcohol or late caffeine with an amount to see your own curve."}}, "es": {"stringUnit": {"state": "translated", "value": "Registra alcohol o cafeína tardía con su cantidad para ver tu propia curva."}}}},
+    "Patterns in your own days, never a cause or a diagnosis.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Patterns in your own days, never a cause or a diagnosis."}}, "es": {"stringUnit": {"state": "translated", "value": "Patrones de tus propios días, nunca una causa ni un diagnóstico."}}}},
+    "Signal checks": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Signal checks"}}, "es": {"stringUnit": {"state": "translated", "value": "Comprobaciones de señal"}}}},
+    "Strap log": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Strap log"}}, "es": {"stringUnit": {"state": "translated", "value": "Registro de la pulsera"}}}},
     "Each vibration means the next step.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Each vibration means the next step."}}, "es": {"stringUnit": {"state": "translated", "value": "Cada vibración indica el paso siguiente."}}}},
     "Pace and length": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Pace and length"}}, "es": {"stringUnit": {"state": "translated", "value": "Ritmo y duración"}}}},
     "The strap taps a slow, steady beat just under your pulse so your heart can settle to it. It is not a breathing cue, and it stops by itself.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "The strap taps a slow, steady beat just under your pulse so your heart can settle to it. It is not a breathing cue, and it stops by itself."}}, "es": {"stringUnit": {"state": "translated", "value": "La pulsera marca un compás lento y constante, un poco por debajo de tu pulso, para que el corazón se acompase. No indica cuándo respirar y se para sola."}}}},
@@ -179,7 +197,7 @@
 
     "Experimental · Oura ring all-day heart rate": { "localizations": {
         "de": {"stringUnit": {"state": "translated", "value": "Experimentell · Oura-Ring: Herzfrequenz den ganzen Tag"}},
-        "es": {"stringUnit": {"state": "translated", "value": "Experimental · Anillo Oura: frecuencia cardiaca todo el día"}},
+        "es": {"stringUnit": {"state": "translated", "value": "Experimental, Anillo Oura: frecuencia cardiaca todo el día"}},
         "fr": {"stringUnit": {"state": "translated", "value": "Expérimental · Bague Oura : fréquence cardiaque toute la journée"}},
         "pt-PT": {"stringUnit": {"state": "translated", "value": "Experimental · Anel Oura: frequência cardíaca todo o dia"}},
         "it": {"stringUnit": {"state": "translated", "value": "Sperimentale · Anello Oura: frequenza cardiaca tutto il giorno"}},
@@ -261,10 +279,10 @@
           "de": {"stringUnit": {"state": "translated", "value": "Strap-Schätzung (nicht verifiziert)"}}, "es": {"stringUnit": {"state": "translated", "value": "estimación de la banda (sin verificar)"}}, "fr": {"stringUnit": {"state": "translated", "value": "estimation du bracelet (non vérifiée)"}}, "it": {"stringUnit": {"state": "translated", "value": "stima della fascia (non verificata)"}}, "pl": {"stringUnit": {"state": "translated", "value": "szacunek opaski (niezweryfikowany)"}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "estimativa da pulseira (não verificada)"}}, "ru": {"stringUnit": {"state": "translated", "value": "оценка ремешка (не проверена)"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "手环估算值（未验证）"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "手環估算值（未驗證）"}}
         } },
         "toggle ON · no estimate yet": { "localizations": {
-          "de": {"stringUnit": {"state": "translated", "value": "Schalter AN · noch keine Schätzung"}}, "es": {"stringUnit": {"state": "translated", "value": "interruptor activado · aún sin estimación"}}, "fr": {"stringUnit": {"state": "translated", "value": "commutateur activé · pas encore d'estimation"}}, "it": {"stringUnit": {"state": "translated", "value": "interruttore attivo · nessuna stima"}}, "pl": {"stringUnit": {"state": "translated", "value": "przełącznik włączony · brak szacunku"}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "interruptor ligado · ainda sem estimativa"}}, "ru": {"stringUnit": {"state": "translated", "value": "переключатель включён · оценки пока нет"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "开关已开启 · 尚无估算值"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "開關已開啟 · 尚無估算值"}}
+          "de": {"stringUnit": {"state": "translated", "value": "Schalter AN · noch keine Schätzung"}}, "es": {"stringUnit": {"state": "translated", "value": "interruptor activado, aún sin estimación"}}, "fr": {"stringUnit": {"state": "translated", "value": "commutateur activé · pas encore d'estimation"}}, "it": {"stringUnit": {"state": "translated", "value": "interruttore attivo · nessuna stima"}}, "pl": {"stringUnit": {"state": "translated", "value": "przełącznik włączony · brak szacunku"}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "interruptor ligado · ainda sem estimativa"}}, "ru": {"stringUnit": {"state": "translated", "value": "переключатель включён · оценки пока нет"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "开关已开启 · 尚无估算值"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "開關已開啟 · 尚無估算值"}}
         } },
         "Pending sync · strap history still offloading": { "localizations": {
-          "de": {"stringUnit": {"state": "translated", "value": "Synchronisierung ausstehend · Strap-Verlauf wird noch übertragen"}}, "es": {"stringUnit": {"state": "translated", "value": "Sincronización pendiente · el historial de la banda aún se está descargando"}}, "fr": {"stringUnit": {"state": "translated", "value": "Synchronisation en attente · l'historique du bracelet est encore en cours de transfert"}}, "it": {"stringUnit": {"state": "translated", "value": "Sincronizzazione in attesa · la cronologia della fascia è ancora in trasferimento"}}, "pl": {"stringUnit": {"state": "translated", "value": "Oczekiwanie na synchronizację · historia opaski wciąż jest pobierana"}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "Sincronização pendente · o histórico da pulseira ainda está a ser transferido"}}, "ru": {"stringUnit": {"state": "translated", "value": "Ожидание синхронизации · история ремешка ещё выгружается"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "等待同步 · 手环历史数据仍在传输"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "等待同步 · 手環歷史資料仍在傳輸"}}
+          "de": {"stringUnit": {"state": "translated", "value": "Synchronisierung ausstehend · Strap-Verlauf wird noch übertragen"}}, "es": {"stringUnit": {"state": "translated", "value": "Sincronización pendiente, el historial de la banda aún se está descargando"}}, "fr": {"stringUnit": {"state": "translated", "value": "Synchronisation en attente · l'historique du bracelet est encore en cours de transfert"}}, "it": {"stringUnit": {"state": "translated", "value": "Sincronizzazione in attesa · la cronologia della fascia è ancora in trasferimento"}}, "pl": {"stringUnit": {"state": "translated", "value": "Oczekiwanie na synchronizację · historia opaski wciąż jest pobierana"}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "Sincronização pendente · o histórico da pulseira ainda está a ser transferido"}}, "ru": {"stringUnit": {"state": "translated", "value": "Ожидание синхронизации · история ремешка ещё выгружается"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "等待同步 · 手环历史数据仍在传输"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "等待同步 · 手環歷史資料仍在傳輸"}}
         } },
         "Strap battery charging, no reading yet": { "localizations": {
           "de": {"stringUnit": {"state": "translated", "value": "Strap-Akku wird geladen, noch kein Messwert"}}, "es": {"stringUnit": {"state": "translated", "value": "Batería de la banda cargando, aún sin lectura"}}, "fr": {"stringUnit": {"state": "translated", "value": "Batterie du bracelet en charge, pas encore de relevé"}}, "it": {"stringUnit": {"state": "translated", "value": "Batteria della fascia in carica, nessuna lettura"}}, "pl": {"stringUnit": {"state": "translated", "value": "Bateria opaski ładuje się, brak odczytu"}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "Bateria da pulseira a carregar, ainda sem leitura"}}, "ru": {"stringUnit": {"state": "translated", "value": "Ремешок заряжается, показаний пока нет"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "手环正在充电，尚无读数"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "手環正在充電，尚無讀數"}}
@@ -1326,7 +1344,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sincronizado · %lld fragmentos"
+            "value": "Sincronizado, %lld fragmentos"
           }
         },
         "fr": {
@@ -1509,7 +1527,7 @@
     "1 month · averages per observed day": {"localizations":{"de":{"stringUnit":{"state":"translated","value":"1 Monat · Durchschnitt je erfasstem Tag"}},"es":{"stringUnit":{"state":"translated","value":"1 mes · promedios por día registrado"}},"fr":{"stringUnit":{"state":"translated","value":"1 mois · moyennes par jour enregistré"}},"pt-PT":{"stringUnit":{"state":"translated","value":"1 mês · médias por dia registado"}},"pl":{"stringUnit":{"state":"translated","value":"1 miesiąc · średnie na zarejestrowany dzień"}},"ru":{"stringUnit":{"state":"translated","value":"1 месяц · средние за день с данными"}},"it":{"stringUnit":{"state":"translated","value":"1 mese · medie per giorno registrato"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"1 个月 · 有记录日的平均值"}},"zh-Hant":{"stringUnit":{"state":"translated","value":"1 個月 · 有紀錄日的平均值"}}}},
     "%lld months · averages per observed day": {"localizations":{"de":{"stringUnit":{"state":"translated","value":"%lld Monate · Durchschnitt je erfasstem Tag"}},"es":{"stringUnit":{"state":"translated","value":"%lld meses · promedios por día registrado"}},"fr":{"stringUnit":{"state":"translated","value":"%lld mois · moyennes par jour enregistré"}},"pt-PT":{"stringUnit":{"state":"translated","value":"%lld meses · médias por dia registado"}},"pl":{"stringUnit":{"state":"translated","value":"Liczba miesięcy: %lld · średnie na zarejestrowany dzień"}},"ru":{"stringUnit":{"state":"translated","value":"Месяцев: %lld · средние за день с данными"}},"it":{"stringUnit":{"state":"translated","value":"%lld mesi · medie per giorno registrato"}},"zh-Hans":{"stringUnit":{"state":"translated","value":"%lld 个月 · 有记录日的平均值"}},"zh-Hant":{"stringUnit":{"state":"translated","value":"%lld 個月 · 有紀錄日的平均值"}}}},
     "%lld working sets · compare when you repeat this program": { "localizations": {
-      "de": {"stringUnit": {"state": "translated", "value": "%lld Arbeitssätze · vergleichbar, wenn du dieses Programm wiederholst"}}, "es": {"stringUnit": {"state": "translated", "value": "%lld series efectivas · compara al repetir este programa"}}, "fr": {"stringUnit": {"state": "translated", "value": "%lld séries de travail · à comparer quand tu refais ce programme"}}, "it": {"stringUnit": {"state": "translated", "value": "%lld serie di lavoro · confronta quando ripeti questo programma"}}, "pl": {"stringUnit": {"state": "translated", "value": "%lld serii roboczych · porównuj, gdy powtarzasz ten program"}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "%lld séries de trabalho · compara quando repetires este programa"}}, "ru": {
+      "de": {"stringUnit": {"state": "translated", "value": "%lld Arbeitssätze · vergleichbar, wenn du dieses Programm wiederholst"}}, "es": {"stringUnit": {"state": "translated", "value": "%lld series efectivas, compara al repetir este programa"}}, "fr": {"stringUnit": {"state": "translated", "value": "%lld séries de travail · à comparer quand tu refais ce programme"}}, "it": {"stringUnit": {"state": "translated", "value": "%lld serie di lavoro · confronta quando ripeti questo programma"}}, "pl": {"stringUnit": {"state": "translated", "value": "%lld serii roboczych · porównuj, gdy powtarzasz ten program"}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "%lld séries de trabalho · compara quando repetires este programa"}}, "ru": {
         "variations": {
           "plural": {
             "one": {
@@ -1718,7 +1736,7 @@
       }
     },
     "Last 7 days · estimated": { "localizations": {
-      "de": {"stringUnit": {"state": "translated", "value": "Letzte 7 Tage · geschätzt"}}, "es": {"stringUnit": {"state": "translated", "value": "Últimos 7 días · estimado"}}, "fr": {"stringUnit": {"state": "translated", "value": "7 derniers jours · estimé"}}, "it": {"stringUnit": {"state": "translated", "value": "Ultimi 7 giorni · stimato"}}, "pl": {"stringUnit": {"state": "translated", "value": "Ostatnie 7 dni · szacunkowo"}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "Últimos 7 dias · estimado"}}, "ru": {"stringUnit": {"state": "translated", "value": "Последние 7 дней · оценка"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "最近 7 天 · 估算"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "最近 7 天 · 估算"}}
+      "de": {"stringUnit": {"state": "translated", "value": "Letzte 7 Tage · geschätzt"}}, "es": {"stringUnit": {"state": "translated", "value": "Últimos 7 días, estimado"}}, "fr": {"stringUnit": {"state": "translated", "value": "7 derniers jours · estimé"}}, "it": {"stringUnit": {"state": "translated", "value": "Ultimi 7 giorni · stimato"}}, "pl": {"stringUnit": {"state": "translated", "value": "Ostatnie 7 dni · szacunkowo"}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "Últimos 7 dias · estimado"}}, "ru": {"stringUnit": {"state": "translated", "value": "Последние 7 дней · оценка"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "最近 7 天 · 估算"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "最近 7 天 · 估算"}}
     } },
     "NOOP couldn't start the sync. Open NOOP to see the strap log.": {
       "localizations": {
@@ -2069,7 +2087,7 @@
       }
     },
     "This session · estimated": { "localizations": {
-      "de": {"stringUnit": {"state": "translated", "value": "Diese Einheit · geschätzt"}}, "es": {"stringUnit": {"state": "translated", "value": "Esta sesión · estimado"}}, "fr": {"stringUnit": {"state": "translated", "value": "Cette séance · estimé"}}, "it": {"stringUnit": {"state": "translated", "value": "Questa sessione · stimato"}}, "pl": {"stringUnit": {"state": "translated", "value": "Ta sesja · szacunkowo"}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "Esta sessão · estimado"}}, "ru": {"stringUnit": {"state": "translated", "value": "Эта тренировка · оценка"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "本次训练 · 估算"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "本次訓練 · 估算"}}
+      "de": {"stringUnit": {"state": "translated", "value": "Diese Einheit · geschätzt"}}, "es": {"stringUnit": {"state": "translated", "value": "Esta sesión, estimado"}}, "fr": {"stringUnit": {"state": "translated", "value": "Cette séance · estimé"}}, "it": {"stringUnit": {"state": "translated", "value": "Questa sessione · stimato"}}, "pl": {"stringUnit": {"state": "translated", "value": "Ta sesja · szacunkowo"}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "Esta sessão · estimado"}}, "ru": {"stringUnit": {"state": "translated", "value": "Эта тренировка · оценка"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "本次训练 · 估算"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "本次訓練 · 估算"}}
     } },
     "Counted from the muscles you assigned each exercise: direct sets count once, indirect ones count as a half — the method the reference figures were derived under. An estimate from your own labels, not something measured off your body.": { "localizations": {
       "de": {"stringUnit": {"state": "translated", "value": "Gezählt nach den Muskeln, die du jeder Übung zugeordnet hast: direkte Sätze zählen einfach, indirekte als halber Satz — die Methode, unter der die Referenzwerte ermittelt wurden. Eine Schätzung aus deinen eigenen Angaben, nichts an deinem Körper Gemessenes."}}, "es": {"stringUnit": {"state": "translated", "value": "Se cuenta según los músculos que asignaste a cada ejercicio: las series directas cuentan una vez y las indirectas como media — el método con el que se obtuvieron las cifras de referencia. Es una estimación a partir de tus propias etiquetas, no algo medido en tu cuerpo."}}, "fr": {"stringUnit": {"state": "translated", "value": "Compté d'après les muscles que tu as attribués à chaque exercice : les séries directes comptent une fois, les indirectes pour moitié — la méthode qui a servi à établir les valeurs de référence. Une estimation issue de tes propres libellés, pas une mesure prise sur ton corps."}}, "it": {"stringUnit": {"state": "translated", "value": "Conteggiato dai muscoli che hai assegnato a ogni esercizio: le serie dirette contano una volta, quelle indirette metà — il metodo con cui sono stati ricavati i valori di riferimento. Una stima dalle tue etichette, non qualcosa misurato sul tuo corpo."}}, "pl": {"stringUnit": {"state": "translated", "value": "Liczone na podstawie mięśni przypisanych do każdego ćwiczenia: serie bezpośrednie liczą się raz, pośrednie za pół — metoda, na której oparto wartości odniesienia. To szacunek z twoich własnych oznaczeń, a nie pomiar na twoim ciele."}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "Contado a partir dos músculos que atribuíste a cada exercício: as séries diretas contam uma vez e as indiretas metade — o método com que os valores de referência foram obtidos. É uma estimativa a partir das tuas etiquetas, não algo medido no teu corpo."}}, "ru": {"stringUnit": {"state": "translated", "value": "Считается по мышцам, которые ты назначил каждому упражнению: прямые подходы идут за один, косвенные за половину — метод, по которому получены эталонные значения. Это оценка по твоим же меткам, а не измерение тела."}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "根据你为每个动作指定的肌群统计：直接组算一组，间接组算半组——参考数值正是用这个方法得出的。这是基于你自己标注的估算，而非在你身上测得的数据。"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "根據你為每個動作指定的肌群統計：直接組算一組，間接組算半組——參考數值正是用這個方法得出的。這是基於你自己標註的估算，而非在你身上測得的數據。"}}
@@ -2682,7 +2700,7 @@
       "de": {"stringUnit": {"state": "translated", "value": "Du hast Übungen hinzugefügt. Fürs nächste Mal ins Programm aufnehmen?"}}, "en": {"stringUnit": {"state": "translated", "value": "You added exercises. Add them to the program for next time?"}}, "es": {"stringUnit": {"state": "translated", "value": "Has añadido ejercicios. ¿Añadirlos al programa para la próxima vez?"}}, "fr": {"stringUnit": {"state": "translated", "value": "Tu as ajouté des exercices. Les ajouter au programme pour la prochaine fois ?"}}, "it": {"stringUnit": {"state": "translated", "value": "Hai aggiunto esercizi. Aggiungerli al programma per la prossima volta?"}}, "pl": {"stringUnit": {"state": "translated", "value": "Dodano ćwiczenia. Dodać je do programu na następny raz?"}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "Adicionaste exercícios. Adicioná-los ao programa para a próxima vez?"}}, "ru": {"stringUnit": {"state": "translated", "value": "Добавлены упражнения. Добавить их в программу на следующий раз?"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "你添加了动作。要把它们加入计划，下次使用吗？"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "你新增了動作。要把它們加入計畫，下次使用嗎？"}}
     } },
     "New: %@ · sets: %lld": { "localizations": {
-      "de": {"stringUnit": {"state": "translated", "value": "Neu: %1$@ · Sätze: %2$lld"}}, "en": {"stringUnit": {"state": "translated", "value": "New: %@ · sets: %lld"}}, "es": {"stringUnit": {"state": "translated", "value": "Nuevo: %1$@ · series: %2$lld"}}, "fr": {"stringUnit": {"state": "translated", "value": "Nouveau : %1$@ · séries : %2$lld"}}, "it": {"stringUnit": {"state": "translated", "value": "Nuovo: %1$@ · serie: %2$lld"}}, "pl": {"stringUnit": {"state": "translated", "value": "Nowe: %1$@ · serie: %2$lld"}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "Novo: %1$@ · séries: %2$lld"}}, "ru": {"stringUnit": {"state": "translated", "value": "Новое: %1$@ · подходов: %2$lld"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "新增：%1$@ · 组数：%2$lld"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "新增：%1$@ · 組數：%2$lld"}}
+      "de": {"stringUnit": {"state": "translated", "value": "Neu: %1$@ · Sätze: %2$lld"}}, "en": {"stringUnit": {"state": "translated", "value": "New: %@ · sets: %lld"}}, "es": {"stringUnit": {"state": "translated", "value": "Nuevo: %1$@, series: %2$lld"}}, "fr": {"stringUnit": {"state": "translated", "value": "Nouveau : %1$@ · séries : %2$lld"}}, "it": {"stringUnit": {"state": "translated", "value": "Nuovo: %1$@ · serie: %2$lld"}}, "pl": {"stringUnit": {"state": "translated", "value": "Nowe: %1$@ · serie: %2$lld"}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "Novo: %1$@ · séries: %2$lld"}}, "ru": {"stringUnit": {"state": "translated", "value": "Новое: %1$@ · подходов: %2$lld"}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "新增：%1$@ · 组数：%2$lld"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "新增：%1$@ · 組數：%2$lld"}}
     } },
     "%@: %lld → %lld sets": { "localizations": {
       "de": {"stringUnit": {"state": "translated", "value": "%1$@: %2$lld → %3$lld Sätze"}}, "en": {"stringUnit": {"state": "translated", "value": "%@: %lld → %lld sets"}}, "es": {"stringUnit": {"state": "translated", "value": "%1$@: %2$lld → %3$lld series"}}, "fr": {"stringUnit": {"state": "translated", "value": "%1$@ : %2$lld → %3$lld séries"}}, "it": {"stringUnit": {"state": "translated", "value": "%1$@: %2$lld → %3$lld serie"}}, "pl": {"stringUnit": {"state": "translated", "value": "%1$@: %2$lld → %3$lld serii"}}, "pt-PT": {"stringUnit": {"state": "translated", "value": "%1$@: %2$lld → %3$lld séries"}}, "ru": {"stringUnit": {"state": "translated", "value": "%1$@: %2$lld → %3$lld подх."}}, "zh-Hans": {"stringUnit": {"state": "translated", "value": "%1$@：%2$lld → %3$lld 组"}}, "zh-Hant": {"stringUnit": {"state": "translated", "value": "%1$@：%2$lld → %3$lld 組"}}
@@ -2871,7 +2889,7 @@
       "de": { "stringUnit": { "state": "translated", "value": "Bereit für den nächsten Satz" } }, "en": { "stringUnit": { "state": "translated", "value": "Ready for the next set" } }, "es": { "stringUnit": { "state": "translated", "value": "Listo para la siguiente serie" } }, "fr": { "stringUnit": { "state": "translated", "value": "Prêt pour la série suivante" } }, "it": { "stringUnit": { "state": "translated", "value": "Pronto per la serie successiva" } }, "pl": { "stringUnit": { "state": "translated", "value": "Gotowe na następną serię" } }, "pt-PT": { "stringUnit": { "state": "translated", "value": "Pronto para a próxima série" } }, "ru": { "stringUnit": { "state": "translated", "value": "Готов к следующему подходу" } }, "zh-Hans": { "stringUnit": { "state": "translated", "value": "可以开始下一组" } }, "zh-Hant": { "stringUnit": { "state": "translated", "value": "可以開始下一組" } }
     } },
     "Next: Set %lld · %@": { "localizations": {
-      "de": { "stringUnit": { "state": "translated", "value": "Als Nächstes: Satz %1$lld · %2$@" } }, "en": { "stringUnit": { "state": "translated", "value": "Next: Set %lld · %@" } }, "es": { "stringUnit": { "state": "translated", "value": "Siguiente: serie %1$lld · %2$@" } }, "fr": { "stringUnit": { "state": "translated", "value": "Ensuite : série %1$lld · %2$@" } }, "it": { "stringUnit": { "state": "translated", "value": "Prossima: serie %1$lld · %2$@" } }, "pl": { "stringUnit": { "state": "translated", "value": "Następna: seria %1$lld · %2$@" } }, "pt-PT": { "stringUnit": { "state": "translated", "value": "A seguir: série %1$lld · %2$@" } }, "ru": { "stringUnit": { "state": "translated", "value": "Далее: подход %1$lld · %2$@" } }, "zh-Hans": { "stringUnit": { "state": "translated", "value": "接下来：第 %1$lld 组 · %2$@" } }, "zh-Hant": { "stringUnit": { "state": "translated", "value": "接下來：第 %1$lld 組 · %2$@" } }
+      "de": { "stringUnit": { "state": "translated", "value": "Als Nächstes: Satz %1$lld · %2$@" } }, "en": { "stringUnit": { "state": "translated", "value": "Next: Set %lld · %@" } }, "es": { "stringUnit": { "state": "translated", "value": "Siguiente: serie %1$lld, %2$@" } }, "fr": { "stringUnit": { "state": "translated", "value": "Ensuite : série %1$lld · %2$@" } }, "it": { "stringUnit": { "state": "translated", "value": "Prossima: serie %1$lld · %2$@" } }, "pl": { "stringUnit": { "state": "translated", "value": "Następna: seria %1$lld · %2$@" } }, "pt-PT": { "stringUnit": { "state": "translated", "value": "A seguir: série %1$lld · %2$@" } }, "ru": { "stringUnit": { "state": "translated", "value": "Далее: подход %1$lld · %2$@" } }, "zh-Hans": { "stringUnit": { "state": "translated", "value": "接下来：第 %1$lld 组 · %2$@" } }, "zh-Hant": { "stringUnit": { "state": "translated", "value": "接下來：第 %1$lld 組 · %2$@" } }
     } },
     "Last set": { "localizations": {
       "de": { "stringUnit": { "state": "translated", "value": "Letzter Satz" } }, "en": { "stringUnit": { "state": "translated", "value": "Last set" } }, "es": { "stringUnit": { "state": "translated", "value": "Última serie" } }, "fr": { "stringUnit": { "state": "translated", "value": "Dernière série" } }, "it": { "stringUnit": { "state": "translated", "value": "Ultima serie" } }, "pl": { "stringUnit": { "state": "translated", "value": "Ostatnia seria" } }, "pt-PT": { "stringUnit": { "state": "translated", "value": "Última série" } }, "ru": { "stringUnit": { "state": "translated", "value": "Последний подход" } }, "zh-Hans": { "stringUnit": { "state": "translated", "value": "最后一组" } }, "zh-Hant": { "stringUnit": { "state": "translated", "value": "最後一組" } }
@@ -2937,7 +2955,7 @@
       "de": { "stringUnit": { "state": "translated", "value": "RPE %1$@ × %2$lld Min" } }, "en": { "stringUnit": { "state": "translated", "value": "RPE %@ × %lld min" } }, "es": { "stringUnit": { "state": "translated", "value": "RPE %1$@ × %2$lld min" } }, "fr": { "stringUnit": { "state": "translated", "value": "RPE %1$@ × %2$lld min" } }, "it": { "stringUnit": { "state": "translated", "value": "RPE %1$@ × %2$lld min" } }, "pl": { "stringUnit": { "state": "translated", "value": "RPE %1$@ × %2$lld min" } }, "pt-PT": { "stringUnit": { "state": "translated", "value": "RPE %1$@ × %2$lld min" } }, "ru": { "stringUnit": { "state": "translated", "value": "RPE %1$@ × %2$lld мин" } }, "zh-Hans": { "stringUnit": { "state": "translated", "value": "RPE %1$@ × %2$lld 分钟" } }, "zh-Hant": { "stringUnit": { "state": "translated", "value": "RPE %1$@ × %2$lld 分鐘" } }
     } },
     "%lld direct · %lld indirect": { "localizations": {
-      "de": { "stringUnit": { "state": "translated", "value": "%1$lld direkt · %2$lld indirekt" } }, "en": { "stringUnit": { "state": "translated", "value": "%lld direct · %lld indirect" } }, "es": { "stringUnit": { "state": "translated", "value": "%1$lld directas · %2$lld indirectas" } }, "fr": { "stringUnit": { "state": "translated", "value": "%1$lld directes · %2$lld indirectes" } }, "it": { "stringUnit": { "state": "translated", "value": "%1$lld dirette · %2$lld indirette" } }, "pl": { "stringUnit": { "state": "translated", "value": "%1$lld bezpośrednich · %2$lld pośrednich" } }, "pt-PT": { "stringUnit": { "state": "translated", "value": "%1$lld diretas · %2$lld indiretas" } }, "ru": { "stringUnit": { "state": "translated", "value": "%1$lld прямых · %2$lld косвенных" } }, "zh-Hans": { "stringUnit": { "state": "translated", "value": "%1$lld 直接 · %2$lld 间接" } }, "zh-Hant": { "stringUnit": { "state": "translated", "value": "%1$lld 直接 · %2$lld 間接" } }
+      "de": { "stringUnit": { "state": "translated", "value": "%1$lld direkt · %2$lld indirekt" } }, "en": { "stringUnit": { "state": "translated", "value": "%lld direct · %lld indirect" } }, "es": { "stringUnit": { "state": "translated", "value": "%1$lld directas, %2$lld indirectas" } }, "fr": { "stringUnit": { "state": "translated", "value": "%1$lld directes · %2$lld indirectes" } }, "it": { "stringUnit": { "state": "translated", "value": "%1$lld dirette · %2$lld indirette" } }, "pl": { "stringUnit": { "state": "translated", "value": "%1$lld bezpośrednich · %2$lld pośrednich" } }, "pt-PT": { "stringUnit": { "state": "translated", "value": "%1$lld diretas · %2$lld indiretas" } }, "ru": { "stringUnit": { "state": "translated", "value": "%1$lld прямых · %2$lld косвенных" } }, "zh-Hans": { "stringUnit": { "state": "translated", "value": "%1$lld 直接 · %2$lld 间接" } }, "zh-Hant": { "stringUnit": { "state": "translated", "value": "%1$lld 直接 · %2$lld 間接" } }
     } },
     "%lld direct": { "localizations": {
       "de": { "stringUnit": { "state": "translated", "value": "%lld direkt" } }, "en": { "stringUnit": { "state": "translated", "value": "%lld direct" } }, "es": { "stringUnit": { "state": "translated", "value": "%lld directas" } }, "fr": { "stringUnit": { "state": "translated", "value": "%lld directes" } }, "it": { "stringUnit": { "state": "translated", "value": "%lld dirette" } }, "pl": { "stringUnit": { "state": "translated", "value": "%lld bezpośrednich" } }, "pt-PT": { "stringUnit": { "state": "translated", "value": "%lld diretas" } }, "ru": { "stringUnit": { "state": "translated", "value": "%lld прямых" } }, "zh-Hans": { "stringUnit": { "state": "translated", "value": "%lld 直接" } }, "zh-Hant": { "stringUnit": { "state": "translated", "value": "%lld 直接" } }
@@ -3943,7 +3961,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$@ · típicamente %2$@ a %3$@, %4$lld."
+            "value": "%1$@, típicamente %2$@ a %3$@, %4$lld."
           }
         },
         "fr": {
@@ -5523,7 +5541,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ en cama · %@ de eficiencia"
+            "value": "%@ en cama, %@ de eficiencia"
           }
         },
         "fr": {
@@ -5587,7 +5605,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ en cama · %@ de eficiencia · fases aproximadas (en el dispositivo)"
+            "value": "%@ en cama, %@ de eficiencia, fases aproximadas (en el dispositivo)"
           }
         },
         "fr": {
@@ -5651,7 +5669,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ en cama · %lld%% de eficiencia"
+            "value": "%@ en cama, %lld%% de eficiencia"
           }
         },
         "fr": {
@@ -6139,7 +6157,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Vínculo %@ · r = %@ · n = %lld días"
+            "value": "Vínculo %@, r = %@, n = %lld días"
           }
         },
         "fr": {
@@ -6801,7 +6819,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ vs inicio · pico %@ ms"
+            "value": "%@ vs inicio, pico %@ ms"
           }
         },
         "fr": {
@@ -7033,61 +7051,61 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · %@"
+            "value": "%@, %@"
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · %@"
+            "value": "%@, %@"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · %@"
+            "value": "%@, %@"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · %@"
+            "value": "%@, %@"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · %@"
+            "value": "%@, %@"
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · %@"
+            "value": "%@, %@"
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · %@"
+            "value": "%@, %@"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · %@"
+            "value": "%@, %@"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · %@"
+            "value": "%@, %@"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · %@"
+            "value": "%@, %@"
           }
         }
       }
@@ -7103,7 +7121,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · %@s inhala / %@s exhala"
+            "value": "%@, %@s inhala / %@s exhala"
           }
         },
         "fr": {
@@ -7155,31 +7173,31 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · %lld kcal"
+            "value": "%@, %lld kcal"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · %lld kcal"
+            "value": "%@, %lld kcal"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · %lld kcal"
+            "value": "%@, %lld kcal"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · %lld kcal"
+            "value": "%@, %lld kcal"
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · %lld kcal"
+            "value": "%@, %lld kcal"
           }
         },
         "ru": {
@@ -7191,19 +7209,19 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · %lld kcal"
+            "value": "%@, %lld kcal"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · %lld kcal"
+            "value": "%@, %lld kcal"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · %lld kcal"
+            "value": "%@, %lld kcal"
           }
         }
       }
@@ -7225,19 +7243,19 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · %lld mg"
+            "value": "%@, %lld mg"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · %lld mg"
+            "value": "%@, %lld mg"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · %lld mg"
+            "value": "%@, %lld mg"
           }
         },
         "pt-PT": {
@@ -7255,13 +7273,13 @@
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · %lld mg"
+            "value": "%@, %lld mg"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · %lld mg"
+            "value": "%@, %lld mg"
           }
         },
         "pl": {
@@ -7277,31 +7295,31 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · Beta"
+            "value": "%@, Beta"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · Beta"
+            "value": "%@, Beta"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · Beta"
+            "value": "%@, Beta"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · Beta"
+            "value": "%@, Beta"
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · Beta"
+            "value": "%@, Beta"
           }
         },
         "ru": {
@@ -7319,13 +7337,13 @@
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · Beta"
+            "value": "%@, Beta"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · Beta"
+            "value": "%@, Beta"
           }
         }
       }
@@ -7341,7 +7359,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · cantidad no registrada"
+            "value": "%@, cantidad no registrada"
           }
         },
         "fr": {
@@ -7405,7 +7423,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · la mejor señal por métrica, de %lld fuentes. Todo se queda en %@."
+            "value": "%@, la mejor señal por métrica, de %lld fuentes. Todo se queda en %@."
           }
         },
         "fr": {
@@ -7457,61 +7475,61 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · n = %lld"
+            "value": "%@, n = %lld"
           }
         },
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · n = %lld"
+            "value": "%@, n = %lld"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · n = %lld"
+            "value": "%@, n = %lld"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · n = %lld"
+            "value": "%@, n = %lld"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · n = %lld"
+            "value": "%@, n = %lld"
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · n = %lld"
+            "value": "%@, n = %lld"
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · n = %lld"
+            "value": "%@, n = %lld"
           }
         },
         "zh-Hans": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · n = %lld"
+            "value": "%@, n = %lld"
           }
         },
         "zh-Hant": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · n = %lld"
+            "value": "%@, n = %lld"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · n = %lld"
+            "value": "%@, n = %lld"
           }
         }
       }
@@ -7527,7 +7545,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · algunas series dispersas ampliadas"
+            "value": "%@, algunas series dispersas ampliadas"
           }
         },
         "fr": {
@@ -7591,7 +7609,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ · tu récord, el %@."
+            "value": "%@, tu récord, el %@."
           }
         },
         "fr": {
@@ -7719,7 +7737,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ – %@  ·  %lld días"
+            "value": "%@ – %@ ,  %lld días"
           }
         },
         "fr": {
@@ -7783,7 +7801,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%@ – %@  ·  1 día"
+            "value": "%@ – %@ ,  1 día"
           }
         },
         "fr": {
@@ -11705,7 +11723,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld respiraciones · %@"
+            "value": "%lld respiraciones, %@"
           }
         },
         "fr": {
@@ -12373,7 +12391,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld días · %@"
+            "value": "%lld días, %@"
           }
         },
         "fr": {
@@ -12437,7 +12455,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld días · %@ · algunas series dispersas ampliadas"
+            "value": "%lld días, %@, algunas series dispersas ampliadas"
           }
         },
         "fr": {
@@ -12501,7 +12519,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld días · %lld sueños"
+            "value": "%lld días, %lld sueños"
           }
         },
         "fr": {
@@ -12565,7 +12583,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld días · %lld sueño almacenado"
+            "value": "%lld días, %lld sueño almacenado"
           }
         },
         "fr": {
@@ -12629,7 +12647,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld días · %lld entrenamientos"
+            "value": "%lld días, %lld entrenamientos"
           }
         },
         "fr": {
@@ -13505,7 +13523,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld marcadores registrados · %lld lecturas"
+            "value": "%lld marcadores registrados, %lld lecturas"
           }
         },
         "fr": {
@@ -13563,7 +13581,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld marcadores registrados · 1 lectura"
+            "value": "%lld marcadores registrados, 1 lectura"
           }
         },
         "fr": {
@@ -14565,7 +14583,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld días solapados · correlación %@ %@"
+            "value": "%lld días solapados, correlación %@ %@"
           }
         },
         "fr": {
@@ -14991,7 +15009,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld lecturas en %lld · %@"
+            "value": "%lld lecturas en %lld, %@"
           }
         },
         "fr": {
@@ -15055,7 +15073,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld lecturas en %lld · %@ · dispersas, ampliadas"
+            "value": "%lld lecturas en %lld, %@, dispersas, ampliadas"
           }
         },
         "fr": {
@@ -15265,7 +15283,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld lecturas usadas · asociación %@ %@. Son tus propios datos puestos lado a lado. No es un hallazgo médico, y muestra asociación, no causa."
+            "value": "%lld lecturas usadas, asociación %@ %@. Son tus propios datos puestos lado a lado. No es un hallazgo médico, y muestra asociación, no causa."
           }
         },
         "fr": {
@@ -15329,7 +15347,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld lecturas · %@"
+            "value": "%lld lecturas, %@"
           }
         },
         "fr": {
@@ -15417,7 +15435,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld lecturas · dispersas, ampliadas a %@"
+            "value": "%lld lecturas, dispersas, ampliadas a %@"
           }
         },
         "fr": {
@@ -15499,7 +15517,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld lecturas · tus propias entradas"
+            "value": "%lld lecturas, tus propias entradas"
           }
         },
         "fr": {
@@ -16119,7 +16137,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld sesiones · %@"
+            "value": "%lld sesiones, %@"
           }
         },
         "fr": {
@@ -16207,7 +16225,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld sesiones · dispersas, ampliadas a %@"
+            "value": "%lld sesiones, dispersas, ampliadas a %@"
           }
         },
         "fr": {
@@ -17662,7 +17680,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%1$lld-%2$lld%3$@ · paso %4$lld"
+            "value": "%1$lld-%2$lld%3$@, paso %4$lld"
           }
         },
         "fr": {
@@ -18260,7 +18278,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%llds restantes · %lld latidos"
+            "value": "%llds restantes, %lld latidos"
           }
         },
         "fr": {
@@ -18382,7 +18400,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "%lld–%lld%@ · paso %lld"
+            "value": "%lld–%lld%@, paso %lld"
           }
         },
         "fr": {
@@ -19462,7 +19480,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "1 día · %@"
+            "value": "1 día, %@"
           }
         },
         "fr": {
@@ -19520,7 +19538,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "1 día · %@ · algunas series dispersas ampliadas"
+            "value": "1 día, %@, algunas series dispersas ampliadas"
           }
         },
         "fr": {
@@ -19810,7 +19828,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "1 marcador registrado · %lld lecturas"
+            "value": "1 marcador registrado, %lld lecturas"
           }
         },
         "fr": {
@@ -19892,7 +19910,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "1 marcador registrado · 1 lectura"
+            "value": "1 marcador registrado, 1 lectura"
           }
         },
         "fr": {
@@ -20240,7 +20258,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "1 lectura en %lld · %@"
+            "value": "1 lectura en %lld, %@"
           }
         },
         "fr": {
@@ -20304,7 +20322,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "1 lectura en %lld · %@ · dispersa, ampliada"
+            "value": "1 lectura en %lld, %@, dispersa, ampliada"
           }
         },
         "fr": {
@@ -20420,7 +20438,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "1 lectura · %@"
+            "value": "1 lectura, %@"
           }
         },
         "fr": {
@@ -20478,7 +20496,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "1 lectura · dispersa, ampliada a %@"
+            "value": "1 lectura, dispersa, ampliada a %@"
           }
         },
         "fr": {
@@ -20536,7 +20554,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "1 lectura · tus propias entradas"
+            "value": "1 lectura, tus propias entradas"
           }
         },
         "fr": {
@@ -20826,7 +20844,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "1 sesión · %@"
+            "value": "1 sesión, %@"
           }
         },
         "fr": {
@@ -20884,7 +20902,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "1 sesión · dispersa, ampliada a %@"
+            "value": "1 sesión, dispersa, ampliada a %@"
           }
         },
         "fr": {
@@ -22618,7 +22636,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "promedio de 5 minutos · día seleccionado"
+            "value": "promedio de 5 minutos, día seleccionado"
           }
         },
         "fr": {
@@ -22676,7 +22694,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "promedio de 5 minutos · desde medianoche"
+            "value": "promedio de 5 minutos, desde medianoche"
           }
         },
         "fr": {
@@ -27424,7 +27442,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "TODOS TUS DATOS · NADA EN LA NUBE"
+            "value": "TODOS TUS DATOS, NADA EN LA NUBE"
           }
         },
         "fr": {
@@ -29066,7 +29084,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Activo · En vivo"
+            "value": "Activo, En vivo"
           }
         },
         "fr": {
@@ -35402,7 +35420,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Auto · %@ de confianza"
+            "value": "Auto, %@ de confianza"
           }
         },
         "fr": {
@@ -35466,7 +35484,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Auto · %lld ppm (Tanaka)"
+            "value": "Auto, %lld ppm (Tanaka)"
           }
         },
         "fr": {
@@ -38926,7 +38944,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Batería %lld%% · Cargando"
+            "value": "Batería %lld%%, Cargando"
           }
         },
         "fr": {
@@ -41438,7 +41456,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Emparejada · transmitiendo"
+            "value": "Emparejada, transmitiendo"
           }
         },
         "fr": {
@@ -46741,7 +46759,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Cálmame · 3 min"
+            "value": "Cálmame, 3 min"
           }
         },
         "fr": {
@@ -47329,7 +47347,7 @@
       }
     },
     "Carried · %@": { "localizations": {
-      "de": { "stringUnit": { "state": "translated", "value": "Übernommen · %@" } }, "es": { "stringUnit": { "state": "translated", "value": "Heredado · %@" } }, "fr": { "stringUnit": { "state": "translated", "value": "Reporté · %@" } }, "it": { "stringUnit": { "state": "translated", "value": "Riportato · %@" } }, "pl": { "stringUnit": { "state": "translated", "value": "Przeniesione · %@" } }, "pt-PT": { "stringUnit": { "state": "translated", "value": "Herdado · %@" } }, "ru": { "stringUnit": { "state": "translated", "value": "Перенесено · %@" } }, "zh-Hans": { "stringUnit": { "state": "translated", "value": "携带 · %@" } }, "zh-Hant": { "stringUnit": { "state": "translated", "value": "攜带 · %@" } }
+      "de": { "stringUnit": { "state": "translated", "value": "Übernommen · %@" } }, "es": { "stringUnit": { "state": "translated", "value": "Heredado, %@" } }, "fr": { "stringUnit": { "state": "translated", "value": "Reporté · %@" } }, "it": { "stringUnit": { "state": "translated", "value": "Riportato · %@" } }, "pl": { "stringUnit": { "state": "translated", "value": "Przeniesione · %@" } }, "pt-PT": { "stringUnit": { "state": "translated", "value": "Herdado · %@" } }, "ru": { "stringUnit": { "state": "translated", "value": "Перенесено · %@" } }, "zh-Hans": { "stringUnit": { "state": "translated", "value": "携带 · %@" } }, "zh-Hant": { "stringUnit": { "state": "translated", "value": "攜带 · %@" } }
     } },
     "Carbs": {
       "localizations": {
@@ -49338,7 +49356,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Carga · %@ pts"
+            "value": "Carga, %@ pts"
           }
         },
         "fr": {
@@ -49396,7 +49414,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Carga · Esfuerzo · Descanso"
+            "value": "Carga, Esfuerzo, Descanso"
           }
         },
         "fr": {
@@ -65478,7 +65496,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Arrastra para desplazarte · toca dos veces para restablecer"
+            "value": "Arrastra para desplazarte, toca dos veces para restablecer"
           }
         },
         "fr": {
@@ -66708,7 +66726,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Cada línea normalizada min–max dentro de %@ · %@"
+            "value": "Cada línea normalizada min–max dentro de %@, %@"
           }
         },
         "fr": {
@@ -69297,7 +69315,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Respiración igualada · coherencia de ~5.5 resp/min"
+            "value": "Respiración igualada, coherencia de ~5.5 resp/min"
           }
         },
         "fr": {
@@ -70018,7 +70036,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Frecuencia cardíaca máxima estimada · %lld ppm"
+            "value": "Frecuencia cardíaca máxima estimada, %lld ppm"
           }
         },
         "fr": {
@@ -71372,7 +71390,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Modelo exacto desconocido. Muestra lo que puede hacer cualquier WHOOP. * estimación en el dispositivo · sin % de SpO₂ desde la pulsera (importa un CSV de WHOOP para eso)."
+            "value": "Modelo exacto desconocido. Muestra lo que puede hacer cualquier WHOOP. * estimación en el dispositivo, sin % de SpO₂ desde la pulsera (importa un CSV de WHOOP para eso)."
           }
         },
         "fr": {
@@ -71952,7 +71970,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Experimental · Fases del sueño"
+            "value": "Experimental, Fases del sueño"
           }
         },
         "fr": {
@@ -72010,13 +72028,13 @@
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Experimental · WHOOP 5 / MG"
+            "value": "Experimental, WHOOP 5 / MG"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Experimental · WHOOP 5 / MG"
+            "value": "Experimental, WHOOP 5 / MG"
           }
         },
         "fr": {
@@ -76454,7 +76472,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Barrido completo · ~13 min"
+            "value": "Barrido completo, ~13 min"
           }
         },
         "fr": {
@@ -76744,7 +76762,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Generado por NOOP el %@ · todo en el dispositivo, sin cuenta, sin nube."
+            "value": "Generado por NOOP el %@, todo en el dispositivo, sin cuenta, sin nube."
           }
         },
         "fr": {
@@ -78631,7 +78649,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "FC %@ · Esfuerzo %@"
+            "value": "FC %@, Esfuerzo %@"
           }
         },
         "fr": {
@@ -79531,7 +79549,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "VFC %@ · FCR %@"
+            "value": "VFC %@, FCR %@"
           }
         },
         "fr": {
@@ -80499,7 +80517,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Respiración guiada por hápticos · encuentra tu ritmo · cálmate"
+            "value": "Respiración guiada por hápticos, encuentra tu ritmo, cálmate"
           }
         },
         "fr": {
@@ -80564,7 +80582,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Respiración guiada por hápticos · observa cómo responde tu VFC"
+            "value": "Respiración guiada por hápticos, observa cómo responde tu VFC"
           }
         },
         "fr": {
@@ -81986,7 +82004,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Frecuencia cardíaca · VFC (en vivo)* · Esfuerzo"
+            "value": "Frecuencia cardíaca, VFC (en vivo)*, Esfuerzo"
           }
         },
         "fr": {
@@ -82044,7 +82062,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Frecuencia cardíaca · VFC · Temp. cutánea* · Frec. respiratoria* · Sueño · Esfuerzo · Batería"
+            "value": "Frecuencia cardíaca, VFC, Temp. cutánea*, Frec. respiratoria*, Sueño, Esfuerzo, Batería"
           }
         },
         "fr": {
@@ -82102,7 +82120,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Frecuencia cardíaca · VFC · Temp. cutánea* · Frec. respiratoria* · Pasos* · Sueño · Esfuerzo · Batería"
+            "value": "Frecuencia cardíaca, VFC, Temp. cutánea*, Frec. respiratoria*, Pasos*, Sueño, Esfuerzo, Batería"
           }
         },
         "fr": {
@@ -82160,7 +82178,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Frecuencia cardíaca · VFC* · Sueño · FC en reposo · Temp. cutánea* · Batería"
+            "value": "Frecuencia cardíaca, VFC*, Sueño, FC en reposo, Temp. cutánea*, Batería"
           }
         },
         "fr": {
@@ -82218,7 +82236,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Frecuencia cardíaca* · VFC* · Sueño* · FC en reposo* · Temp. cutánea* · Batería*"
+            "value": "Frecuencia cardíaca*, VFC*, Sueño*, FC en reposo*, Temp. cutánea*, Batería*"
           }
         },
         "fr": {
@@ -82328,7 +82346,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Recuperación cardíaca · %1$@"
+            "value": "Recuperación cardíaca, %1$@"
           }
         },
         "fr": {
@@ -85231,7 +85249,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "¿Qué tan seguro está NOOP?  ·  Sólido · Construyendo · Calibrando"
+            "value": "¿Qué tan seguro está NOOP? ,  Sólido, Construyendo, Calibrando"
           }
         },
         "fr": {
@@ -93457,7 +93475,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Anoche · %@"
+            "value": "Anoche, %@"
           }
         },
         "fr": {
@@ -94757,7 +94775,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Último sueño · %@"
+            "value": "Último sueño, %@"
           }
         },
         "fr": {
@@ -96533,7 +96551,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Solo FC en vivo + R-R · sin sueño, recuperación, temperatura de la piel, SpO₂, pasos ni batería (esos son solo de WHOOP)."
+            "value": "Solo FC en vivo + R-R, sin sueño, recuperación, temperatura de la piel, SpO₂, pasos ni batería (esos son solo de WHOOP)."
           }
         },
         "fr": {
@@ -97532,7 +97550,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "En vivo · latido a latido"
+            "value": "En vivo, latido a latido"
           }
         },
         "fr": {
@@ -98072,7 +98090,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Bloqueado %@ · los ritmos varían, vuelve a medir cuando quieras."
+            "value": "Bloqueado %@, los ritmos varían, vuelve a medir cuando quieras."
           }
         },
         "fr": {
@@ -99470,7 +99488,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Exhalación larga · baja el ritmo hacia el descanso"
+            "value": "Exhalación larga, baja el ritmo hacia el descanso"
           }
         },
         "fr": {
@@ -103941,7 +103959,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Normalizado mín–máx · series dispersas ampliadas más allá de %@ · %@"
+            "value": "Normalizado mín–máx, series dispersas ampliadas más allá de %@, %@"
           }
         },
         "fr": {
@@ -110757,7 +110775,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sin RMSSD · datos R-R insuficientes"
+            "value": "Sin RMSSD, datos R-R insuficientes"
           }
         },
         "fr": {
@@ -123999,7 +124017,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Emparejado · inactivo"
+            "value": "Emparejado, inactivo"
           }
         },
         "fr": {
@@ -125015,7 +125033,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "r de Pearson sobre la ventana visible · |r| ≥ 0,30, n ≥ 10"
+            "value": "r de Pearson sobre la ventana visible, |r| ≥ 0,30, n ≥ 10"
           }
         },
         "fr": {
@@ -125079,7 +125097,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "r de Pearson · %@"
+            "value": "r de Pearson, %@"
           }
         },
         "fr": {
@@ -125433,7 +125451,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Curva personal · ajustada al prior"
+            "value": "Curva personal, ajustada al prior"
           }
         },
         "fr": {
@@ -126361,7 +126379,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Pellizca para hacer zoom · arrastra para desplazarte"
+            "value": "Pellizca para hacer zoom, arrastra para desplazarte"
           }
         },
         "fr": {
@@ -126477,7 +126495,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Plan · cambio de %lld días"
+            "value": "Plan, cambio de %lld días"
           }
         },
         "fr": {
@@ -129164,7 +129182,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Barrido rápido · ~7 min"
+            "value": "Barrido rápido, ~7 min"
           }
         },
         "fr": {
@@ -130778,7 +130796,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Clasificado · tus datos"
+            "value": "Clasificado, tus datos"
           }
         },
         "fr": {
@@ -131011,7 +131029,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sin procesar · por segundo"
+            "value": "Sin procesar, por segundo"
           }
         },
         "fr": {
@@ -136694,7 +136712,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Eliminado · datos conservados"
+            "value": "Eliminado, datos conservados"
           }
         },
         "fr": {
@@ -142284,31 +142302,31 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "SD1 · ms"
+            "value": "SD1, ms"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "SD1 · ms"
+            "value": "SD1, ms"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "SD1 · ms"
+            "value": "SD1, ms"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "SD1 · ms"
+            "value": "SD1, ms"
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "SD1 · ms"
+            "value": "SD1, ms"
           }
         },
         "ru": {
@@ -142332,7 +142350,7 @@
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "SD1 · ms"
+            "value": "SD1, ms"
           }
         }
       }
@@ -142400,31 +142418,31 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "SD2 · ms"
+            "value": "SD2, ms"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "SD2 · ms"
+            "value": "SD2, ms"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "SD2 · ms"
+            "value": "SD2, ms"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "SD2 · ms"
+            "value": "SD2, ms"
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "SD2 · ms"
+            "value": "SD2, ms"
           }
         },
         "ru": {
@@ -142448,7 +142466,7 @@
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "SD2 · ms"
+            "value": "SD2, ms"
           }
         }
       }
@@ -145612,7 +145630,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Desplázate para hacer zoom · arrastra para mover"
+            "value": "Desplázate para hacer zoom, arrastra para mover"
           }
         },
         "fr": {
@@ -149612,7 +149630,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sorbo %lld ml · Taza %lld ml · Botella %lld ml"
+            "value": "Sorbo %lld ml, Taza %lld ml, Botella %lld ml"
           }
         },
         "fr": {
@@ -151918,7 +151936,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Sueño · puntuaciones · registro · de dónde vienen tus números"
+            "value": "Sueño, puntuaciones, registro, de dónde vienen tus números"
           }
         },
         "fr": {
@@ -152498,7 +152516,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tono suave en cada fase · respeta el modo silencio"
+            "value": "Tono suave en cada fase, respeta el modo silencio"
           }
         },
         "fr": {
@@ -153328,7 +153346,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Escasa, ampliada a %@ · %lld lecturas"
+            "value": "Escasa, ampliada a %@, %lld lecturas"
           }
         },
         "fr": {
@@ -153410,7 +153428,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Velocidad · Cadencia · Potencia · Distancia · Energía · Frecuencia cardíaca (si la máquina la envía)"
+            "value": "Velocidad, Cadencia, Potencia, Distancia, Energía, Frecuencia cardíaca (si la máquina la envía)"
           }
         },
         "fr": {
@@ -153526,7 +153544,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Respiración cuadrada · enfoque constante"
+            "value": "Respiración cuadrada, enfoque constante"
           }
         },
         "fr": {
@@ -155070,7 +155088,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Iniciado %@ · probando %@"
+            "value": "Iniciado %@, probando %@"
           }
         },
         "fr": {
@@ -155128,7 +155146,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Comenzó a %lld ppm · el ritmo acompaña a tu corazón hacia abajo."
+            "value": "Comenzó a %lld ppm, el ritmo acompaña a tu corazón hacia abajo."
           }
         },
         "fr": {
@@ -159610,7 +159628,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Estrés · %@"
+            "value": "Estrés, %@"
           }
         },
         "fr": {
@@ -159675,7 +159693,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Estrés · M"
+            "value": "Estrés, M"
           }
         },
         "fr": {
@@ -163446,7 +163464,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Toca un entrenamiento para ver su detalle · toca ••• para reetiquetarlo, editarlo o eliminarlo."
+            "value": "Toca un entrenamiento para ver su detalle, toca ••• para reetiquetarlo, editarlo o eliminarlo."
           }
         },
         "fr": {
@@ -176177,7 +176195,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "WHOOP 4.0 · movimiento → pasos"
+            "value": "WHOOP 4.0, movimiento → pasos"
           }
         },
         "fr": {
@@ -184217,7 +184235,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Entrenamiento guardado · %@"
+            "value": "Entrenamiento guardado, %@"
           }
         },
         "fr": {
@@ -187881,7 +187899,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tu ritmo fijado · %@ resp/min"
+            "value": "Tu ritmo fijado, %@ resp/min"
           }
         },
         "fr": {
@@ -188765,7 +188783,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Tu pulsera está vinculada · %lld%% de batería."
+            "value": "Tu pulsera está vinculada, %lld%% de batería."
           }
         },
         "fr": {
@@ -189363,7 +189381,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zona %lld · %@"
+            "value": "Zona %lld, %@"
           }
         },
         "fr": {
@@ -189427,7 +189445,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zona %lld · %lld%%"
+            "value": "Zona %lld, %lld%%"
           }
         },
         "fr": {
@@ -189439,7 +189457,7 @@
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Zona %lld · %lld%%"
+            "value": "Zona %lld, %lld%%"
           }
         },
         "pt-PT": {
@@ -189607,7 +189625,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Con zoom · arrastra para desplazarte"
+            "value": "Con zoom, arrastra para desplazarte"
           }
         },
         "fr": {
@@ -191012,7 +191030,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "prom. %@ · %lldh"
+            "value": "prom. %@, %lldh"
           }
         },
         "fr": {
@@ -191128,7 +191146,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "prom. · %lldd"
+            "value": "prom., %lldd"
           }
         },
         "fr": {
@@ -193026,13 +193044,13 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "est. · %@"
+            "value": "est., %@"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "est. · %@"
+            "value": "est., %@"
           }
         },
         "it": {
@@ -193044,7 +193062,7 @@
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "est. · %@"
+            "value": "est., %@"
           }
         },
         "ru": {
@@ -194958,7 +194976,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "días de bajo estrés · %lldd"
+            "value": "días de bajo estrés, %lldd"
           }
         },
         "fr": {
@@ -195492,7 +195510,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "última ingesta hace unos %@ · %lld ingestas aún en la estimación. Solo una guía aproximada, basada en lo que registraste."
+            "value": "última ingesta hace unos %@, %lld ingestas aún en la estimación. Solo una guía aproximada, basada en lo que registraste."
           }
         },
         "fr": {
@@ -197617,13 +197635,13 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "de 3 · %@"
+            "value": "de 3, %@"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "de 3 · %@"
+            "value": "de 3, %@"
           }
         },
         "it": {
@@ -197635,7 +197653,7 @@
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "de 3 · %@"
+            "value": "de 3, %@"
           }
         },
         "ru": {
@@ -197733,7 +197751,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "bajo demanda · R-R de hoy"
+            "value": "bajo demanda, R-R de hoy"
           }
         },
         "fr": {
@@ -198035,7 +198053,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "pico %@ · %@"
+            "value": "pico %@, %@"
           }
         },
         "fr": {
@@ -198151,7 +198169,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "proyectado · %@"
+            "value": "proyectado, %@"
           }
         },
         "fr": {
@@ -198795,7 +198813,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "lado a lado · %@ antes de cada lectura"
+            "value": "lado a lado, %@ antes de cada lectura"
           }
         },
         "fr": {
@@ -199491,7 +199509,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "desactualizado · %@"
+            "value": "desactualizado, %@"
           }
         },
         "fr": {
@@ -202723,7 +202741,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "± %lld años · una comparación de forma física, no una edad biológica"
+            "value": "± %lld años, una comparación de forma física, no una edad biológica"
           }
         },
         "fr": {
@@ -202775,7 +202793,7 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "± %lld · %@"
+            "value": "± %lld, %@"
           }
         },
         "en": {
@@ -202787,7 +202805,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "± %lld · %@"
+            "value": "± %lld, %@"
           }
         },
         "fr": {
@@ -212265,7 +212283,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Presence · Regular"
+            "value": "Presence, Regular"
           }
         },
         "fr": {
@@ -212277,7 +212295,7 @@
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Presence · Regular"
+            "value": "Presence, Regular"
           }
         },
         "it": {
@@ -212329,37 +212347,37 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Presence · Punching"
+            "value": "Presence, Punching"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "Presence · Punching"
+            "value": "Presence, Punching"
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Presence · Punching"
+            "value": "Presence, Punching"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "Presence · Punching"
+            "value": "Presence, Punching"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "Presence · Punching"
+            "value": "Presence, Punching"
           }
         },
         "ru": {
           "stringUnit": {
             "state": "translated",
-            "value": "Presence · Punching"
+            "value": "Presence, Punching"
           }
         },
         "zh-Hans": {
@@ -212521,7 +212539,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Fuerte 1 s in · 1 s out"
+            "value": "Fuerte 1 s in, 1 s out"
           }
         },
         "fr": {
@@ -212585,7 +212603,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Guiado · rítmico rápido"
+            "value": "Guiado, rítmico rápido"
           }
         },
         "fr": {
@@ -212597,7 +212615,7 @@
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Guiado · rítmico rápido"
+            "value": "Guiado, rítmico rápido"
           }
         },
         "it": {
@@ -212649,7 +212667,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Guiado · rondas + retenções"
+            "value": "Guiado, rondas + retenções"
           }
         },
         "fr": {
@@ -212661,7 +212679,7 @@
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Guiado · rondas + retenções"
+            "value": "Guiado, rondas + retenções"
           }
         },
         "it": {
@@ -212713,7 +212731,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "2 s in · 2 s out · rítmico"
+            "value": "2 s in, 2 s out, rítmico"
           }
         },
         "fr": {
@@ -212725,7 +212743,7 @@
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "2 s in · 2 s out · rítmico"
+            "value": "2 s in, 2 s out, rítmico"
           }
         },
         "it": {
@@ -212777,7 +212795,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Respiración abdominal · pausa suave"
+            "value": "Respiración abdominal, pausa suave"
           }
         },
         "fr": {
@@ -212841,7 +212859,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Más ligero · retención suave más larga"
+            "value": "Más ligero, retención suave más larga"
           }
         },
         "fr": {
@@ -212905,31 +212923,31 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "6 s in · 6 s out · ~5 br/min"
+            "value": "6 s in, 6 s out, ~5 br/min"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "6 s in · 6 s out · ~5 br/min"
+            "value": "6 s in, 6 s out, ~5 br/min"
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "6 s in · 6 s out · ~5 br/min"
+            "value": "6 s in, 6 s out, ~5 br/min"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "6 s in · 6 s out · ~5 br/min"
+            "value": "6 s in, 6 s out, ~5 br/min"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "6 s in · 6 s out · ~5 br/min"
+            "value": "6 s in, 6 s out, ~5 br/min"
           }
         },
         "ru": {
@@ -212969,7 +212987,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Respiración océano · garganta suave"
+            "value": "Respiración océano, garganta suave"
           }
         },
         "fr": {
@@ -213033,7 +213051,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Guiado · pulsos abdominales rápidos"
+            "value": "Guiado, pulsos abdominales rápidos"
           }
         },
         "fr": {
@@ -213097,7 +213115,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Inhala 4 · mantén 7 · exhala 8"
+            "value": "Inhala 4, mantén 7, exhala 8"
           }
         },
         "fr": {
@@ -213161,7 +213179,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Guiado · conectado continuo"
+            "value": "Guiado, conectado continuo"
           }
         },
         "fr": {
@@ -213225,7 +213243,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Nasal suave · ligera falta de aire"
+            "value": "Nasal suave, ligera falta de aire"
           }
         },
         "fr": {
@@ -213289,7 +213307,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Lento in · retenções suaves · lento out"
+            "value": "Lento in, retenções suaves, lento out"
           }
         },
         "fr": {
@@ -213301,7 +213319,7 @@
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "Lento in · retenções suaves · lento out"
+            "value": "Lento in, retenções suaves, lento out"
           }
         },
         "it": {
@@ -213353,7 +213371,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Nadi Shodhana · ciclo izq/der"
+            "value": "Nadi Shodhana, ciclo izq/der"
           }
         },
         "fr": {
@@ -213411,37 +213429,37 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "CCB · ~3,8 s / 3,8 s · ~7,8 br/min"
+            "value": "CCB, ~3,8 s / 3,8 s, ~7,8 br/min"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "CCB · ~3,8 s / 3,8 s · ~7,8 br/min"
+            "value": "CCB, ~3,8 s / 3,8 s, ~7,8 br/min"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "CCB · ~3,8 s / 3,8 s · ~7,8 br/min"
+            "value": "CCB, ~3,8 s / 3,8 s, ~7,8 br/min"
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "CCB · ~3,8 s / 3,8 s · ~7,8 br/min"
+            "value": "CCB, ~3,8 s / 3,8 s, ~7,8 br/min"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "CCB · ~3,8 s / 3,8 s · ~7,8 br/min"
+            "value": "CCB, ~3,8 s / 3,8 s, ~7,8 br/min"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "CCB · ~3,8 s / 3,8 s · ~7,8 br/min"
+            "value": "CCB, ~3,8 s / 3,8 s, ~7,8 br/min"
           }
         },
         "ru": {
@@ -213475,37 +213493,37 @@
         "de": {
           "stringUnit": {
             "state": "translated",
-            "value": "CCB · ~2,4 s / 2,4 s · ~12,4 br/min"
+            "value": "CCB, ~2,4 s / 2,4 s, ~12,4 br/min"
           }
         },
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "CCB · ~2,4 s / 2,4 s · ~12,4 br/min"
+            "value": "CCB, ~2,4 s / 2,4 s, ~12,4 br/min"
           }
         },
         "fr": {
           "stringUnit": {
             "state": "translated",
-            "value": "CCB · ~2,4 s / 2,4 s · ~12,4 br/min"
+            "value": "CCB, ~2,4 s / 2,4 s, ~12,4 br/min"
           }
         },
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "CCB · ~2,4 s / 2,4 s · ~12,4 br/min"
+            "value": "CCB, ~2,4 s / 2,4 s, ~12,4 br/min"
           }
         },
         "it": {
           "stringUnit": {
             "state": "translated",
-            "value": "CCB · ~2,4 s / 2,4 s · ~12,4 br/min"
+            "value": "CCB, ~2,4 s / 2,4 s, ~12,4 br/min"
           }
         },
         "pl": {
           "stringUnit": {
             "state": "translated",
-            "value": "CCB · ~2,4 s / 2,4 s · ~12,4 br/min"
+            "value": "CCB, ~2,4 s / 2,4 s, ~12,4 br/min"
           }
         },
         "ru": {
@@ -213545,7 +213563,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "CCB · ~1,9 s / 1,9 s · empujar"
+            "value": "CCB, ~1,9 s / 1,9 s, empujar"
           }
         },
         "fr": {
@@ -213609,7 +213627,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Exhalación forzada · retenciones · lento in/out"
+            "value": "Exhalación forzada, retenciones, lento in/out"
           }
         },
         "fr": {
@@ -213673,7 +213691,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "Inhalación lenta · retención suave · exhalación larga"
+            "value": "Inhalación lenta, retención suave, exhalación larga"
           }
         },
         "fr": {
@@ -216849,7 +216867,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "CTL · Forma física"
+            "value": "CTL, Forma física"
           }
         },
         "fr": {
@@ -216867,7 +216885,7 @@
         "pt-PT": {
           "stringUnit": {
             "state": "translated",
-            "value": "CTL · Forma física"
+            "value": "CTL, Forma física"
           }
         },
         "pl": {
@@ -216901,7 +216919,7 @@
         "es": {
           "stringUnit": {
             "state": "translated",
-            "value": "ATL · Fatiga"
+            "value": "ATL, Fatiga"
           }
         },
         "fr": {
