@@ -103,7 +103,7 @@ final class RepCounterLive: ObservableObject {
 
     /// End the set. When the wearer marked repetitions for a chosen exercise, fit the settings to that
     /// count and remember them for next time.
-    func finish() {
+    func finish(weightKg: Double = 0) {
         guard isCounting else { return }
         isCounting = false
         guard secondsReceived > 0 else { return }
@@ -124,6 +124,12 @@ final class RepCounterLive: ObservableObject {
         }
         sets.insert(SetResult(name: exercise?.name ?? "", reps: reps, marked: marks, seconds: secondsReceived),
                     at: 0)
+        if reps > 0 {
+            RepSetStore.append(RepSetRecord(date: Date(), exerciseId: exercise?.id ?? "",
+                                            name: exercise?.name ?? "", muscle: exercise?.muscle ?? "",
+                                            secondary: exercise?.secondary ?? [], reps: reps,
+                                            seconds: secondsReceived, weightKg: weightKg))
+        }
     }
 
     /// Called for every frame the collector sees; ignores anything that is not a motion frame.
@@ -179,6 +185,7 @@ struct RepCounterView: View {
     @State private var startFailed = false
     @State private var exercise: LibraryExercise?
     @State private var choosing = false
+    @State private var weightKg: Double = 0
 
     var body: some View {
         ScreenScaffold(title: "Rep counter") {
@@ -186,6 +193,23 @@ struct RepCounterView: View {
             setCard
             motionCard
             if !counter.sets.isEmpty { setsCard }
+            NavigationLink {
+                MuscleLoadView()
+            } label: {
+                SummaryCard(symbol: "figure.strengthtraining.traditional", title: "Muscle load",
+                            showsChevron: true) {
+                    Text("Sets per muscle group this week, and your history.")
+                        .font(.system(size: 16))
+                        .foregroundStyle(SummaryStyle.primary)
+                        .fixedSize(horizontal: false, vertical: true)
+                        .padding(.top, 8)
+                }
+                .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+        }
+        .onChange(of: exercise) { chosen in
+            weightKg = chosen.map { RepSetStore.lastWeight(for: $0.id) } ?? 0
         }
         .sheet(isPresented: $choosing) {
             ExercisePickerView(selection: $exercise)
@@ -197,7 +221,7 @@ struct RepCounterView: View {
             if connected { listen() } else { counter.stopListening() }
         }
         .onDisappear {
-            if counter.isCounting { counter.finish() }
+            if counter.isCounting { finish() }
             if counter.isListening {
                 counter.stopListening()
                 Task { await model.ble.stopGroundTruthRawCapture() }
@@ -213,19 +237,22 @@ struct RepCounterView: View {
         } label: {
             SummaryCard(symbol: "dumbbell.fill", title: "Exercise", showsChevron: true) {
                 if let exercise {
-                    HStack(alignment: .center, spacing: 14) {
+                    VStack(alignment: .leading, spacing: 12) {
                         ExerciseAnimation(exercise: exercise)
-                            .frame(width: 120)
-                        VStack(alignment: .leading, spacing: 4) {
+                        VStack(alignment: .leading, spacing: 3) {
                             Text(exercise.name)
-                                .font(.system(size: 17, weight: .medium))
+                                .font(.system(size: 21, weight: .medium))
                                 .foregroundStyle(SummaryStyle.primary)
                                 .fixedSize(horizontal: false, vertical: true)
+                            Text(MuscleGroups.title(exercise.muscle))
+                                .font(.system(size: 16))
+                                .foregroundStyle(SummaryStyle.tint)
                             Text(RepProfileStore.profile(for: exercise.id) == nil ? "Not learned yet" : "Learned")
-                                .font(.system(size: 13))
+                                .font(.system(size: 15))
                                 .foregroundStyle(SummaryStyle.secondary)
                         }
-                        Spacer(minLength: 0)
+                        MuscleFigure(levels: exercise.muscleLevels)
+                            .frame(height: 220)
                     }
                     .padding(.top, 12)
                 } else {
@@ -265,6 +292,8 @@ struct RepCounterView: View {
                     .buttonStyle(.plain)
                     .padding(.top, 14)
                 }
+                weightRow
+                    .padding(.top, 14)
                 Button {
                     if counter.isCounting { finish() } else { start() }
                 } label: {
@@ -281,11 +310,36 @@ struct RepCounterView: View {
                 .buttonStyle(.plain)
                 .disabled(!live.encryptedBond && !counter.isCounting)
                 .opacity(!live.encryptedBond && !counter.isCounting ? 0.4 : 1)
-                .padding(.top, counter.isCounting ? 4 : 14)
+                .padding(.top, 4)
             }
             .frame(maxWidth: .infinity)
             .padding(.top, 8)
         }
+    }
+
+    /// The weight on the bar or in the hand, in steps of 2.5 kg. Optional; it only labels the set.
+    private var weightRow: some View {
+        HStack(spacing: 12) {
+            Text("Weight")
+                .font(.system(size: 17))
+                .foregroundStyle(SummaryStyle.primary)
+            Spacer()
+            weightButton("minus") { weightKg = max(0, weightKg - 2.5) }
+            SummaryValue(text: weightKg.formatted(.number.precision(.fractionLength(0...1))), unit: "kg", size: 20)
+                .frame(minWidth: 76)
+            weightButton("plus") { weightKg = min(500, weightKg + 2.5) }
+        }
+    }
+
+    private func weightButton(_ symbol: String, action: @escaping () -> Void) -> some View {
+        Button(action: action) {
+            Image(systemName: symbol)
+                .font(.system(size: 17, weight: .semibold))
+                .foregroundStyle(SummaryStyle.primary)
+                .frame(width: 44, height: 44)
+                .background(Circle().fill(StrandPalette.surfaceInset))
+        }
+        .buttonStyle(.plain)
     }
 
     private var motionCard: some View {
@@ -381,7 +435,8 @@ struct RepCounterView: View {
     }
 
     private func finish() {
-        counter.finish()
+        counter.finish(weightKg: weightKg)
+        if let exercise { RepSetStore.setLastWeight(weightKg, for: exercise.id) }
     }
 }
 

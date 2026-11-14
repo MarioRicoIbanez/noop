@@ -75,6 +75,10 @@ packages:
   ZIPFoundation:
     url: https://github.com/weichsel/ZIPFoundation.git
     exactVersion: 0.9.20
+  # Body figures with per-muscle fills for the exercise library and the muscle-load view (MIT).
+  MuscleMap:
+    url: https://github.com/melihcolpan/MuscleMap
+    exactVersion: 1.9.0
 targets:
   Strand:
     type: application
@@ -369,6 +373,7 @@ targets:
       - package: MarkdownUI
       - package: ZIPFoundation
       - package: PolarProtocol
+      - package: MuscleMap
       - target: NOOPiOSWidgets
       # Embed the watchOS app so the iPhone app carries it (NOOP.app/Watch/NOOPWatch.app). A watch app
       # installs by riding inside its iOS companion; without this it would never reach a paired watch.

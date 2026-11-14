@@ -10,6 +10,15 @@
       }
     },
     {
+      "identity" : "musclemap",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/melihcolpan/MuscleMap",
+      "state" : {
+        "revision" : "3aa662bd5147463b20d523f95d74e1a12c7c8b2e",
+        "version" : "1.9.0"
+      }
+    },
+    {
       "identity" : "networkimage",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/gonzalezreal/NetworkImage",

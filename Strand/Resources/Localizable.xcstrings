@@ -1,6 +1,11 @@
 {
   "sourceLanguage": "en",
   "strings": {
+    "Shoulders": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Shoulders"}}, "es": {"stringUnit": {"state": "translated", "value": "Hombros"}}}},
+    "Middle back": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Middle back"}}, "es": {"stringUnit": {"state": "translated", "value": "Espalda media"}}}},
+    "Muscle load": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Muscle load"}}, "es": {"stringUnit": {"state": "translated", "value": "Carga muscular"}}}},
+    "Finish a set in the rep counter and it shows up here.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Finish a set in the rep counter and it shows up here."}}, "es": {"stringUnit": {"state": "translated", "value": "Termina una serie en el contador y aparecerá aquí."}}}},
+    "Sets per muscle group this week, and your history.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Sets per muscle group this week, and your history."}}, "es": {"stringUnit": {"state": "translated", "value": "Series por grupo muscular esta semana y tu historial."}}}},
     "Your WHOOP history from a data export (.zip).": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Your WHOOP history from a data export (.zip)."}}, "es": {"stringUnit": {"state": "translated", "value": "Tu historial de WHOOP desde una exportación de datos (.zip)."}}}},
     "Your Apple Health export (export.zip): sleep, heart rate, steps and workouts.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Your Apple Health export (export.zip): sleep, heart rate, steps and workouts."}}, "es": {"stringUnit": {"state": "translated", "value": "Tu exportación de Apple Health (export.zip): sueño, pulso, pasos y entrenamientos."}}}},
     "Your Mi Band history from the Mi Fitness folder, zipped.": {"localizations": {"en": {"stringUnit": {"state": "translated", "value": "Your Mi Band history from the Mi Fitness folder, zipped."}}, "es": {"stringUnit": {"state": "translated", "value": "Tu historial de Mi Band desde la carpeta de Mi Fitness, comprimida."}}}},
